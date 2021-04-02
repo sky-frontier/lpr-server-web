@@ -40,3 +40,6 @@ body,
   height: 100%;
   padding: 2%;
 }
+div.react-tel-input input.form-control {
+  width: 100%;
+}
