@@ -1,0 +1,33 @@
+html,
+body,
+#root,
+.app,
+.app > div {
+  height: 100%;
+}
+.invisible {
+  display: none;
+}
+#content-body {
+  padding-top: 70px;
+  background-color: #ebeff2;
+  height: 100%;
+}
+@media only screen and (max-width: 990px) {
+  #content-body {
+    padding-top: 55px;
+  }
+}
+.content {
+  padding: 20px 3% 0%;
+}
+.rightFlex {
+  display: flex;
+  justify-content: flex-end;
+}
+.clickThrough {
+  pointer-events: none;
+}
+.clickAble {
+  pointer-events: auto;
+}
