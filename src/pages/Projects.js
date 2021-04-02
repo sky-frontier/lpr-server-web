@@ -15,7 +15,7 @@ function createData(projectName, location, infomation) {
   return { projectName, location, infomation };
 }
 
-export default function Projects({ match }) {
+export function Projects({ match }) {
   const storeContext = useContext(store);
   const globalState = storeContext.state;
   let history = useHistory();
@@ -95,7 +95,7 @@ export default function Projects({ match }) {
       <div className="content">
         <Form inline className="rightFlex">
           <Row>
-            <Col xs="auto">
+            <Col sm="auto">
               <Form.Control
                 id="name"
                 placeholder="Name"
@@ -103,7 +103,7 @@ export default function Projects({ match }) {
                 value={state.name}
               />
             </Col>
-            <Col xs="auto">
+            <Col sm="auto">
               <Form.Control
                 id="location"
                 placeholder="Location"
@@ -111,12 +111,12 @@ export default function Projects({ match }) {
                 value={state.location}
               />
             </Col>
-            <Col xs="auto">
+            <Col sm="auto">
               <Button type="button" onClick={filter}>
                 Search
               </Button>
             </Col>
-            <Col xs="auto">
+            <Col sm="auto">
               <Button class="btn btn-success" type="button" onClick={insert}>
                 Add +
               </Button>
@@ -157,3 +157,5 @@ export default function Projects({ match }) {
     </div>
   );
 }
+
+export default { Projects };

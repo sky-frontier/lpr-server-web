@@ -25,9 +25,18 @@ body,
   display: flex;
   justify-content: flex-end;
 }
+.centerFlex {
+  display: flex;
+  justify-content: center;
+}
 .clickThrough {
   pointer-events: none;
 }
 .clickAble {
   pointer-events: auto;
+}
+.tabModal {
+  background-color: white;
+  height: 100%;
+  padding: 2%;
 }

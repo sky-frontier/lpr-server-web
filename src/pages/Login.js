@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { store } from "../store.js";
 import { useHistory } from "react-router-dom";
-export default function Login() {
+export function Login() {
   const storeContext = useContext(store);
   const globalState = storeContext.state;
   const { dispatch } = storeContext;
@@ -129,3 +129,5 @@ export default function Login() {
     </div>
   );
 }
+
+export default { Login };

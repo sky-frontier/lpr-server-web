@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { Form, Row, Col, Button } from "react-bootstrap";
 
-export default function ProjectForm(props) {
+export function ProjectForm(props) {
   let ID = props.ID;
   const [state, setState] = useState({
     name: "",
@@ -52,30 +52,34 @@ export default function ProjectForm(props) {
   }, [dummy]);
 
   return (
-    <Form>
-      <Form.Group as={Row} controlId="formHorizontalEmail">
-        <Form.Label column sm={2}>
-          Email
-        </Form.Label>
-        <Col xs="auto">
-          <Form.Control type="email" placeholder="Email" />
-        </Col>
-      </Form.Group>
+    <div>
+      <Form>
+        <Form.Group as={Row}>
+          <Form.Label column sm={4}>
+            Project Name
+          </Form.Label>
+          <Col sm={4}>
+            <Form.Control placeholder="Email" />
+          </Col>
+        </Form.Group>
 
-      <Form.Group as={Row} controlId="formHorizontalPassword">
-        <Form.Label column sm={2}>
-          Password
-        </Form.Label>
-        <Col xs="auto">
-          <Form.Control type="password" placeholder="Password" />
-        </Col>
-      </Form.Group>
+        <Form.Group as={Row}>
+          <Form.Label column sm={4}>
+            Password
+          </Form.Label>
+          <Col sm={4}>
+            <Form.Control placeholder="Password" />
+          </Col>
+        </Form.Group>
 
-      <Form.Group as={Row}>
-        <Col sm={{ span: 10, offset: 2 }}>
-          <Button type="button">Update</Button>
-        </Col>
-      </Form.Group>
-    </Form>
+        <Form.Group as={Row}>
+          <Col sm={{ span: 8, offset: 7 }}>
+            <Button type="button">Update</Button>
+          </Col>
+        </Form.Group>
+      </Form>
+    </div>
   );
 }
+
+export default { ProjectForm };

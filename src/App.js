@@ -28,7 +28,7 @@ class DebugRouter extends Router {
   }
 }
 
-export default function App() {
+export function App() {
   return (
     // <DebugRouter>
     <Router>
@@ -36,10 +36,9 @@ export default function App() {
         <PrivateRoute path="/home">
           <Home />
         </PrivateRoute>
-        <PrivateRoute
-          path="/project/:id"
-          component={EditProject}
-        ></PrivateRoute>
+        <PrivateRoute path="/project/:projectId">
+          <EditProject />
+        </PrivateRoute>
         <PrivateRoute path="/project">
           <Projects />
         </PrivateRoute>
@@ -59,17 +58,19 @@ function PrivateRoute({ children, ...rest }) {
   return (
     <Route
       {...rest}
-      render={({ location }) =>
+      render={(props) =>
         auth ? (
           <div className="h-100">
             <NavBar />
-            <div id="content-body">{children}</div>
+            <div id="content-body">
+              {React.cloneElement(children, { params: props.match.params })}
+            </div>
           </div>
         ) : (
           <Redirect
             to={{
               pathname: "/",
-              state: { from: location }
+              state: { from: props.location }
             }}
           />
         )
@@ -100,3 +101,5 @@ function PublicRoute({ children, ...rest }) {
     />
   );
 }
+
+export default App;

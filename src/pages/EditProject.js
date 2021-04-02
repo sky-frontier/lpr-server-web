@@ -1,5 +1,52 @@
 import { ProjectForm } from "../components/index.js";
-
-export default function EditProject({ match }) {
-  return <ProjectForm ID={match.params.id} />;
+import { Row, Col } from "react-bootstrap";
+import Nav from "react-bootstrap/Nav";
+import Tab from "react-bootstrap/Tab";
+export function EditProject(props) {
+  //return <ProjectForm ID={props.params.projectId} />;
+  return (
+    <div className="tabModal">
+      {/*<PageHeader>
+        Edit Project
+      </PageHeader>*/}
+      <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+        <Row>
+          <Col xs="auto">
+            <Nav variant="pills" className="flex-column">
+              <Nav.Item>
+                <Nav.Link eventKey="first">Infomation</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="second">Business</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="third">Devices</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="fourth">LED Config</Nav.Link>
+              </Nav.Item>
+            </Nav>
+          </Col>
+          <Col sm={9}>
+            <Tab.Content>
+              <Tab.Pane eventKey="first">
+                <ProjectForm ID={props.params.projectId} />
+              </Tab.Pane>
+              <Tab.Pane eventKey="second">
+                <div>Second</div>
+              </Tab.Pane>
+              <Tab.Pane eventKey="third">
+                <div>Third</div>
+              </Tab.Pane>
+              <Tab.Pane eventKey="fourth">
+                <div>Fourth</div>
+              </Tab.Pane>
+            </Tab.Content>
+          </Col>
+        </Row>
+      </Tab.Container>
+    </div>
+  );
 }
+
+export default { EditProject };

@@ -12,7 +12,7 @@ import { store } from "../store.js";
 import { useContext, useState } from "react";
 import { useHistory, Link } from "react-router-dom";
 
-export default function NavBar() {
+export function NavBar() {
   const storeContext = useContext(store);
   const globalState = storeContext.state;
   const [toggled, setToggled] = useState(true);
@@ -105,3 +105,5 @@ export default function NavBar() {
     </div>
   );
 }
+
+export default { NavBar };
