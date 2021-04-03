@@ -43,3 +43,15 @@ body,
 div.react-tel-input input.form-control {
   width: 100%;
 }
+.iconButton {
+  background-color: transparent;
+  border-style: none;
+}
+.iconButton:hover {
+  background-color: transparent;
+  border-style: none;
+}
+.iconButton:active {
+  background-color: transparent;
+  border-style: none;
+}

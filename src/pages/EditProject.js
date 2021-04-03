@@ -3,7 +3,6 @@ import { Row, Col } from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
 export function EditProject(props) {
-  //return <ProjectForm ID={props.params.projectId} />;
   return (
     <div className="tabModal">
       {/*<PageHeader>

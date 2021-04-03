@@ -5,14 +5,17 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
+import IconButton from "@material-ui/core/IconButton";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
-import { useHistory } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 
-function createData(projectName, location, infomation) {
-  return { projectName, location, infomation };
+import { ProjectDelModal, ProjectAddModal } from "../components/index.js";
+
+function createData(id, projectName, location, infomation) {
+  return { id, projectName, location, infomation };
 }
 
 export function Projects({ match }) {
@@ -21,6 +24,11 @@ export function Projects({ match }) {
   let history = useHistory();
   const [initialRows, setInitialRows] = useState([]);
   const [rows, setRows] = useState([]);
+  const [toggle, setToggle] = useState({
+    delete: false,
+    add: false
+  });
+  const [curID, setCurID] = useState("");
   const [state, setState] = useState({
     name: "",
     location: ""
@@ -52,14 +60,17 @@ export function Projects({ match }) {
       console.error("There was an error!", error);
     });*/
     let res = [
-      createData("Project 1", "Sample", "Sample"),
-      createData("Project 2", "Sample", "Sample"),
-      createData("Project 3", "Sample", "Sample"),
-      createData("Project 4", "Sample", "Sample")
+      createData("1", "Project 1", "Sample", "Sample"),
+      createData("2", "Project 2", "Sample", "Sample"),
+      createData("3", "Project 3", "Sample", "Sample"),
+      createData("4", "Project 4", "Sample", "Sample")
     ];
     setInitialRows(res);
-    setRows(res);
   }, [dummy]);
+
+  useEffect(() => {
+    filter();
+  }, [initialRows]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -69,9 +80,23 @@ export function Projects({ match }) {
     }));
   };
 
+  const toggleModal = (modal) => {
+    let prevVal = toggle[modal];
+    setToggle((prevState) => ({
+      ...prevState,
+      [modal]: !prevVal
+    }));
+  };
+
+  const activateModal = (projectID) => {
+    setCurID(projectID);
+    toggleModal("delete");
+  };
+
   const filter = (e) => {
     let { name, location } = state;
     let curRows = initialRows;
+    console.log(curRows);
     setRows(
       curRows.filter(
         (row) =>
@@ -79,7 +104,6 @@ export function Projects({ match }) {
           row["location"].indexOf(location) >= 0
       )
     );
-    console.log(rows);
   };
 
   const insert = (e) => {
@@ -90,8 +114,41 @@ export function Projects({ match }) {
     history.push("/project/" + ID);
   };
 
+  const edit = (projectID) => {
+    history.push("/project/" + projectID);
+  };
+
+  const del = async (projectID) => {
+    /*
+    API for removing 
+    */
+    console.log(projectID);
+    let curRows = initialRows;
+    console.log(curRows.filter((row) => projectID !== row["id"]));
+    setInitialRows(curRows.filter((row) => projectID !== row["id"]));
+    toggleModal("delete");
+  };
+
   return (
     <div>
+      <ProjectDelModal
+        hide={toggle.delete}
+        success={() => {
+          del(curID);
+        }}
+        toggleModal={() => {
+          toggleModal("delete");
+        }}
+      />
+      <ProjectAddModal
+        hide={toggle.add}
+        success={() => {
+          insert();
+        }}
+        toggleModal={() => {
+          toggleModal("add");
+        }}
+      />
       <div className="content">
         <Form inline className="rightFlex">
           <Row>
@@ -120,7 +177,9 @@ export function Projects({ match }) {
               <Button
                 className="btn btn-success"
                 type="button"
-                onClick={insert}
+                onClick={() => {
+                  toggleModal("add");
+                }}
               >
                 Add +
               </Button>
@@ -148,9 +207,16 @@ export function Projects({ match }) {
                   <TableCell align="left">{row.location}</TableCell>
                   <TableCell align="left">{row.infomation}</TableCell>
                   <TableCell align="right">
-                    <PencilSquare size={21} color="royalblue" />
-                    &nbsp;
-                    <Trash color="red" size={21} />
+                    <IconButton onClick={() => edit(row.id)}>
+                      <PencilSquare
+                        data-value={row.id}
+                        size={21}
+                        color="royalblue"
+                      />
+                    </IconButton>
+                    <IconButton onClick={() => activateModal(row.id)}>
+                      <Trash color="red" size={21} />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
