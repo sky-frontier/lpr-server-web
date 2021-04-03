@@ -5,6 +5,7 @@ import "react-phone-input-2/lib/style.css";
 
 export function ProjectForm(props) {
   let ID = props.ID;
+  const [validated, setValidated] = useState(false);
   const [state, setState] = useState({
     name: "",
     type: "",
@@ -43,9 +44,9 @@ export function ProjectForm(props) {
       console.error("There was an error!", error);
     });*/
     let res = {
-      name: "Project 1",
+      name: "Project",
       type: "Sample",
-      location: "Bukit Batok",
+      location: "Sample",
       contact: "65987654321",
       MACoy: "Sample",
       equipManu: "Sample"
@@ -61,18 +62,31 @@ export function ProjectForm(props) {
     }));
   };
 
-  const update = (e) => {};
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setValidated(true);
+    if (form.checkValidity()) update();
+  };
+
+  const update = () => {
+    /* Pending API for project details update*/
+  };
 
   return (
     <div>
-      <Form>
+      <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Form.Group as={Row}>
           <Form.Label column sm={4}>
             Project ID
           </Form.Label>
-          <Form.Label column sm={4}>
-            {ID}
-          </Form.Label>
+          <Col sm={4}>
+            <Form.Control type="text" placeholder={ID} readOnly />
+          </Col>
         </Form.Group>
 
         <Form.Group as={Row}>
@@ -81,11 +95,16 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col sm={4}>
             <Form.Control
+              required
               placeholder="Name"
               id="name"
+              name="name"
               value={state.name}
               onChange={handleChange}
             />
+            <Form.Control.Feedback type="invalid">
+              Project Name is a required field.
+            </Form.Control.Feedback>
           </Col>
         </Form.Group>
 
@@ -95,11 +114,16 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col sm={4}>
             <Form.Control
+              required
               placeholder="Type"
               id="type"
+              name="type"
               value={state.type}
               onChange={handleChange}
             />
+            <Form.Control.Feedback type="invalid">
+              Project Type is a required field.
+            </Form.Control.Feedback>
           </Col>
         </Form.Group>
 
@@ -109,11 +133,16 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col sm={4}>
             <Form.Control
+              required
               placeholder="Location"
               id="location"
+              name="location"
               value={state.location}
               onChange={handleChange}
             />
+            <Form.Control.Feedback type="invalid">
+              Location is a required field.
+            </Form.Control.Feedback>
           </Col>
         </Form.Group>
 
@@ -123,11 +152,16 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col sm={4}>
             <Form.Control
+              required
               placeholder="Equipment Manufacturer"
               id="equipManu"
+              name="equipManu"
               value={state.equipManu}
               onChange={handleChange}
             />
+            <Form.Control.Feedback type="invalid">
+              Equipment Manufacturer is a required field.
+            </Form.Control.Feedback>
           </Col>
         </Form.Group>
 
@@ -137,11 +171,16 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col sm={4}>
             <Form.Control
+              required
               placeholder="MA Company"
               id="MACoy"
+              name="MACoy"
               value={state.MACoy}
               onChange={handleChange}
             />
+            <Form.Control.Feedback type="invalid">
+              MA Company is a required field.
+            </Form.Control.Feedback>
           </Col>
         </Form.Group>
 
@@ -149,21 +188,30 @@ export function ProjectForm(props) {
           <Form.Label column sm={4}>
             Contact No.
           </Form.Label>
-          <Col sm={4}>
+          <Form.Label column sm={4}>
             <PhoneInput
+              inputProps={{
+                required: true
+              }}
               id="contactInput"
+              name="contact"
               country={"sg"}
               value={state.contact}
               onChange={() => {}}
+              isValid={(value, country) => {
+                if (value.length === 0) {
+                  return false;
+                } else {
+                  return true;
+                }
+              }}
             />
-          </Col>
+          </Form.Label>
         </Form.Group>
 
         <Form.Group as={Row}>
           <Col sm={{ span: 8, offset: 7 }}>
-            <Button type="button" onClick={update}>
-              Update
-            </Button>
+            <Button type="submit">Update</Button>
           </Col>
         </Form.Group>
       </Form>

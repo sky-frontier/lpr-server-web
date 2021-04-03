@@ -52,10 +52,10 @@ export function Projects({ match }) {
       console.error("There was an error!", error);
     });*/
     let res = [
-      createData("Project 1", "Bukit Gombak", "gate"),
-      createData("Project 2", "Bukit Batok", "gate"),
-      createData("Project 3", "Chua Chu Kang", "gate"),
-      createData("Project 4", "Lim Chu Batok", "gate")
+      createData("Project 1", "Sample", "Sample"),
+      createData("Project 2", "Sample", "Sample"),
+      createData("Project 3", "Sample", "Sample"),
+      createData("Project 4", "Sample", "Sample")
     ];
     setInitialRows(res);
     setRows(res);
@@ -117,7 +117,11 @@ export function Projects({ match }) {
               </Button>
             </Col>
             <Col sm="auto">
-              <Button class="btn btn-success" type="button" onClick={insert}>
+              <Button
+                className="btn btn-success"
+                type="button"
+                onClick={insert}
+              >
                 Add +
               </Button>
             </Col>
