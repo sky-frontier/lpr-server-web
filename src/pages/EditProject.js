@@ -1,4 +1,4 @@
-import { ProjectForm } from "../components/index.js";
+import { ProjectForm, BusinessDetails } from "../components/index.js";
 import { Row, Col } from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
@@ -32,7 +32,7 @@ export function EditProject(props) {
                 <ProjectForm ID={props.params.projectId} />
               </Tab.Pane>
               <Tab.Pane eventKey="second">
-                <div>Second</div>
+                <BusinessDetails ID={props.params.projectId} />
               </Tab.Pane>
               <Tab.Pane eventKey="third">
                 <div>Third</div>

@@ -1,4 +1,5 @@
 import { NavBar } from "./NavBar";
 import { ProjectForm } from "./ProjectForm";
-import { ProjectDelModal, ProjectAddModal } from "./ProjectModal";
-export { NavBar, ProjectForm, ProjectDelModal, ProjectAddModal };
+import { ProjectModal } from "./ProjectModal";
+import { BusinessDetails } from "./BusinessDetails";
+export { NavBar, ProjectForm, ProjectModal, BusinessDetails };

@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, Row, Col, Button } from "react-bootstrap";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 
-export function ProjectForm(props) {
+export function BusinessDetails(props) {
   let ID = props.ID;
   const [validated, setValidated] = useState(false);
   const [state, setState] = useState({
@@ -115,15 +113,12 @@ export function ProjectForm(props) {
           <Col sm={4}>
             <Form.Control
               required
-              as="select"
+              placeholder="Type"
               id="type"
               name="type"
               value={state.type}
               onChange={handleChange}
-            >
-              <option value={""}>--Select Type--</option>
-              <option>Sample</option>
-            </Form.Control>
+            />
             <Form.Control.Feedback type="invalid">
               Project Type is a required field.
             </Form.Control.Feedback>
@@ -188,31 +183,6 @@ export function ProjectForm(props) {
         </Form.Group>
 
         <Form.Group as={Row}>
-          <Form.Label column sm={4}>
-            Contact No.
-          </Form.Label>
-          <Form.Label column sm={4}>
-            <PhoneInput
-              inputProps={{
-                required: true
-              }}
-              id="contactInput"
-              name="contact"
-              country={"sg"}
-              value={state.contact}
-              onChange={() => {}}
-              isValid={(value, country) => {
-                if (value.length === 0) {
-                  return false;
-                } else {
-                  return true;
-                }
-              }}
-            />
-          </Form.Label>
-        </Form.Group>
-
-        <Form.Group as={Row}>
           <Col sm={{ span: 8, offset: 7 }}>
             <Button type="submit">Update</Button>
           </Col>
@@ -222,4 +192,4 @@ export function ProjectForm(props) {
   );
 }
 
-export default { ProjectForm };
+export default { BusinessDetails };

@@ -10,9 +10,9 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
-import { Redirect, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-import { ProjectDelModal, ProjectAddModal } from "../components/index.js";
+import { ProjectModal } from "../components/index.js";
 
 function createData(id, projectName, location, infomation) {
   return { id, projectName, location, infomation };
@@ -131,7 +131,7 @@ export function Projects({ match }) {
 
   return (
     <div>
-      <ProjectDelModal
+      <ProjectModal
         hide={toggle.delete}
         success={() => {
           del(curID);
@@ -139,8 +139,10 @@ export function Projects({ match }) {
         toggleModal={() => {
           toggleModal("delete");
         }}
+        title="Confirm Deletion"
+        body="Delete this project?"
       />
-      <ProjectAddModal
+      <ProjectModal
         hide={toggle.add}
         success={() => {
           insert();
@@ -148,6 +150,8 @@ export function Projects({ match }) {
         toggleModal={() => {
           toggleModal("add");
         }}
+        title="Confirm Addition"
+        body="Add a new project?"
       />
       <div className="content">
         <Form inline className="rightFlex">
