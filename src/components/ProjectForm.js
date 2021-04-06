@@ -114,6 +114,7 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col sm={4}>
             <Form.Control
+              custom
               required
               as="select"
               id="type"

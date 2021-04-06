@@ -55,14 +55,6 @@ div.react-tel-input input.form-control {
   background-color: transparent;
   border-style: none;
 }
-
-.was-validated select.validDropdown:valid {
-  border-color: #ced4da;
-  background-image: none;
-  box-shadow: none;
-}
-form.was-validated select.validDropdown:invalid {
-  border-color: #dc3545;
-  background-image: none;
-  box-shadow: #dc3545;
+.react-numeric-input {
+  width: 100%;
 }
