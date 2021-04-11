@@ -1,13 +1,14 @@
-import { ProjectForm, BusinessDetails } from "../components/index.js";
+import {
+  ProjectForm,
+  BusinessDetails,
+  Devices
+} from "./projectSubPages/index.js";
 import { Row, Col } from "react-bootstrap";
 import Nav from "react-bootstrap/Nav";
 import Tab from "react-bootstrap/Tab";
 export function EditProject(props) {
   return (
     <div className="tabModal">
-      {/*<PageHeader>
-        Edit Project
-      </PageHeader>*/}
       <Tab.Container id="left-tabs-example" defaultActiveKey="first">
         <Row>
           <Col xs="auto">
@@ -35,7 +36,7 @@ export function EditProject(props) {
                 <BusinessDetails ID={props.params.projectId} />
               </Tab.Pane>
               <Tab.Pane eventKey="third">
-                <div>Third</div>
+                <Devices ID={props.params.projectId} />
               </Tab.Pane>
               <Tab.Pane eventKey="fourth">
                 <div>Fourth</div>

@@ -20,6 +20,9 @@ body,
   .cardDiv {
     margin-left: 30px;
   }
+  #gateHeader {
+    display: none;
+  }
 }
 .content {
   padding: 20px 3% 0%;
@@ -74,7 +77,7 @@ div.react-tel-input input.form-control {
 #delGate {
   position: absolute;
   right: 0;
-  top: 0;
+  top: 10px;
   z-index: 9;
 }
 #gateHeader {

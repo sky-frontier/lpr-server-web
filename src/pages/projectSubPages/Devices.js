@@ -1,4 +1,4 @@
-import { Card, Button, CardDeck } from "react-bootstrap";
+import { Card, Button, CardDeck, ButtonGroup } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { DevicesModal } from "../../components/index.js";
 import IconButton from "@material-ui/core/IconButton";
@@ -9,6 +9,11 @@ export function Devices(props) {
   let ID = props.ID;
   const [dummy, setDummy] = useState(false);
   const [gates, setGates] = useState([]);
+  const [curGate, setCurGate] = useState(null);
+  const [info, setInfo] = useState({
+    type: null,
+    id: null
+  });
   let cardMenu = [];
   useEffect(() => {
     /*
@@ -117,12 +122,33 @@ export function Devices(props) {
                     }
                   />
                 </Card.Body>
-                <Button variant="primary">Go somewhere</Button>
+                <ButtonGroup>
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      setCurGate(gate.id);
+                    }}
+                  >
+                    Devices
+                  </Button>
+                  <Button
+                    variant="warning"
+                    onClick={() => {
+                      setInfo({
+                        type: "gate",
+                        id: gate.id
+                      });
+                    }}
+                  >
+                    Info
+                  </Button>
+                </ButtonGroup>
               </Card>
             ))}
           </CardDeck>
         </div>
       </div>
+      {curGate === null ? <div></div> : <div></div>}
     </div>
   );
 }
