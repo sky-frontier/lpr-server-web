@@ -17,6 +17,9 @@ body,
   #content-body {
     padding-top: 55px;
   }
+  .cardDiv {
+    margin-left: 30px;
+  }
 }
 .content {
   padding: 20px 3% 0%;
@@ -57,4 +60,36 @@ div.react-tel-input input.form-control {
 }
 .react-numeric-input {
   width: 100%;
+}
+.alert {
+  position: absolute;
+  right: 0;
+}
+.cardDiv {
+  overflow-x: scroll;
+  padding: 8% 5%;
+  scroll-margin-right: 0;
+}
+#addGate,
+#delGate {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 9;
+}
+#gateHeader {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 9;
+  padding: 10px;
+}
+.deviceTab {
+  box-shadow: 0 0 20px #ebeff2;
+  border-radius: 10px;
+  position: relative;
+}
+.deviceContainter {
+  width: 75%;
+  position: relative;
 }

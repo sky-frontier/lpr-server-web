@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Form, Row, Col, Button } from "react-bootstrap";
+import { Form, Row, Col, Button, Alert } from "react-bootstrap";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
@@ -14,6 +14,7 @@ export function ProjectForm(props) {
     MACoy: "",
     equipManu: ""
   });
+  const [alert, setAlert] = useState(false);
   const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
@@ -73,18 +74,34 @@ export function ProjectForm(props) {
     if (form.checkValidity()) update();
   };
 
+  const onShowAlert = () => {
+    setAlert(true);
+    window.setTimeout(() => {
+      setAlert(false);
+    }, 2000);
+  };
+
   const update = () => {
     /* Pending API for project details update*/
+    onShowAlert();
   };
 
   return (
     <div>
+      {alert ? (
+        <Alert className="alert" variant="success">
+          <p>Update Successful</p>
+        </Alert>
+      ) : null}
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Form.Group as={Row}>
           <Form.Label column sm={4}>
             Project ID
           </Form.Label>
-          <Col sm={4}>
+          <Col
+            sm={4}
+            className="align-items-center d-flex justify-content-center"
+          >
             <Form.Control type="text" placeholder={ID} readOnly />
           </Col>
         </Form.Group>
@@ -93,7 +110,10 @@ export function ProjectForm(props) {
           <Form.Label column sm={4}>
             Project Name
           </Form.Label>
-          <Col sm={4}>
+          <Col
+            sm={4}
+            className="align-items-center d-flex justify-content-center"
+          >
             <Form.Control
               required
               placeholder="Name"
@@ -112,7 +132,10 @@ export function ProjectForm(props) {
           <Form.Label column sm={4}>
             Project Type
           </Form.Label>
-          <Col sm={4}>
+          <Col
+            sm={4}
+            className="align-items-center d-flex justify-content-center"
+          >
             <Form.Control
               custom
               required
@@ -135,7 +158,10 @@ export function ProjectForm(props) {
           <Form.Label column sm={4}>
             Location
           </Form.Label>
-          <Col sm={4}>
+          <Col
+            sm={4}
+            className="align-items-center d-flex justify-content-center"
+          >
             <Form.Control
               required
               placeholder="Location"
@@ -154,7 +180,10 @@ export function ProjectForm(props) {
           <Form.Label column sm={4}>
             Equipment Manufacturer
           </Form.Label>
-          <Col sm={4}>
+          <Col
+            sm={4}
+            className="align-items-center d-flex justify-content-center"
+          >
             <Form.Control
               required
               placeholder="Equipment Manufacturer"
@@ -173,7 +202,10 @@ export function ProjectForm(props) {
           <Form.Label column sm={4}>
             MA Company
           </Form.Label>
-          <Col sm={4}>
+          <Col
+            sm={4}
+            className="align-items-center d-flex justify-content-center"
+          >
             <Form.Control
               required
               placeholder="MA Company"
@@ -192,7 +224,11 @@ export function ProjectForm(props) {
           <Form.Label column sm={4}>
             Contact No.
           </Form.Label>
-          <Form.Label column sm={4}>
+          <Form.Label
+            column
+            sm={4}
+            className="align-items-center d-flex justify-content-center"
+          >
             <PhoneInput
               inputProps={{
                 required: true
