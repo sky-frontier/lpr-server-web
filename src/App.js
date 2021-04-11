@@ -90,7 +90,7 @@ function PublicRoute({ children, ...rest }) {
         auth ? (
           <Redirect
             to={{
-              pathname: "/project/temp",
+              pathname: "/project",
               state: { from: location }
             }}
           />
