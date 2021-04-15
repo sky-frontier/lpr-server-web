@@ -11,7 +11,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import { useHistory } from "react-router-dom";
-
+import axios from "axios";
 import { ProjectModal } from "../components/index.js";
 
 export function Projects({ match }) {
@@ -45,7 +45,8 @@ export function Projects({ match }) {
         }
       })
     };
-
+    console.log(server_URL);
+    console.log(requestOptions);
     fetch(server_URL, requestOptions)
       .then(async (response) => {
         console.log(response);
