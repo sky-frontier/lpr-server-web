@@ -1,58 +1,52 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Form, Row, Col, Button, Alert } from "react-bootstrap";
 import PhoneInput from "react-phone-input-2";
+import { store } from "../../store.js";
 import "react-phone-input-2/lib/style.css";
 
 export function ProjectForm(props) {
-  let ID = props.ID;
+  const storeContext = useContext(store);
+  const globalState = storeContext.state;
+  const server_URL = globalState.server_URL;
+  let ID = parseInt(props.ID);
   const [validated, setValidated] = useState(false);
   const [state, setState] = useState({
-    name: "",
-    type: "",
+    projectName: "",
+    projectType: "",
     location: "",
-    contact: "",
-    MACoy: "",
+    contactNumber: "",
+    maCompany: "",
     equipManu: ""
   });
-  const [alert, setAlert] = useState(false);
+  const [alert, setAlert] = useState(null);
   const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
-    /*
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: props.id
+        authID: "",
+        serviceName: "getProject",
+        content: {
+          projectID: ID
+        }
       })
     };
-    
-    fetch(server_URL + "/projectIdQuery", requestOptions)
-    .then(async (response) => {
-      const data = await response.json();
-  
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
-  
-      initialRows = response.data;
-    })
-    .catch((error) => {
-      this.setState({ errorMessage: error.toString() });
-      console.error("There was an error!", error);
-    });*/
-    let res = {
-      name: "Project",
-      type: "Sample",
-      location: "Sample",
-      contact: "65987654321",
-      MACoy: "Sample",
-      equipManu: "Sample"
-    };
-    setState(res);
+    fetch(server_URL, requestOptions)
+      .then(async (response) => {
+        const data = await response.json();
+        // check for error response
+        if (data.status !== "success") {
+          // get error message from body or default to response status
+          const error = (data && data.message) || response.status;
+          return Promise.reject(error);
+        }
+        setState(data.message);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
   }, [dummy]);
 
   const handleChange = (e) => {
@@ -71,28 +65,54 @@ export function ProjectForm(props) {
       e.stopPropagation();
     }
     setValidated(true);
+    console.log(form.checkValidity());
     if (form.checkValidity()) update();
   };
 
-  const onShowAlert = () => {
-    setAlert(true);
+  const onShowAlert = (val) => {
+    setAlert(val);
     window.setTimeout(() => {
-      setAlert(false);
+      setAlert(null);
     }, 2000);
   };
 
   const update = () => {
-    /* Pending API for project details update*/
-    onShowAlert();
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        authID: "",
+        serviceName: "modifyProject",
+        content: {
+          projectID: ID,
+          modifyParams: state
+        }
+      })
+    };
+    fetch(server_URL, requestOptions)
+      .then(async (response) => {
+        const data = await response.json();
+        // check for error response
+        if (data.status !== "success") {
+          // get error message from body or default to response status
+          const error = (data && data.message) || response.status;
+          return Promise.reject(error);
+        }
+        onShowAlert("success");
+      })
+      .catch((error) => {
+        onShowAlert("error");
+        console.error("There was an error!", error);
+      });
   };
 
   return (
     <div>
-      {alert ? (
-        <Alert className="alert" variant="success">
-          <p>Update Successful</p>
+      {alert === null ? null:
+        <Alert className="alert" variant={alert==="success"?"success":"danger"}>
+          <p style={{margin:0}}>{alert==="success"?"Update Successful":"An Error Occured"}</p>
         </Alert>
-      ) : null}
+      }
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Form.Group as={Row}>
           <Form.Label column sm={4}>
@@ -100,7 +120,6 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col
             sm={4}
-            className="align-items-center d-flex justify-content-center"
           >
             <Form.Control type="text" placeholder={ID} readOnly />
           </Col>
@@ -112,14 +131,13 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col
             sm={4}
-            className="align-items-center d-flex justify-content-center"
           >
             <Form.Control
               required
               placeholder="Name"
-              id="name"
-              name="name"
-              value={state.name}
+              id="projectName"
+              name="projectName"
+              value={state.projectName}
               onChange={handleChange}
             />
             <Form.Control.Feedback type="invalid">
@@ -134,19 +152,19 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col
             sm={4}
-            className="align-items-center d-flex justify-content-center"
           >
             <Form.Control
               custom
               required
               as="select"
-              id="type"
-              name="type"
-              value={state.type}
+              id="projectType"
+              name="projectType"
+              value={state.projectType}
               onChange={handleChange}
             >
               <option value={""}>--Select Type--</option>
-              <option>Sample</option>
+              <option>condo</option>
+              <option>hdb</option>
             </Form.Control>
             <Form.Control.Feedback type="invalid">
               Project Type is a required field.
@@ -160,11 +178,9 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col
             sm={4}
-            className="align-items-center d-flex justify-content-center"
           >
             <Form.Control
               required
-              placeholder="Location"
               id="location"
               name="location"
               value={state.location}
@@ -182,11 +198,9 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col
             sm={4}
-            className="align-items-center d-flex justify-content-center"
           >
             <Form.Control
               required
-              placeholder="Equipment Manufacturer"
               id="equipManu"
               name="equipManu"
               value={state.equipManu}
@@ -204,14 +218,12 @@ export function ProjectForm(props) {
           </Form.Label>
           <Col
             sm={4}
-            className="align-items-center d-flex justify-content-center"
           >
             <Form.Control
               required
-              placeholder="MA Company"
-              id="MACoy"
-              name="MACoy"
-              value={state.MACoy}
+              id="maCompany"
+              name="maCompany"
+              value={state.maCompany}
               onChange={handleChange}
             />
             <Form.Control.Feedback type="invalid">
@@ -227,17 +239,22 @@ export function ProjectForm(props) {
           <Form.Label
             column
             sm={4}
-            className="align-items-center d-flex justify-content-center"
           >
             <PhoneInput
               inputProps={{
                 required: true
               }}
-              id="contactInput"
-              name="contact"
+              placeholder="+XX-XXXX-XXXX"
+              id="contactNumber"
+              name="contactNumber"
               country={"sg"}
-              value={state.contact}
-              onChange={() => {}}
+              value={state.contactNumber}
+              onChange={(e)=>{
+                setState((prevState) => ({
+                  ...prevState,
+                  ["contactNumber"]: e
+                }));
+              }}
               isValid={(value, country) => {
                 if (value.length === 0) {
                   return false;

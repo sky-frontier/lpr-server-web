@@ -1,31 +1,80 @@
 import { Card, Button, CardDeck, ButtonGroup } from "react-bootstrap";
-import { useState, useEffect } from "react";
-import { DevicesModal } from "../../components/index.js";
+import { useState, useEffect, useContext } from "react";
+import { DeviceModal, GateModal } from "../../components/index.js";
 import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import { store } from "../../store.js";
 
 export function Devices(props) {
-  let ID = props.ID;
+  const storeContext = useContext(store);
+  const globalState = storeContext.state;
+  const server_URL = globalState.server_URL;
+  let ID = parseInt(props.ID);
   const [dummy, setDummy] = useState(false);
   const [gates, setGates] = useState([]);
   const [curGate, setCurGate] = useState(null);
   const [info, setInfo] = useState({
-    type: null,
-    id: null
+    type: "gate",
+    id: 2
   });
   let cardMenu = [];
   useEffect(() => {
-    /*
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: props.id
+        authID: "",
+        serviceName: "getTable",
+        content: {
+          objName: "gate",
+          columns: ["gateID", "gateName", "gateType"],
+          filters:{
+            projectID: ID
+          }
+        }
       })
     };
     
-    fetch(server_URL + "/projectIdQuery", requestOptions)
+    fetch(server_URL, requestOptions)
+    .then(async (response) => {
+      const data = await response.json();
+  
+      // check for error response
+      if (!response.ok) {
+        // get error message from body or default to response status
+        const error = (data && data.content) || response.status;
+        return Promise.reject(error);
+      }
+      setGates(data.content);
+    })
+    .catch((error) => {
+      this.setState({ errorMessage: error.toString() });
+      console.error("There was an error!", error);
+    });
+  }, [dummy]);
+
+  const handleAdd = () => {
+    const newGateReq = {
+      gateName: "Gate",
+      gateType: "entry",
+      isOpenForInvalid: false,
+      isOpenForTemp: false,
+      isChargeable: false,
+      ledOnTime: "00:00:00",
+      ledOffTime: "00:00:00"
+    }
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        authID: "",
+        serviceName: "createGate",
+        content: newGateReq
+      })
+    };
+    
+    fetch(server_URL, requestOptions)
     .then(async (response) => {
       const data = await response.json();
   
@@ -35,64 +84,39 @@ export function Devices(props) {
         const error = (data && data.message) || response.status;
         return Promise.reject(error);
       }
-  
-      initialRows = response.data;
+      let newGate = {
+        ...newGateReq,
+        gateID: data.message.gateID
+      }
+      setGates((prevGates) => 
+        prevGates.concat(newGate)
+      );
     })
     .catch((error) => {
       this.setState({ errorMessage: error.toString() });
       console.error("There was an error!", error);
-    });*/
-    let res = [
-      {
-        id: "1",
-        gateName: "Gate 1",
-        gateType: "Entry"
-      },
-      {
-        id: "2",
-        gateName: "Gate 2",
-        gateType: "Exit"
-      },
-      {
-        id: "3",
-        gateName: "Gate 3",
-        gateType: "Entry"
-      },
-      {
-        id: "4",
-        gateName: "Gate 4",
-        gateType: "Entry"
-      },
-      {
-        id: "5",
-        gateName: "Gate 5",
-        gateType: "Entry"
-      },
-      {
-        id: "6",
-        gateName: "Gate 6",
-        gateType: "Entry"
-      },
-      {
-        id: "7",
-        gateName: "Gate 7",
-        gateType: "Entry"
-      },
-      {
-        id: "8",
-        gateName: "Gate 8",
-        gateType: "Entry"
-      }
-    ];
-    setGates(res);
-  }, [dummy]);
-
-  const handleAdd = () => {};
+    });
+  };
 
   const del = (id) => {};
 
   return (
     <div>
+      <div>
+      {info.type === null? null:(
+        info.type === "gate"? 
+        <GateModal 
+        id={info.id}
+        toggleModal={
+          ()=>setInfo({
+            type: null,
+            id: null
+          })}
+          />
+          :
+          null
+      )}
+      </div>
       <div className="deviceContainter">
         <div id="gateHeader">
           <h4>Gates</h4>
@@ -105,9 +129,9 @@ export function Devices(props) {
         <div className="deviceTab cardDiv align-items-center d-flex">
           <CardDeck>
             {gates.map((gate) => (
-              <Card style={{ width: "1500px" }}>
+              <Card style={{ width: "200px" }}>
                 <div id="delGate">
-                  <IconButton onClick={() => del(gates.id)}>
+                  <IconButton onClick={() => del(gates.gateID)}>
                     <HighlightOffIcon style={{ color: "#d32f2f" }} />
                   </IconButton>
                 </div>
@@ -117,8 +141,8 @@ export function Devices(props) {
                     variant="top"
                     src={
                       gate.gateType === "Entry"
-                        ? require("../../assets/entry.jpg")
-                        : require("../../assets/exit.png")
+                        ? "../../assets/entry.jpg"
+                        : "../../assets/exit.png"
                     }
                   />
                 </Card.Body>
@@ -126,7 +150,7 @@ export function Devices(props) {
                   <Button
                     variant="primary"
                     onClick={() => {
-                      setCurGate(gate.id);
+                      setCurGate(gate.gateID);
                     }}
                   >
                     Devices
@@ -136,7 +160,7 @@ export function Devices(props) {
                     onClick={() => {
                       setInfo({
                         type: "gate",
-                        id: gate.id
+                        id: gate.gateID
                       });
                     }}
                   >

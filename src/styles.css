@@ -67,6 +67,7 @@ div.react-tel-input input.form-control {
 .alert {
   position: absolute;
   right: 0;
+  align-items: center;
 }
 .cardDiv {
   overflow-x: scroll;
@@ -92,7 +93,19 @@ div.react-tel-input input.form-control {
   border-radius: 10px;
   position: relative;
 }
-.deviceContainter {
+.deviceContainter{
   width: 75%;
-  position: relative;
+  position:relative;
+}
+@media (min-width: 576px){
+  .modalDevice {
+    right: 10px;
+    top: 55px;
+    max-height: calc(100% - 100px);
+    position: fixed;
+    z-index:1000;
+  }
+}
+.posAbs{
+  position: absolute;
 }

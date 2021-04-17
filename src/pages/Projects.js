@@ -11,7 +11,6 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import { useHistory } from "react-router-dom";
-import axios from "axios";
 import { ProjectModal } from "../components/index.js";
 
 export function Projects({ match }) {
@@ -33,6 +32,7 @@ export function Projects({ match }) {
   });
   const [dummy, setDummy] = useState(false);
   useEffect(() => {
+    console.log("hi");
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -45,20 +45,17 @@ export function Projects({ match }) {
         }
       })
     };
-    console.log(server_URL);
-    console.log(requestOptions);
     fetch(server_URL, requestOptions)
       .then(async (response) => {
-        console.log(response);
         const data = await response.json();
         // check for error response
-        if (response.status !== "success") {
+        if (data.status !== "success") {
           // get error message from body or default to response status
           const error = (data && data.message) || response.status;
           return Promise.reject(error);
         }
-
-        setInitialRows(data.message);
+        console.log(data.content);
+        setInitialRows(data.content);
       })
       .catch((error) => {
         console.error("There was an error!", error);
@@ -104,11 +101,37 @@ export function Projects({ match }) {
   };
 
   const insert = (e) => {
-    /*
-    API for inserting empty state into DB while returning generated ID
-    */
-    let ID = "8f88a3c0a1d7c25";
-    history.push("/project/" + ID);
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        authID: "",
+        serviceName: "createProject",
+        content: {
+          projectName: "",
+          projectType: "",
+          location: "",
+          contactNumber: "",
+          maCompany: "",
+          equipManu: ""
+        }
+      })
+    };
+    fetch(server_URL, requestOptions)
+      .then(async (response) => {
+        const data = await response.json();
+        // check for error response
+        if (data.status !== "success") {
+          // get error message from body or default to response status
+          const error = (data && data.content) || response.status;
+          return Promise.reject(error);
+        }
+        let ID = data.content.projectID;
+        history.push("/project/" + ID);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
   };
 
   const edit = (projectID) => {
