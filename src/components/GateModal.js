@@ -1,7 +1,8 @@
 import { useState, useEffect, useContext } from "react";
-import { Form, Row, Col, Button, Alert, Modal } from "react-bootstrap";
+import { Form, Row, Col, Button, Modal } from "react-bootstrap";
 import TimeField from 'react-simple-timefield';
 import { store } from "../store.js";
+import { alertService } from '../services/index.js';
 
 export function GateModal(props) {
     const storeContext = useContext(store);
@@ -11,10 +12,10 @@ export function GateModal(props) {
     let toggleModel = props.toggleModal;
     const [validated, setValidated] = useState(false);
     const [state, setState] = useState({});
-    const [alert, setAlert] = useState(null);
     const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
+    setValidated(false);
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -37,14 +38,15 @@ export function GateModal(props) {
         const error = (data && data.message) || response.status;
         return Promise.reject(error);
       }
-      console.log(data.message);
+   //   console.log("hey");
+   //   console.log(data.message);
       setState(data.message);
     })
     .catch((error) => {
-      this.setState({ errorMessage: error.toString() });
+      alertService.error("There was an error!");
       console.error("There was an error!", error);
     });
-  }, [dummy]);
+  }, [dummy, ID]);
 
   const handleChange = (e, filler, e2) => {
       console.log(e,filler,e2);
@@ -56,7 +58,6 @@ export function GateModal(props) {
       id = e2.id;
       value = e;
     }
-    console.log(typeof state[id]);
     if (typeof state[id] === "boolean") {
         console.log("bool");
       setState((prevState) => ({
@@ -82,13 +83,6 @@ export function GateModal(props) {
     if (form.checkValidity()) update();
   };
 
-  const onShowAlert = () => {
-    setAlert(true);
-    window.setTimeout(() => {
-      setAlert(false);
-    }, 2000);
-  };
-
   const update = () => {
     const requestOptions = {
     method: "POST",
@@ -111,21 +105,16 @@ export function GateModal(props) {
         const error = (data && data.message) || response.status;
         return Promise.reject(error);
         }
-        onShowAlert("success");
+        alertService.success("Update Successful!");
     })
     .catch((error) => {
-        onShowAlert("error");
+      alertService.error("There was an error!");
         console.error("There was an error!", error);
     });
   };
 
   return (
     <div className ="posAbs">
-      {alert === null ? null:
-        <Alert className="alert" variant={alert==="success"?"success":"danger"}>
-          <p style={{margin:0}}>{alert==="success"?"Update Successful":"An Error Occured"}</p>
-        </Alert>
-      }
       <div className = "modal-dialog modalDevice modal-dialog-scrollable">
         <div className = "modal-content">
             <Modal.Header
@@ -138,7 +127,7 @@ export function GateModal(props) {
                 <div>
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
-                        Project ID
+                        Gate ID
                     </Form.Label>
                     <Col
                         sm={6}
@@ -150,7 +139,7 @@ export function GateModal(props) {
 
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
-                        Project Name
+                        Gate Name
                     </Form.Label>
                     <Col
                         sm={6}
@@ -171,7 +160,7 @@ export function GateModal(props) {
 
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
-                        Project Type
+                        Gate Type
                     </Form.Label>
                     <Col
                         sm={6}
@@ -258,6 +247,7 @@ export function GateModal(props) {
                         <TimeField 
                         value={state.ledOnTime} 
                         onChange={handleChange}
+                        showSeconds = {true}
                         input={
                             <input
                               id = "ledOnTime"
@@ -282,6 +272,7 @@ export function GateModal(props) {
                         <TimeField 
                         value={state.ledOffTime} 
                         onChange={handleChange}
+                        showSeconds = {true}
                         input={
                             <input
                               id = "ledOffTime"

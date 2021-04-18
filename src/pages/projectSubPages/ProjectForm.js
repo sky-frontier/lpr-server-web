@@ -1,8 +1,9 @@
 import { useState, useEffect, useContext } from "react";
-import { Form, Row, Col, Button, Alert } from "react-bootstrap";
+import { Form, Row, Col, Button } from "react-bootstrap";
 import PhoneInput from "react-phone-input-2";
 import { store } from "../../store.js";
 import "react-phone-input-2/lib/style.css";
+import { alertService } from '../../services/index.js';
 
 export function ProjectForm(props) {
   const storeContext = useContext(store);
@@ -18,7 +19,6 @@ export function ProjectForm(props) {
     maCompany: "",
     equipManu: ""
   });
-  const [alert, setAlert] = useState(null);
   const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
@@ -45,6 +45,7 @@ export function ProjectForm(props) {
         setState(data.message);
       })
       .catch((error) => {
+        alertService.error("There was an error!");
         console.error("There was an error!", error);
       });
   }, [dummy]);
@@ -69,13 +70,6 @@ export function ProjectForm(props) {
     if (form.checkValidity()) update();
   };
 
-  const onShowAlert = (val) => {
-    setAlert(val);
-    window.setTimeout(() => {
-      setAlert(null);
-    }, 2000);
-  };
-
   const update = () => {
     const requestOptions = {
       method: "POST",
@@ -98,21 +92,16 @@ export function ProjectForm(props) {
           const error = (data && data.message) || response.status;
           return Promise.reject(error);
         }
-        onShowAlert("success");
+        alertService.success('Update Successful!');
       })
       .catch((error) => {
-        onShowAlert("error");
+        alertService.error("There was an error!");
         console.error("There was an error!", error);
       });
   };
 
   return (
     <div>
-      {alert === null ? null:
-        <Alert className="alert" variant={alert==="success"?"success":"danger"}>
-          <p style={{margin:0}}>{alert==="success"?"Update Successful":"An Error Occured"}</p>
-        </Alert>
-      }
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Form.Group as={Row}>
           <Form.Label column sm={4}>

@@ -2,7 +2,8 @@ import React, { useContext } from "react";
 import { store } from "./store.js";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import "./styles.css";
-import { NavBar } from "./components/index.js";
+import "./assets/scrollbar.css";
+import { NavBar, AlertGroup } from "./components/index.js";
 import {
   BrowserRouter as Router,
   Switch,
@@ -61,6 +62,7 @@ function PrivateRoute({ children, ...rest }) {
       render={(props) =>
         auth ? (
           <div className="h-100">
+              <AlertGroup />
             <NavBar />
             <div id="content-body">
               {React.cloneElement(children, { params: props.match.params })}
@@ -94,7 +96,8 @@ function PublicRoute({ children, ...rest }) {
               state: { from: location }
             }}
           />
-        ) : (
+        ) : 
+        <AlertGroup />(
           children
         )
       }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Form, Row, Col, Button, InputGroup, Alert } from "react-bootstrap";
+import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
 import NumericInput from "react-numeric-input";
+import { alertService } from '../../services/index.js';
 
 export function BusinessDetails(props) {
   let ID = props.ID;
@@ -11,7 +12,6 @@ export function BusinessDetails(props) {
     vehicleColorDetect: false,
     localImgStore: false
   });
-  const [alert, setAlert] = useState(false);
   const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export function BusinessDetails(props) {
       initialRows = response.data;
     })
     .catch((error) => {
-      this.setState({ errorMessage: error.toString() });
+      alertService.error("There was an error!");
       console.error("There was an error!", error);
     });*/
     let res = {
@@ -78,16 +78,8 @@ export function BusinessDetails(props) {
     update();
   };
 
-  const onShowAlert = () => {
-    setAlert(true);
-    window.setTimeout(() => {
-      setAlert(false);
-    }, 2000);
-  };
-
   const update = () => {
     /* Pending API for project details update*/
-    onShowAlert();
   };
 
   function myFormat(num) {
@@ -96,11 +88,6 @@ export function BusinessDetails(props) {
 
   return (
     <div>
-      {alert ? (
-        <Alert className="alert" variant="success">
-          <p>Update Successful</p>
-        </Alert>
-      ) : null}
       <Form onSubmit={handleSubmit}>
         <Form.Group as={Row}>
           <Form.Label column sm={4}>

@@ -11,7 +11,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import { useHistory } from "react-router-dom";
-import { ProjectModal } from "../components/index.js";
+import { ConfirmModal } from "../components/index.js";
 
 export function Projects({ match }) {
   const storeContext = useContext(store);
@@ -151,7 +151,7 @@ export function Projects({ match }) {
 
   return (
     <div>
-      <ProjectModal
+      <ConfirmModal
         hide={toggle.delete}
         success={() => {
           del(curID);
@@ -162,7 +162,7 @@ export function Projects({ match }) {
         title="Confirm Deletion"
         body="Delete this project?"
       />
-      <ProjectModal
+      <ConfirmModal
         hide={toggle.add}
         success={() => {
           insert();

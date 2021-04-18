@@ -1,5 +1,7 @@
 import { NavBar } from "./NavBar";
-import { ProjectModal } from "./ProjectModal";
-import { DeviceModal } from "./DevicesModal";
+import { ConfirmModal } from "./ConfirmModal";
+import { QueryModal } from "./QueryModal";
+import { DeviceModal } from "./DeviceModal";
 import { GateModal } from "./GateModal";
-export { NavBar, ProjectModal, DeviceModal, GateModal };
+import { AlertGroup } from "./AlertGroup.js"
+export { NavBar, ConfirmModal, DeviceModal, GateModal, QueryModal, AlertGroup };

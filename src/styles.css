@@ -83,7 +83,7 @@ div.react-tel-input input.form-control {
 }
 #gateHeader {
   position: absolute;
-  left: 0;
+  left: 10px;
   top: 0;
   z-index: 9;
   padding: 10px;
@@ -93,7 +93,12 @@ div.react-tel-input input.form-control {
   border-radius: 10px;
   position: relative;
 }
+.gateContainer{
+  width: 75%;
+  position:relative;
+}
 .deviceContainter{
+  margin-top:20px;
   width: 75%;
   position:relative;
 }
@@ -108,4 +113,25 @@ div.react-tel-input input.form-control {
 }
 .posAbs{
   position: absolute;
+}
+.deviceCard{
+  width:200px;
+}
+.cardImg{
+  padding:20px;
+}
+.cardButton{
+  width:100%;
+}
+.primary-transform{
+  filter: invert(36%) sepia(49%) saturate(6233%) hue-rotate(200deg) brightness(103%) contrast(104%);
+}
+.alertGrp{
+  z-index:2000;
+  position:fixed;
+  bottom: 10px;
+  right:20px;
+}
+.alert{
+  position:relative;
 }
