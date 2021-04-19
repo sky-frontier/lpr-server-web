@@ -8,6 +8,9 @@ body,
 .invisible {
   display: none;
 }
+.greyBackground{
+  background-color: #ebeff2;
+}
 #content-body {
   padding-top: 70px;
   background-color: #ebeff2;
@@ -64,11 +67,6 @@ div.react-tel-input input.form-control {
 .react-numeric-input {
   width: 100%;
 }
-.alert {
-  position: absolute;
-  right: 0;
-  align-items: center;
-}
 .cardDiv {
   overflow-x: scroll;
   padding: 8% 5% 2% 5%;
@@ -101,6 +99,7 @@ div.react-tel-input input.form-control {
   margin-top:20px;
   width: 75%;
   position:relative;
+  padding-bottom:20px;
 }
 .modalDevice {
   right: 10px;
@@ -110,7 +109,7 @@ div.react-tel-input input.form-control {
   z-index:800;
 }
 .posAbs{
-  position: absolute;
+  position: absolute; 
 }
 .card-deck .card {
   flex: 1 0;

@@ -10,11 +10,10 @@ import { House, List } from "react-bootstrap-icons";
 import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { store } from "../store.js";
 import { useContext, useState } from "react";
-import { useHistory, Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 export function NavBar() {
   const storeContext = useContext(store);
-  const globalState = storeContext.state;
   const [toggled, setToggled] = useState(true);
   const { dispatch } = storeContext;
   let history = useHistory();

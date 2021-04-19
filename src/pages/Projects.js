@@ -1,16 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import IconButton from "@material-ui/core/IconButton";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
+import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import { useHistory } from "react-router-dom";
-import { ConfirmModal } from "../components/index.js";
+import { ConfirmModal, TablePaginationActions } from "../components/index.js";
 import {getProjects, addProject } from '../services/index.js';
 
 export function Projects({ match }) {
@@ -28,7 +21,7 @@ export function Projects({ match }) {
     projectType: ""
   });
   const [dummy, setDummy] = useState(false);
-  useEffect(() => {
+  const reload = () =>{
     getProjects(["projectID", "projectName", "location", "projectType"])
       .then(async (data) => {
         console.log(data.content);
@@ -37,6 +30,9 @@ export function Projects({ match }) {
       .catch((error) => {
         console.error("There was an error!", error);
       });
+  }
+  useEffect(() => {
+    reload();
   }, [dummy]);
 
   useEffect(() => {
@@ -101,6 +97,21 @@ export function Projects({ match }) {
     console.log(curRows.filter((row) => projectID !== row["id"]));
     setInitialRows(curRows.filter((row) => projectID !== row["id"]));
     toggleModal("delete");
+  };
+
+  
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   return (
@@ -178,7 +189,7 @@ export function Projects({ match }) {
           </Row>
         </Form>
       </div>
-      <div className="content">
+      <div className="content greyBackground">
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
@@ -190,14 +201,16 @@ export function Projects({ match }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {(rowsPerPage > 0
+            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            : rows).map((row) => (
                 <TableRow key={row.projectName}>
                   <TableCell component="th" scope="row">
                     {row.projectName}
                   </TableCell>
                   <TableCell align="left">{row.location}</TableCell>
                   <TableCell align="left">{row.projectType}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="right" style={{padding:0}}>
                     <IconButton onClick={() => edit(row.projectID)}>
                       <PencilSquare
                         data-value={row.projectID}
@@ -211,7 +224,30 @@ export function Projects({ match }) {
                   </TableCell>
                 </TableRow>
               ))}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
             </TableBody>
+            <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
+                colSpan={4}
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: { 'aria-label': 'rows per page' },
+                  native: true,
+                }}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableRow>
+          </TableFooter>
           </Table>
         </TableContainer>
       </div>

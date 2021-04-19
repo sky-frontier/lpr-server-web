@@ -1,5 +1,5 @@
-import { Card, Button, CardDeck, ButtonGroup, Modal, Breadcrumb } from "react-bootstrap";
-import { useState, useEffect, useContext } from "react";
+import { Card, Button, CardDeck, Breadcrumb } from "react-bootstrap";
+import { useState, useEffect } from "react";
 import { DeviceModal, GateModal } from "../../components/index.js";
 import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
@@ -41,7 +41,6 @@ export function Devices(props) {
     type: null,
     id: null
   });
-  let cardMenu = [];
 
   const reloadGates = () =>{
     getGate(ID, ["gateID", "gateName", "gateType"])
@@ -157,8 +156,7 @@ export function Devices(props) {
         }}
         title="Confirm Addition"
         body="Enter Device ID"
-      />
-      
+      />      
       <Breadcrumb>
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item href="/project">Projects</Breadcrumb.Item>

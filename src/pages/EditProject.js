@@ -1,7 +1,8 @@
 import {
   ProjectForm,
   BusinessDetails,
-  Devices
+  Devices,
+  LedConfig
 } from "./projectSubPages/index.js";
 import { Row, Col } from "react-bootstrap";
 import {Nav, Tab} from "react-bootstrap";
@@ -38,7 +39,7 @@ export function EditProject(props) {
                 <Devices ID={props.params.projectId} />
               </Tab.Pane>
               <Tab.Pane eventKey="fourth">
-                <div>Fourth</div>
+                <LedConfig ID={props.params.projectId} />
               </Tab.Pane>
             </Tab.Content>
           </Col>

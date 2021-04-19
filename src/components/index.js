@@ -4,4 +4,5 @@ import { QueryModal } from "./QueryModal";
 import { DeviceModal } from "./DeviceModal";
 import { GateModal } from "./GateModal";
 import { AlertGroup } from "./AlertGroup.js"
-export { NavBar, ConfirmModal, DeviceModal, GateModal, QueryModal, AlertGroup };
+import {TablePaginationActions} from './TablePaginationActions';
+export { NavBar, ConfirmModal, DeviceModal, GateModal, QueryModal, AlertGroup, TablePaginationActions };
