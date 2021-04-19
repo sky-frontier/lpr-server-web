@@ -80,7 +80,8 @@ export function LedConfig(props) {
   };
 
   const save = () =>{
-
+    // API
+    //reload();
   }
 
   const edit = (vals) =>{

@@ -56,6 +56,11 @@ export function NavBar() {
                 Project
               </div>
             </Nav.Link>
+            <Nav.Link>
+              <div data-value="/regex" onClick={direct}>
+                Plate Regex
+              </div>
+            </Nav.Link>
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item data-value="/home" onClick={direct}>
                 Action
@@ -92,6 +97,11 @@ export function NavBar() {
             <MenuItem icon={<House />}>
               <div data-value="/project" onClick={direct}>
                 Project
+              </div>
+            </MenuItem>
+            <MenuItem icon={<House />}>
+              <div data-value="/regex" onClick={direct}>
+                Plate Regex
               </div>
             </MenuItem>
             <SubMenu title="Components">

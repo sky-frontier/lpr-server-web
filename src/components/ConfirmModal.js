@@ -18,7 +18,6 @@ export function ConfirmModal(props) {
         </Button>
         <Button variant="primary" onClick={()=>{
           success();
-          toggleModal();
         }}>
           Confirm
         </Button>
