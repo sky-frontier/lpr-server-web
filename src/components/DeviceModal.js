@@ -1,13 +1,9 @@
 import { useState, useEffect, useContext } from "react";
 import { Form, Row, Col, Button, Modal } from "react-bootstrap";
 import TimeField from 'react-simple-timefield';
-import { store } from "../store.js";
-import { alertService } from '../services/index.js';
+import { alertService, getDeviceInfo, updateDeviceInfo } from '../services/index.js';
 
 export function DeviceModal(props) {
-    const storeContext = useContext(store);
-    const globalState = storeContext.state;
-    const server_URL = globalState.server_URL;
     let ID = parseInt(props.id);
     let toggleModel = props.toggleModal;
     const [validated, setValidated] = useState(false);
@@ -15,28 +11,8 @@ export function DeviceModal(props) {
     const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "getDevice",
-        content: {
-            deviceID: ID
-        }
-      })
-    };
-    
-    fetch(server_URL, requestOptions)
-    .then(async (response) => {
-      const data = await response.json();
-  
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
+    getDeviceInfo(ID)
+    .then(async (data) => {
       console.log(data.message);
       setState(data.message);
     })
@@ -83,27 +59,8 @@ export function DeviceModal(props) {
   };
 
   const update = () => {
-    const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-        authID: "",
-        serviceName: "modifyDevice",
-        content: {
-            deviceID: ID,
-            modifyParams: state
-        }
-    })
-    };
-    fetch(server_URL, requestOptions)
-    .then(async (response) => {
-        const data = await response.json();
-        // check for error response
-        if (data.status !== "success") {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-        }
+    updateDeviceInfo(ID,state)
+    .then(async (data) => {
         alertService.success("Update Successful!");
     })
     .catch((error) => {

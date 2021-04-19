@@ -1,12 +1,11 @@
-import { Card, Button, CardDeck, ButtonGroup, Modal } from "react-bootstrap";
+import { Card, Button, CardDeck, ButtonGroup, Modal, Breadcrumb } from "react-bootstrap";
 import { useState, useEffect, useContext } from "react";
 import { DeviceModal, GateModal } from "../../components/index.js";
 import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { ConfirmModal, QueryModal } from "../../components/index.js";
-import { store } from "../../store.js";
-import { alertService } from '../../services/index.js';
+import { alertService, getDevice, getGate, createGate, createDevice } from '../../services/index.js';
 
 
 import entry from '../../assets/entry.jpg';
@@ -26,9 +25,6 @@ function image(value){
 }
 
 export function Devices(props) {
-  const storeContext = useContext(store);
-  const globalState = storeContext.state;
-  const server_URL = globalState.server_URL;
   let ID = parseInt(props.ID);
   const [dummy, setDummy] = useState(false);
   const [gates, setGates] = useState([]);
@@ -46,68 +42,25 @@ export function Devices(props) {
     id: null
   });
   let cardMenu = [];
-  useEffect(() => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "getTable",
-        content: {
-          objName: "gate",
-          columns: ["gateID", "gateName", "gateType"],
-          filters:{
-            projectID: ID
-          }
-        }
-      })
-    };
-    
-    fetch(server_URL, requestOptions)
-    .then(async (response) => {
-      const data = await response.json();
-  
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.content) || response.status;
-        return Promise.reject(error);
-      }
+
+  const reloadGates = () =>{
+    getGate(ID, ["gateID", "gateName", "gateType"])
+    .then(async (data) => {
       setGates(data.content);
     })
     .catch((error) => {
       alertService.error("There was an error!" + error);
       console.error("There was an error!", error);
     });
-  }, [dummy]);
+  }
 
   useEffect(() => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "getTable",
-        content: {
-          objName: "device",
-          columns: ["deviceID", "deviceName", "deviceType", "deviceStatus"],
-          filters:{
-            gateID: curGate
-          }
-        }
-      })
-    };
-    
-    fetch(server_URL, requestOptions)
-    .then(async (response) => {
-      const data = await response.json();
-  
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.content) || response.status;
-        return Promise.reject(error);
-      }
+    reloadGates();
+  }, [dummy]);
+
+  const reloadDevices = () =>{
+    getDevice(curGate,["deviceID", "deviceName", "deviceType", "deviceStatus"])
+    .then(async (data) => {
       console.log(curGate);
       console.log(data.content);
       setDevices(data.content);
@@ -116,46 +69,16 @@ export function Devices(props) {
       alertService.error("There was an error!" + error);
       console.error("There was an error!", error);
     });
+  }
+
+  useEffect(() => {
+    reloadDevices();
   }, [curGate]);
 
-  const handleAddGate = () => {
-    const newGateReq = {
-      projectID: ID,
-      gateName: "Gate",
-      gateType: "entry",
-      isOpenForInvalid: false,
-      isOpenForTemp: false,
-      isChargeable: false,
-      ledOnTime: "00:00:00",
-      ledOffTime: "00:00:00"
-    }
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "createGate",
-        content: newGateReq
-      })
-    };
-    
-    fetch(server_URL, requestOptions)
-    .then(async (response) => {
-      const data = await response.json();
-  
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
-      let newGate = {
-        ...newGateReq,
-        gateID: data.message.gateID
-      }
-      setGates((prevGates) => 
-        prevGates.concat(newGate)
-      );
+  const handleAddGate = () => {    
+    createGate(ID)
+    .then(async (data) => {
+      reloadGates();
       setCurGate(data.message.gateID);
       alertService.success("Gate Added");
     })
@@ -167,47 +90,10 @@ export function Devices(props) {
 
   const handleAddDevice = (deviceID) => {
     console.log("adding",deviceID);
-    /*
-    const newDeviceReq = {
-      deviceID,
-      gateID: 1
-      deviceName: "Front Entry Camera",
-      deviceType: "LPR camera",
-      deviceCarpark: "Trevista Car Park",
-      deviceStatus: "online",
-      manufacturer: "example manufacturer",
-      manufacturerCode: "xyz123",
-      direction: "entry",
-      isPrimaryDevice: true
-
-    }
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "createDevice",
-        content: newDeviceReq
-      })
-    };
-    
-    fetch(server_URL, requestOptions)
-    .then(async (response) => {
-      const data = await response.json();
-  
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
-      let newDevice = {
-        ...newDeviceReq,
-        gateID: data.message.gateID
-      }
-      setDevices((prevDevices) => 
-        prevDevices.concat(newDevice)
-      );
+    /*    
+    createDevice(curGate, deviceID)
+    .then(async (data) => {
+      reloadDevices();
       alertService.success("Device Added"");
     })
     .catch((error) => {
@@ -272,6 +158,12 @@ export function Devices(props) {
         title="Confirm Addition"
         body="Enter Device ID"
       />
+      
+      <Breadcrumb>
+        <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
+        <Breadcrumb.Item href="/project">Projects</Breadcrumb.Item>
+        <Breadcrumb.Item active>Devices</Breadcrumb.Item>
+      </Breadcrumb>
       <div>
       {info.type === null? null:(
         info.type === "gate"? 

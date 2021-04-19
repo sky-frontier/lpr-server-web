@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { store } from "../store.js";
-import { Form, Row, Col, Button } from "react-bootstrap";
+import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -12,11 +11,9 @@ import Paper from "@material-ui/core/Paper";
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import { useHistory } from "react-router-dom";
 import { ConfirmModal } from "../components/index.js";
+import {getProjects, addProject } from '../services/index.js';
 
 export function Projects({ match }) {
-  const storeContext = useContext(store);
-  const globalState = storeContext.state;
-  const server_URL = globalState.server_URL;
   let history = useHistory();
   const [initialRows, setInitialRows] = useState([]);
   const [rows, setRows] = useState([]);
@@ -32,35 +29,15 @@ export function Projects({ match }) {
   });
   const [dummy, setDummy] = useState(false);
   useEffect(() => {
-    console.log("hi");
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "getTable",
-        content: {
-          objName: "project",
-          columns: ["projectID", "projectName", "location", "projectType"]
-        }
-      })
-    };
-    fetch(server_URL, requestOptions)
-      .then(async (response) => {
-        const data = await response.json();
-        // check for error response
-        if (data.status !== "success") {
-          // get error message from body or default to response status
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
+    getProjects(["projectID", "projectName", "location", "projectType"])
+      .then(async (data) => {
         console.log(data.content);
         setInitialRows(data.content);
       })
       .catch((error) => {
         console.error("There was an error!", error);
       });
-  }, [dummy, server_URL]);
+  }, [dummy]);
 
   useEffect(() => {
     filter();
@@ -101,31 +78,8 @@ export function Projects({ match }) {
   };
 
   const insert = (e) => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "createProject",
-        content: {
-          projectName: "",
-          projectType: "",
-          location: "",
-          contactNumber: "",
-          maCompany: "",
-          equipManu: ""
-        }
-      })
-    };
-    fetch(server_URL, requestOptions)
-      .then(async (response) => {
-        const data = await response.json();
-        // check for error response
-        if (data.status !== "success") {
-          // get error message from body or default to response status
-          const error = (data && data.content) || response.status;
-          return Promise.reject(error);
-        }
+    addProject()
+      .then(async (data) => {
         let ID = data.content.projectID;
         history.push("/project/" + ID);
       })
@@ -173,7 +127,12 @@ export function Projects({ match }) {
         title="Confirm Addition"
         body="Add a new project?"
       />
+
       <div className="content">
+      <Breadcrumb>
+        <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
+        <Breadcrumb.Item active>Projects</Breadcrumb.Item>
+      </Breadcrumb>
         <Form inline className="rightFlex">
           <Row>
             <Col sm="auto">

@@ -1,13 +1,9 @@
 import { useState, useEffect, useContext } from "react";
 import { Form, Row, Col, Button, Modal } from "react-bootstrap";
 import TimeField from 'react-simple-timefield';
-import { store } from "../store.js";
-import { alertService } from '../services/index.js';
+import { alertService, getGateInfo, updateGateInfo } from '../services/index.js';
 
 export function GateModal(props) {
-    const storeContext = useContext(store);
-    const globalState = storeContext.state;
-    const server_URL = globalState.server_URL;
     let ID = parseInt(props.id);
     let toggleModel = props.toggleModal;
     const [validated, setValidated] = useState(false);
@@ -16,30 +12,8 @@ export function GateModal(props) {
 
   useEffect(() => {
     setValidated(false);
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "getGate",
-        content: {
-            gateID: ID
-        }
-      })
-    };
-    
-    fetch(server_URL, requestOptions)
-    .then(async (response) => {
-      const data = await response.json();
-  
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
-   //   console.log("hey");
-   //   console.log(data.message);
+    getGateInfo(ID)
+    .then(async (data) => {
       setState(data.message);
     })
     .catch((error) => {
@@ -84,27 +58,8 @@ export function GateModal(props) {
   };
 
   const update = () => {
-    const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-        authID: "",
-        serviceName: "modifyGate",
-        content: {
-            gateID: ID,
-            modifyParams: state
-        }
-    })
-    };
-    fetch(server_URL, requestOptions)
-    .then(async (response) => {
-        const data = await response.json();
-        // check for error response
-        if (data.status !== "success") {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-        }
+    updateGateInfo(ID, state)
+    .then(async (data) => {
         alertService.success("Update Successful!");
     })
     .catch((error) => {
@@ -249,12 +204,12 @@ export function GateModal(props) {
                         onChange={handleChange}
                         showSeconds = {true}
                         input={
-                            <input
+                            <Form.Control
+                              required
                               id = "ledOnTime"
                               type="text"
                               name="ledOnTime"
                               placeholder="Time"
-                              className="form-control"
                             />
                         } />
                     </Form.Label>
@@ -274,12 +229,12 @@ export function GateModal(props) {
                         onChange={handleChange}
                         showSeconds = {true}
                         input={
-                            <input
+                            <Form.Control
+                              required
                               id = "ledOffTime"
                               type="text"
                               name="ledOffTime"
                               placeholder="Time"
-                              className="form-control"
                             />
                         } />
                     </Form.Label>

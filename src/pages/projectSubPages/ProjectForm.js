@@ -1,14 +1,10 @@
 import { useState, useEffect, useContext } from "react";
-import { Form, Row, Col, Button } from "react-bootstrap";
+import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import PhoneInput from "react-phone-input-2";
-import { store } from "../../store.js";
 import "react-phone-input-2/lib/style.css";
-import { alertService } from '../../services/index.js';
+import { alertService, getProjectInfo, updateProjectInfo } from '../../services/index.js';
 
 export function ProjectForm(props) {
-  const storeContext = useContext(store);
-  const globalState = storeContext.state;
-  const server_URL = globalState.server_URL;
   let ID = parseInt(props.ID);
   const [validated, setValidated] = useState(false);
   const [state, setState] = useState({
@@ -22,26 +18,8 @@ export function ProjectForm(props) {
   const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "getProject",
-        content: {
-          projectID: ID
-        }
-      })
-    };
-    fetch(server_URL, requestOptions)
-      .then(async (response) => {
-        const data = await response.json();
-        // check for error response
-        if (data.status !== "success") {
-          // get error message from body or default to response status
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
+    getProjectInfo(ID)
+      .then(async (data) => {
         setState(data.message);
       })
       .catch((error) => {
@@ -71,27 +49,8 @@ export function ProjectForm(props) {
   };
 
   const update = () => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        authID: "",
-        serviceName: "modifyProject",
-        content: {
-          projectID: ID,
-          modifyParams: state
-        }
-      })
-    };
-    fetch(server_URL, requestOptions)
-      .then(async (response) => {
-        const data = await response.json();
-        // check for error response
-        if (data.status !== "success") {
-          // get error message from body or default to response status
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
+    updateProjectInfo(ID, state)
+      .then(async (data) => {
         alertService.success('Update Successful!');
       })
       .catch((error) => {
@@ -102,6 +61,11 @@ export function ProjectForm(props) {
 
   return (
     <div>
+      <Breadcrumb>
+        <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
+        <Breadcrumb.Item href="/project">Projects</Breadcrumb.Item>
+        <Breadcrumb.Item active>Project Info</Breadcrumb.Item>
+      </Breadcrumb>
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Form.Group as={Row}>
           <Form.Label column sm={4}>

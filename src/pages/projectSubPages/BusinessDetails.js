@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
+import { Form, Row, Col, Button, InputGroup, Breadcrumb } from "react-bootstrap";
 import NumericInput from "react-numeric-input";
-import { alertService } from '../../services/index.js';
+import { alertService, getBusinessInfo, updateBusinessInfo } from '../../services/index.js';
 
 export function BusinessDetails(props) {
   let ID = props.ID;
@@ -15,27 +15,10 @@ export function BusinessDetails(props) {
   const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
-    /*
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: props.id
-      })
-    };
-    
-    fetch(server_URL + "/projectIdQuery", requestOptions)
-    .then(async (response) => {
-      const data = await response.json();
-  
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
-  
-      initialRows = response.data;
+    /*   
+    getBusinessInfo(ID)
+    .then(async (data) => {
+      setState(data.message)
     })
     .catch((error) => {
       alertService.error("There was an error!");
@@ -88,6 +71,11 @@ export function BusinessDetails(props) {
 
   return (
     <div>
+      <Breadcrumb>
+        <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
+        <Breadcrumb.Item href="/project">Projects</Breadcrumb.Item>
+        <Breadcrumb.Item active>Business Details</Breadcrumb.Item>
+      </Breadcrumb>
       <Form onSubmit={handleSubmit}>
         <Form.Group as={Row}>
           <Form.Label column sm={4}>

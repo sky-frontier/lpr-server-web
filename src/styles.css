@@ -71,7 +71,7 @@ div.react-tel-input input.form-control {
 }
 .cardDiv {
   overflow-x: scroll;
-  padding: 8% 5%;
+  padding: 8% 5% 2% 5%;
   scroll-margin-right: 0;
 }
 #addGate,
@@ -102,23 +102,32 @@ div.react-tel-input input.form-control {
   width: 75%;
   position:relative;
 }
-@media (min-width: 576px){
-  .modalDevice {
-    right: 10px;
-    top: 55px;
-    max-height: calc(100% - 100px);
-    position: fixed;
-    z-index:1000;
-  }
+.modalDevice {
+  right: 10px;
+  top: 55px;
+  max-height: calc(100% - 100px);
+  position: fixed;
+  z-index:800;
 }
 .posAbs{
   position: absolute;
 }
+.card-deck .card {
+  flex: 1 0;
+  margin-right: 15px;
+  margin-bottom: 0;
+  margin-left: 15px;
+}
+.card-deck{
+  display: flex;
+  flex-flow: 	row nowrap;
+}
 .deviceCard{
-  width:200px;
+  width:180px;
 }
 .cardImg{
-  padding:20px;
+  padding: 0px 20px 20px 20px;
+  width:140px;
 }
 .cardButton{
   width:100%;

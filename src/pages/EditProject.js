@@ -4,8 +4,7 @@ import {
   Devices
 } from "./projectSubPages/index.js";
 import { Row, Col } from "react-bootstrap";
-import Nav from "react-bootstrap/Nav";
-import Tab from "react-bootstrap/Tab";
+import {Nav, Tab} from "react-bootstrap";
 export function EditProject(props) {
   return (
     <div className="tabModal">
