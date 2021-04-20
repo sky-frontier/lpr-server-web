@@ -6,11 +6,14 @@ import {
   SubMenu
 } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
-import { House, List } from "react-bootstrap-icons";
+import { List } from "react-bootstrap-icons";
 import { Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { store } from "../store.js";
 import { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
+import InfoIcon from '@material-ui/icons/Info';
+import HomeIcon from '@material-ui/icons/Home';
+import CodeIcon from '@material-ui/icons/Code';
 
 export function NavBar() {
   const storeContext = useContext(store);
@@ -28,8 +31,8 @@ export function NavBar() {
     });
     history.push("/");
   };
-  const direct = (props) => {
-    let path = props.target.dataset.value;
+  const direct = (path) => {
+    console.log("clicked", path);
     setToggled(true);
     history.push(path);
   };
@@ -47,17 +50,17 @@ export function NavBar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto d-sm-block d-md-none">
             <Nav.Link>
-              <div data-value="/home" onClick={direct}>
+              <div onClick={()=>direct("/home")}>
                 Home
               </div>
             </Nav.Link>
             <Nav.Link>
-              <div data-value="/project" onClick={direct}>
+              <div onClick={()=>direct("/project")}>
                 Project
               </div>
             </Nav.Link>
             <Nav.Link>
-              <div data-value="/regex" onClick={direct}>
+              <div onClick={()=>direct("/regex")}>
                 Plate Regex
               </div>
             </Nav.Link>
@@ -85,22 +88,22 @@ export function NavBar() {
       <ProSidebar
         className="clickAble d-none d-sm-block navbar-default navbar-static-top"
         collapsed={toggled}
-        collapsedWidth="0px"
+        //collapsedWidth="px"
       >
         <SidebarContent>
-          <Menu iconShape="square">
-            <MenuItem icon={<House />}>
-              <div data-value="/home" onClick={direct}>
+          <Menu iconShape="circle">
+            <MenuItem icon={<HomeIcon onClick={()=>direct("/home")}/>}>
+              <div onClick={()=>direct("/home")}>
                 Home
               </div>
             </MenuItem>
-            <MenuItem icon={<House />}>
-              <div data-value="/project" onClick={direct}>
+            <MenuItem icon={<InfoIcon onClick={()=>direct("/project")} />}>
+              <div onClick={()=>direct("/projet")}>
                 Project
               </div>
             </MenuItem>
-            <MenuItem icon={<House />}>
-              <div data-value="/regex" onClick={direct}>
+            <MenuItem icon={<CodeIcon onClick={()=>direct("/regex")} />}>
+              <div onClick={()=>direct("/regex")}>
                 Plate Regex
               </div>
             </MenuItem>

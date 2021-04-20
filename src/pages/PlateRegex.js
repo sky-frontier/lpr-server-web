@@ -51,38 +51,38 @@ export function PlateRegex({ match }) {
         {
             id: 1,
             projectName: "Sample 1",
-            plateRegex: "S%ample 1",
-            plateNo: "Sample 1"
+            plateRegex: "S%D1234T",
+            plateNo: "SXD1234T"
         },
         {
             id: 2,
             projectName: "Sample 2",
-            plateRegex: "S%ample 2",
-            plateNo: "Sample 2"
+            plateRegex: "S%D1234T",
+            plateNo: "SXD1234T"
         },
         {
             id: 3,
             projectName: "Sample 3",
-            plateRegex: "S%ample 3",
-            plateNo: "Sample 3"
+            plateRegex: "S%D1234T",
+            plateNo: "SXD1234T"
         },
         {
             id: 4,
             projectName: "Sample 4",
-            plateRegex: "S%ample 4",
-            plateNo: "Sample 4"
+            plateRegex: "S%D1234T",
+            plateNo: "SXD1234T"
         },
         {
             id: 5,
             projectName: "Sample 5",
-            plateRegex: "S%ample 5",
-            plateNo: "Sample 5"
+            plateRegex: "S%D1234T",
+            plateNo: "SXD1234T"
         },
         {
             id: 6,
             projectName: "Sample 6",
-            plateRegex: "S%ample 6",
-            plateNo: "Sample 6"
+            plateRegex: "S%D1234T",
+            plateNo: "SXD1234T"
         }
     ];
     setInitialRows(res);
@@ -409,9 +409,9 @@ export function PlateRegex({ match }) {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Project</TableCell>
-                <TableCell align="left">Regex of Plate</TableCell>
-                <TableCell align="left">Actual Plate</TableCell>
+                <TableCell align="center">Project</TableCell>
+                <TableCell align="center">Regex of Plate</TableCell>
+                <TableCell align="center">Actual Plate</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -420,11 +420,23 @@ export function PlateRegex({ match }) {
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row) => (
                 <TableRow key={row.projectName}>
-                  <TableCell component="th" scope="row">
+                  <TableCell component="th" scope="row" align="center">
                     {row.projectName}
                   </TableCell>
-                  <TableCell align="left">{row.plateRegex}</TableCell>
-                  <TableCell align="left">{row.plateNo}</TableCell>
+                  <TableCell align="center">
+                    <div className="outerPlate" >
+                      <div className="innerPlate">
+                        <u>{row.plateRegex}</u>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell align="center">
+                    <div className="outerPlate" >
+                      <div className="innerPlate">
+                        <u>{row.plateNo}</u>
+                      </div>
+                    </div>
+                  </TableCell>
                   <TableCell align="right" style={{padding:0}}>
                     <IconButton onClick={() => activateModal(row)}>
                       <PencilSquare

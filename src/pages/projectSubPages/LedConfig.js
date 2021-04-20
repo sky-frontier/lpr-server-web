@@ -122,9 +122,9 @@ export function LedConfig(props) {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Trigger</TableCell>
-                <TableCell align="left">Voice Message</TableCell>
-                <TableCell align="left">Text Message</TableCell>
+                <TableCell align="center">Trigger</TableCell>
+                <TableCell align="center">Voice Message</TableCell>
+                <TableCell align="center">Text Message</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -133,10 +133,10 @@ export function LedConfig(props) {
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row) => (
                 <TableRow key={row.id}>
-                  <TableCell component="th" scope="row">
+                  <TableCell component="th" scope="row" align="center">
                     {row.trigger}
                   </TableCell>
-                  <TableCell align="left">
+                  <TableCell align="center">
                     {curID === row.id?
                     <Input 
                         id="voiceMsg" 
@@ -146,7 +146,7 @@ export function LedConfig(props) {
                     :row.voiceMsg
                     }
                   </TableCell>
-                  <TableCell align="left">
+                  <TableCell align="center">
                     {curID === row.id?
                     <Input 
                         id="textMsg" 
