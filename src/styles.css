@@ -163,3 +163,9 @@ div.react-tel-input input.form-control {
 .overflowTable{
   overflow-x: auto;
 }
+.padding-0{
+  padding: 0;
+}
+td.padding-0{
+  padding: 0;
+}

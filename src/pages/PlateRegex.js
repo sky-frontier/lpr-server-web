@@ -2,12 +2,10 @@ import React, { useState, useContext, useEffect } from "react";
 import { Form, Row, Col, Button, Breadcrumb, Modal } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { PencilSquare, Trash } from "react-bootstrap-icons";
-import { useHistory } from "react-router-dom";
 import { ConfirmModal, TablePaginationActions } from "../components/index.js";
 import {getProjects } from '../services/index.js';
 
 export function PlateRegex({ match }) {
-  let history = useHistory();
   const [initialRows, setInitialRows] = useState([]);
   const [validated, setValidated] = useState(false);
   const [rows, setRows] = useState([]);
@@ -21,6 +19,20 @@ export function PlateRegex({ match }) {
     projectName: "",
     plateNo: ""
   });
+  const [curState, setCurState] = useState({
+    projectName: "",
+    plateNo: ""
+  });
+  const reset = () =>{
+    setState({
+      projectName: "",
+      plateNo: ""
+    });
+    setCurState({
+      projectName: "",
+      plateNo: ""
+    });
+  }
   const [val, setVal] = useState({
     projectName: "",
     plateRegex: "",
@@ -63,8 +75,8 @@ export function PlateRegex({ match }) {
         {
             id: 3,
             projectName: "Sample 3",
-            plateRegex: "S%D1234T",
-            plateNo: "SXD1234T"
+            plateRegex: "S%D1232T",
+            plateNo: "SXD1232T"
         },
         {
             id: 4,
@@ -90,7 +102,7 @@ export function PlateRegex({ match }) {
 
   useEffect(() => {
     filter();
-  }, [initialRows]);
+  }, [initialRows, curState]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -128,13 +140,14 @@ export function PlateRegex({ match }) {
   };
 
   const filter = (e) => {
-    let { projectName, plateNo } = state;
+    let { projectName, plateNo } = curState;
+    console.log(projectName, plateNo);
     let curRows = initialRows;
     setRows(
       curRows.filter(
         (row) =>
-          row["projectName"].indexOf(projectName) >= 0 &&
-          row["plateNo"].indexOf(plateNo) >= 0
+          row["projectName"].toLowerCase().indexOf(projectName.toLowerCase()) >= 0 &&
+          row["plateNo"].toLowerCase().indexOf(plateNo.toLowerCase()) >= 0
       )
     );
   };
@@ -355,7 +368,7 @@ export function PlateRegex({ match }) {
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item active>Plate Regex</Breadcrumb.Item>
       </Breadcrumb>
-        <Form inline className="rightFlex">
+        <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
           <Row>
             <Col sm="auto">
               <Form.Control
@@ -381,8 +394,13 @@ export function PlateRegex({ match }) {
               />
             </Col>
             <Col sm="auto">
-              <Button type="button" onClick={filter}>
+              <Button type="button" onClick={()=>{setCurState(state)}}>
                 Search
+              </Button>
+            </Col>
+            <Col sm="auto">
+              <Button type="button" variant="secondary" onClick={reset}>
+                Cancel
               </Button>
             </Col>
             <Col sm="auto">

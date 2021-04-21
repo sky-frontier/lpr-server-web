@@ -1,14 +1,11 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Form, Row, Col, Button, Breadcrumb, Modal } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
-import { PencilSquare, Trash } from "react-bootstrap-icons";
-import { useHistory } from "react-router-dom";
-import { ConfirmModal, TablePaginationActions } from "../components/index.js";
+import { TablePaginationActions } from "../components/index.js";
 import {getMovementLogs } from '../services/index.js';
 import CarIcon from '../assets/car.png';
 
 export function Records({ match }) {
-  let history = useHistory();
   const [initialRows, setInitialRows] = useState([]);
   const [validated, setValidated] = useState(false);
   const [rows, setRows] = useState([]);
@@ -37,16 +34,15 @@ export function Records({ match }) {
     plateImage: "Plate Image"
   };
   const fields = [
-    "logID",
     "projectName",
     "vehicleType",
-    "actionTaken",
+  //  "actionTaken",
     "gateName",
     "gateType",
-    "originalPlate",
-    "confirmedPlate",
     "detectionTime",
     "confirmedTime",
+    "originalPlate",
+    "confirmedPlate",
     "image1",
     "image2",
     "image3",
@@ -60,23 +56,33 @@ export function Records({ match }) {
     gateType: "120px",
     originalPlate: "120px",
     confirmedPlate: "120px",
-    detectionTime: "120px",
-    confirmedTime: "120px",
-    image1: "120px",
-    image2: "120px",
-    image3: "120px",
-    plateImage: "120px"
+    detectionTime: "230px",
+    confirmedTime: "230px",
+    image1: "90px",
+    image2: "90px",
+    image3: "90px",
+    plateImage: "90px"
   };
+  const fieldHeight = {
+    image1: "50px",
+    image2: "50px",
+    image3: "50px",
+    plateImage: "50px"
+
+  }
   const [state, setState] = useState({
+    curField: "projectName",
+    val: ""
+  });
+  const [curState, setCurState] = useState({
     curField: "projectName",
     val: ""
   });
   const [dummy, setDummy] = useState(false);
   const [projects, setProjects] = useState([]);
   const reload = () =>{
-    getMovementLogs(fields, [])
+    getMovementLogs(fields.concat("logID"), [])
       .then(async (data) => {
-        console.log(data.content);
         setInitialRows(data.content);
       })
       .catch((error) => {
@@ -89,7 +95,7 @@ export function Records({ match }) {
 
   useEffect(() => {
     filter();
-  }, [initialRows]);
+  }, [initialRows, curState]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -107,15 +113,26 @@ export function Records({ match }) {
   };
 
   const filter = (e) => {
-    let { curField, val } = state;
+    let { curField, val } = curState;
     let curRows = initialRows;
     setRows(
       curRows.filter(
         (row) =>
-          row[curField].indexOf(val) >= 0
+          row[curField].toLowerCase().indexOf(val.toLowerCase()) >= 0
       )
     );
   };
+  
+  const reset = async (e) =>{
+    setState({
+      curField: "projectName",
+      val: ""
+    });
+    setCurState({
+      curField: "projectName",
+      val: ""
+    });
+  }
   
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -138,7 +155,7 @@ export function Records({ match }) {
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item active>Entry Exit Records</Breadcrumb.Item>
       </Breadcrumb>
-        <Form inline className="rightFlex">
+        <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
           <Row>
             <Col sm="auto">
               <Form.Control
@@ -162,8 +179,13 @@ export function Records({ match }) {
               />
             </Col>
             <Col sm="auto">
-              <Button type="button" onClick={filter}>
+              <Button type="button" onClick={()=>{setCurState(state)}}>
                 Search
+              </Button>
+            </Col>
+            <Col sm="auto">
+              <Button type="button" variant="secondary" onClick={reset}>
+                Cancel
               </Button>
             </Col>
           </Row>
@@ -184,52 +206,54 @@ export function Records({ match }) {
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row) => (
                 <TableRow key={row.logID}>
-                  <TableCell component="th" scope="row" align="center">
+                  <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.projectName}
                   </TableCell>
-                  <TableCell component="th" scope="row" align="center">
+                  <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.vehicleType}
                   </TableCell>
-                  <TableCell component="th" scope="row" align="center">
+                 {/* <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.actionTaken}
-                  </TableCell>
-                  <TableCell component="th" scope="row" align="center">
+            </TableCell>*/}
+                  <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.gateName}
                   </TableCell>
-                  <TableCell component="th" scope="row" align="center">
+                  <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.gateType}
                   </TableCell>
-                  <TableCell component="th" scope="row" align="center">
+                  <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.detectionTime}
                   </TableCell>
-                  <TableCell component="th" scope="row" align="center">
+                  <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.confirmedTime}
                   </TableCell>
-                  <TableCell align="center">
+                  <TableCell className="padding-0" align="center">
                     <div className="outerPlate" >
                       <div className="innerPlate">
                         <u>{row.originalPlate}</u>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell align="center">
+                  <TableCell className="padding-0" align="center">
                     <div className="outerPlate" >
                       <div className="innerPlate">
-                        <u>{row.confirmedPlate}</u>
+                        <u>{row.confirmedPlate === null ?
+                        "---------------":row.confirmedPlate
+                        }</u>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell align="center">
-                    <img src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
+                  <TableCell className="padding-0" align="center">
+                    <img style={{"height":fieldHeight.image1}} src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
                   </TableCell>
-                  <TableCell align="center">
-                    <img src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
+                  <TableCell className="padding-0" align="center">
+                    <img style={{"height":fieldHeight.image2}} src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
                   </TableCell>
-                  <TableCell align="center">
-                    <img src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
+                  <TableCell className="padding-0" align="center">
+                    <img style={{"height":fieldHeight.image3}} src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
                   </TableCell>
-                  <TableCell align="center">
-                    <img src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
+                  <TableCell className="padding-0" align="center">
+                    <img style={{"height":fieldHeight.plateImage}} src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
                   </TableCell>
                 </TableRow>
               ))}
@@ -243,7 +267,7 @@ export function Records({ match }) {
         </TableContainer>
         <TableRow className="d-flex justify-content-center">
             <TablePagination
-              rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
+              rowsPerPageOptions={[5, 10, 50]}
               colSpan={13}
               count={rows.length}
               rowsPerPage={rowsPerPage}

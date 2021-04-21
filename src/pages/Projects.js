@@ -20,6 +20,23 @@ export function Projects({ match }) {
     location: "",
     projectType: ""
   });
+  const [curState, setCurState] = useState({
+    projectName: "",
+    location: "",
+    projectType: ""
+  });
+  const reset = () =>{
+    setState({
+      projectName: "",
+      location: "",
+      projectType: ""
+    });
+    setCurState({
+      projectName: "",
+      location: "",
+      projectType: ""
+    });
+  }
   const [dummy, setDummy] = useState(false);
   const reload = () =>{
     getProjects(["projectID", "projectName", "location", "projectType"])
@@ -37,7 +54,7 @@ export function Projects({ match }) {
 
   useEffect(() => {
     filter();
-  }, [initialRows]);
+  }, [initialRows, curState]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -61,15 +78,15 @@ export function Projects({ match }) {
   };
 
   const filter = (e) => {
-    let { projectName, location, projectType } = state;
+    let { projectName, location, projectType } = curState;
     let curRows = initialRows;
     console.log(curRows);
     setRows(
       curRows.filter(
         (row) =>
-          row["projectName"].indexOf(projectName) >= 0 &&
-          row["location"].indexOf(location) >= 0 &&
-          row["projectType"].indexOf(projectType) >= 0
+          row["projectName"].toLowerCase().indexOf(projectName.toLowerCase()) >= 0 &&
+          row["location"].toLowerCase().indexOf(location.toLowerCase()) >= 0 &&
+          row["projectType"].toLowerCase().indexOf(projectType.toLowerCase()) >= 0
       )
     );
   };
@@ -146,7 +163,7 @@ export function Projects({ match }) {
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item active>Projects</Breadcrumb.Item>
       </Breadcrumb>
-        <Form inline className="rightFlex">
+        <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
           <Row>
             <Col sm="auto">
               <Form.Control
@@ -173,8 +190,13 @@ export function Projects({ match }) {
               />
             </Col>
             <Col sm="auto">
-              <Button type="button" onClick={()=>{reload();filter();}}>
+              <Button type="button" onClick={()=>{setCurState(state)}}>
                 Search
+              </Button>
+            </Col>
+            <Col sm="auto">
+              <Button type="button" variant="secondary" onClick={reset}>
+                Cancel
               </Button>
             </Col>
             <Col sm="auto">
