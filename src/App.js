@@ -11,7 +11,7 @@ import {
   Redirect
 } from "react-router-dom";
 
-import { Home, Login, Projects, EditProject, PlateRegex } from "./pages/index.js";
+import { Home, Login, Projects, EditProject, PlateRegex, Records } from "./pages/index.js";
 
 class DebugRouter extends Router {
   constructor(props) {
@@ -45,6 +45,9 @@ export function App() {
         </PrivateRoute>
         <PrivateRoute path="/regex">
           <PlateRegex />
+        </PrivateRoute>
+        <PrivateRoute path="/records">
+          <Records />
         </PrivateRoute>
         <PublicRoute path="/">
           <Login />

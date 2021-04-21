@@ -29,6 +29,24 @@ const getProjects = (columns) =>{
     .then(returnFunc)
 }
 
+const getMovementLogs = (columns, filters) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "getTable",
+          content: {
+            objName: "movementLog",
+            columns,
+            filters
+          }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 const addProject = () =>{
     const requestOptions = {
         method: "POST",
@@ -125,10 +143,9 @@ const createDevice = (gateID, deviceID) =>{
         manufacturer: "example manufacturer",
         manufacturerCode: "xyz123",
         direction: "entry",
-        isPrimaryDevice: true
-
-        }
-        const requestOptions = {
+        isPrimaryDevice: 1
+    }
+    const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -150,6 +167,22 @@ const getProjectInfo = (ID) =>{
             serviceName: "getProject",
             content: {
             projectID: ID
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const delProject = (ID) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "deleteProject",
+            content: {
+                projectID: ID
             }
         })
     };
@@ -206,6 +239,22 @@ const getGateInfo = (ID) =>{
     .then(returnFunc)
 }
 
+const delGate = (ID) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "deleteGate",
+            content: {
+                gateID: ID
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 const updateGateInfo = (ID, state) =>{
     const requestOptions = {
         method: "POST",
@@ -230,6 +279,22 @@ const getDeviceInfo = (ID) =>{
         body: JSON.stringify({
           authID: "",
           serviceName: "getDevice",
+          content: {
+              deviceID: ID
+          }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const delDevice = (ID) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "deleteDevice",
           content: {
               deviceID: ID
           }
@@ -270,5 +335,9 @@ export {
     getDeviceInfo,
     updateDeviceInfo,
     getProjects,
-    addProject
+    addProject,
+    delProject,
+    delGate,
+    delDevice,
+    getMovementLogs
 };

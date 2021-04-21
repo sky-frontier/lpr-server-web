@@ -176,6 +176,7 @@ export function PlateRegex({ match }) {
     filter();
     */
     console.log(id);
+    reload();
     toggleModal("delete");
   };
 

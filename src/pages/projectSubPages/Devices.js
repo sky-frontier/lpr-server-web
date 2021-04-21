@@ -5,7 +5,7 @@ import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { ConfirmModal, QueryModal } from "../../components/index.js";
-import { alertService, getDevice, getGate, createGate, createDevice } from '../../services/index.js';
+import { alertService, getDevice, getGate, createGate, createDevice, delGate, delDevice } from '../../services/index.js';
 
 
 import entry from '../../assets/entry.jpg';
@@ -30,7 +30,7 @@ export function Devices(props) {
   const [gates, setGates] = useState([]);
   const [devices, setDevices] = useState([]);
   const [curGate, setCurGate] = useState(null);
-  const [curID,setCurId] = useState(null);
+  const [curID,setCurID] = useState(null);
   const [toggle, setToggle] = useState({
     addGate: false,
     delGate: false,
@@ -79,6 +79,11 @@ export function Devices(props) {
     .then(async (data) => {
       reloadGates();
       setCurGate(data.message.gateID);
+      setInfo({
+        type: "gate",
+        id: data.message.gateID
+      });
+      toggleModal("addGate");
       alertService.success("Gate Added");
     })
     .catch((error) => {
@@ -89,21 +94,62 @@ export function Devices(props) {
 
   const handleAddDevice = (deviceID) => {
     console.log("adding",deviceID);
-    /*    
     createDevice(curGate, deviceID)
     .then(async (data) => {
       reloadDevices();
-      alertService.success("Device Added"");
+      setInfo({
+        type: "device",
+        id: data.message.deviceID
+      });
+      toggleModal("addDevice");
+      alertService.success("Device Added");
     })
     .catch((error) => {
         alertService.error("There was an error!" + error);
       console.error("There was an error!", error);
-    });*/
+    });
   };
 
-  const delGate = (id) => {console.log("deleting",id)};
+  const deleteDevice = (id) => {
+    delDevice(id)
+    .then(async (data) => {
+      reloadDevices();
+      if(info.type==="device"&&info.id===id){
+        setInfo({
+          type: null,
+          id: null
+        })
+      }
+      alertService.success("Device Deleted");
+      toggleModal("delDevice");
+    })
+    .catch((error) => {
+        alertService.error("There was an error!" + error);
+      console.error("There was an error!", error);
+    });
+  };
 
-  const delDevice = (id) => {console.log("deleting",id)};
+  const deleteGate = (id) => {
+    delGate(id)
+    .then(async (data) => {
+      reloadGates();
+      if(info.type==="gate"&&info.id===id){
+        setInfo({
+          type: null,
+          id: null
+        })
+      }
+      if(curGate === id){
+        setCurGate(null);
+      }
+      toggleModal("delGate");
+      alertService.success("Gate Deleted");
+    })
+    .catch((error) => {
+        alertService.error("There was an error!" + error);
+      console.error("There was an error!", error);
+    });
+  };
 
   const toggleModal = (modal) => {
     let prevVal = toggle[modal];
@@ -118,7 +164,7 @@ export function Devices(props) {
       <ConfirmModal
         hide={toggle.delGate}
         success={() => {
-          delGate(curID);
+          deleteGate(curID);
         }}
         toggleModal={() => {
           toggleModal("delGate");
@@ -140,7 +186,7 @@ export function Devices(props) {
       <ConfirmModal
         hide={toggle.delDevice}
         success={() => {
-          delDevice(curID);
+          deleteDevice(curID);
         }}
         toggleModal={() => {
           toggleModal("delDevice");
@@ -199,7 +245,7 @@ export function Devices(props) {
               <Card className = "deviceCard">
                 <div id="delGate">
                   <IconButton onClick={() => {
-                    setCurId(gate.gateID);
+                    setCurID(gate.gateID);
                     toggleModal("delGate");
                   }}>
                     <HighlightOffIcon style={{ color: "#d32f2f" }} />
@@ -247,7 +293,7 @@ export function Devices(props) {
               <Card className = "deviceCard">
                 <div id="delGate">
                   <IconButton onClick={() => {
-                    setCurId(device.deviceID);
+                    setCurID(device.deviceID);
                     toggleModal("delDevice");
                   }}>
                     <HighlightOffIcon style={{ color: "#d32f2f" }} />

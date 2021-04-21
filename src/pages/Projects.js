@@ -4,7 +4,7 @@ import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Tabl
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import { useHistory } from "react-router-dom";
 import { ConfirmModal, TablePaginationActions } from "../components/index.js";
-import {getProjects, addProject } from '../services/index.js';
+import {getProjects, addProject, delProject, alertService } from '../services/index.js';
 
 export function Projects({ match }) {
   let history = useHistory();
@@ -63,6 +63,7 @@ export function Projects({ match }) {
   const filter = (e) => {
     let { projectName, location, projectType } = state;
     let curRows = initialRows;
+    console.log(curRows);
     setRows(
       curRows.filter(
         (row) =>
@@ -76,7 +77,7 @@ export function Projects({ match }) {
   const insert = (e) => {
     addProject()
       .then(async (data) => {
-        let ID = data.content.projectID;
+        let ID = data.message.projectID;
         history.push("/project/" + ID);
       })
       .catch((error) => {
@@ -89,14 +90,15 @@ export function Projects({ match }) {
   };
 
   const del = async (projectID) => {
-    /*
-    API for removing 
-    */
-    console.log(projectID);
-    let curRows = initialRows;
-    console.log(curRows.filter((row) => projectID !== row["id"]));
-    setInitialRows(curRows.filter((row) => projectID !== row["id"]));
-    toggleModal("delete");
+    delProject(projectID)
+    .then(async (data) => {
+      reload();
+      toggleModal("delete");
+      alertService.success("Project Deleted");
+    })
+    .catch((error) => {
+      console.error("There was an error!", error);
+    });
   };
 
   
@@ -171,7 +173,7 @@ export function Projects({ match }) {
               />
             </Col>
             <Col sm="auto">
-              <Button type="button" onClick={filter}>
+              <Button type="button" onClick={()=>{reload();filter();}}>
                 Search
               </Button>
             </Col>

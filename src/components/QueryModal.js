@@ -11,8 +11,12 @@ export function QueryModal(props) {
     const handleChange = (e) =>{
       setValue(e.target.value);
     }
+    const exit = () =>{
+      setValue("");
+      toggleModal();
+    }
     return (
-      <Modal show={hide} onHide={toggleModal}>
+      <Modal show={hide} onHide={exit}>
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
@@ -26,12 +30,12 @@ export function QueryModal(props) {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={toggleModal}>
+          <Button variant="secondary" onClick={exit}>
             Cancel
           </Button>
           <Button variant="primary" onClick={()=>{
               success(value);
-              toggleModal();
+              exit();
               }}>
             Confirm
           </Button>

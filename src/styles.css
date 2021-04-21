@@ -94,12 +94,12 @@ div.react-tel-input input.form-control {
   position: relative;
 }
 .gateContainer{
-  width: 75%;
+  width: 72%;
   position:relative;
 }
 .deviceContainter{
   margin-top:20px;
-  width: 75%;
+  width: 72%;
   position:relative;
   padding-bottom:20px;
 }
@@ -159,4 +159,7 @@ div.react-tel-input input.form-control {
   display: inline-block;
   border: 2px solid #64D381;
   border-radius: 4px;
+}
+.overflowTable{
+  overflow-x: auto;
 }

@@ -13,7 +13,11 @@ import {
     getDeviceInfo,
     updateDeviceInfo,
     getProjects,
-    addProject} from "./api";
+    addProject,
+    delProject,
+    delGate,
+    delDevice,
+    getMovementLogs} from "./api";
 export {
     alertService,
     alertType,
@@ -30,5 +34,9 @@ export {
     getDeviceInfo,
     updateDeviceInfo,
     getProjects,
-    addProject
+    addProject,
+    delProject,
+    delGate,
+    delDevice,
+    getMovementLogs
 };

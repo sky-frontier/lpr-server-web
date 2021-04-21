@@ -14,6 +14,8 @@ import { useHistory } from "react-router-dom";
 import InfoIcon from '@material-ui/icons/Info';
 import HomeIcon from '@material-ui/icons/Home';
 import CodeIcon from '@material-ui/icons/Code';
+import StorageIcon from '@material-ui/icons/Storage';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 export function NavBar() {
   const storeContext = useContext(store);
@@ -64,6 +66,11 @@ export function NavBar() {
                 Plate Regex
               </div>
             </Nav.Link>
+            <Nav.Link>
+              <div onClick={()=>direct("/records")}>
+                Records
+              </div>
+            </Nav.Link>
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item data-value="/home" onClick={direct}>
                 Action
@@ -107,7 +114,12 @@ export function NavBar() {
                 Plate Regex
               </div>
             </MenuItem>
-            <SubMenu title="Components">
+            <MenuItem icon={<StorageIcon onClick={()=>direct("/records")} />}>
+              <div onClick={()=>direct("/records")}>
+                Exit/Entry Records
+              </div>
+            </MenuItem>
+            <SubMenu title="Components" icon={<MoreVertIcon/>}>
               <MenuItem>Component 1</MenuItem>
               <MenuItem>Component 2</MenuItem>
             </SubMenu>
