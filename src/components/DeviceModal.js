@@ -4,11 +4,10 @@ import TimeField from 'react-simple-timefield';
 import { alertService, getDeviceInfo, updateDeviceInfo } from '../services/index.js';
 
 export function DeviceModal(props) {
-    let ID = parseInt(props.id);
+    let ID = props.id;
     let toggleModel = props.toggleModal;
     const [validated, setValidated] = useState(false);
     const [state, setState] = useState({});
-    const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
     getDeviceInfo(ID)
@@ -20,7 +19,7 @@ export function DeviceModal(props) {
       alertService.error("There was an error!");
       console.error("There was an error!", error);
     });
-  }, [dummy]);
+  }, [ID]);
 
   const handleChange = (e, filler, e2) => {
       console.log(e,filler,e2);

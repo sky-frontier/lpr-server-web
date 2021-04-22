@@ -3,7 +3,8 @@ import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { TablePaginationActions } from "../components/index.js";
 import {getMovementLogs } from '../services/index.js';
-import CarIcon from '../assets/car.png';
+import closeGate from '../assets/closeGate.png';
+import openGate from '../assets/openGate.jpg';
 
 export function Records({ match }) {
   const [initialRows, setInitialRows] = useState([]);
@@ -12,7 +13,6 @@ export function Records({ match }) {
   const  queryFields = [
     "projectName",
     "vehicleType",
-    "actionTaken",
     "gateName",
     "gateType",
     "originalPlate",
@@ -21,7 +21,7 @@ export function Records({ match }) {
   const fieldPlaceholder = {
     projectName: "Project Name",
     vehicleType: "Vehicle Type",
-    actionTaken: "Action Taken",
+    isOpened: "Is Opened",
     gateName: "Gate Name",
     gateType: "Gate Type",
     originalPlate: "Original Plate",
@@ -36,7 +36,7 @@ export function Records({ match }) {
   const fields = [
     "projectName",
     "vehicleType",
-  //  "actionTaken",
+    "isOpened",
     "gateName",
     "gateType",
     "detectionTime",
@@ -51,7 +51,7 @@ export function Records({ match }) {
   const fieldLength = {
     projectName: "120px",
     vehicleType: "120px",
-    actionTaken: "120px",
+    isOpened: "120px",
     gateName: "120px",
     gateType: "120px",
     originalPlate: "120px",
@@ -67,8 +67,8 @@ export function Records({ match }) {
     image1: "50px",
     image2: "50px",
     image3: "50px",
-    plateImage: "50px"
-
+    plateImage: "50px",
+    isOpened: "50px"
   }
   const [state, setState] = useState({
     curField: "projectName",
@@ -212,9 +212,11 @@ export function Records({ match }) {
                   <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.vehicleType}
                   </TableCell>
-                 {/* <TableCell className="padding-0" component="th" scope="row" align="center">
-                    {row.actionTaken}
-            </TableCell>*/}
+                  <TableCell className="padding-0" component="th" scope="row" align="center">
+                    {row.isOpened === true?
+                    <img style={{"height":fieldHeight.isOpened}} src={openGate} className="success-transform"/>:
+                    <img style={{"height":fieldHeight.isOpened}} src={closeGate} className="danger-transform"/>}
+            </TableCell>
                   <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.gateName}
                   </TableCell>

@@ -136,6 +136,12 @@ div.react-tel-input input.form-control {
 .primary-transform{
   filter: invert(36%) sepia(49%) saturate(6233%) hue-rotate(200deg) brightness(103%) contrast(104%);
 }
+.danger-transform{
+  filter: invert(17%) sepia(86%) saturate(6280%) hue-rotate(357deg) brightness(105%) contrast(115%);
+}
+.success-transform{
+  filter: invert(50%) sepia(100%) saturate(401%) hue-rotate(81deg) brightness(86%) contrast(82%);
+}
 .alertGrp{
   z-index:2000;
   position:fixed;
