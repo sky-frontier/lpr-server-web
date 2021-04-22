@@ -16,6 +16,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import CodeIcon from '@material-ui/icons/Code';
 import StorageIcon from '@material-ui/icons/Storage';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import LocalParkingIcon from '@material-ui/icons/LocalParking';
 
 export function NavBar() {
   const storeContext = useContext(store);
@@ -68,7 +69,12 @@ export function NavBar() {
             </Nav.Link>
             <Nav.Link>
               <div onClick={()=>direct("/records")}>
-                Records
+                Log Records
+              </div>
+            </Nav.Link>
+            <Nav.Link>
+              <div onClick={()=>direct("/parking")}>
+                Parking Records
               </div>
             </Nav.Link>
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
@@ -117,6 +123,11 @@ export function NavBar() {
             <MenuItem icon={<StorageIcon onClick={()=>direct("/records")} />}>
               <div onClick={()=>direct("/records")}>
                 Exit/Entry Records
+              </div>
+            </MenuItem>
+            <MenuItem icon={<LocalParkingIcon onClick={()=>direct("/parking")} />}>
+              <div onClick={()=>direct("/parking")}>
+                Parking Records
               </div>
             </MenuItem>
             <SubMenu title="Components" icon={<MoreVertIcon/>}>

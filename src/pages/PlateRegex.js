@@ -3,109 +3,89 @@ import { Form, Row, Col, Button, Breadcrumb, Modal } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import { ConfirmModal, TablePaginationActions } from "../components/index.js";
-import {getProjects } from '../services/index.js';
+import {getProjects, 
+  getSpecialPlate,
+  delSpecialPlate,
+  updateSpecialPlate,
+  addSpecialPlate } from '../services/index.js';
 
 export function PlateRegex({ match }) {
   const [initialRows, setInitialRows] = useState([]);
   const [validated, setValidated] = useState(false);
+  const [curID, setCurID] = useState("");
   const [rows, setRows] = useState([]);
   const [toggle, setToggle] = useState({
     delete: false,
     add: false,
     edit: false
   });
-  const [curID, setCurID] = useState("");
   const [state, setState] = useState({
-    projectName: "",
-    plateNo: ""
+    projectID: null,
+    actualPlate: ""
   });
   const [curState, setCurState] = useState({
-    projectName: "",
-    plateNo: ""
+    projectID: null,
+    actualPlate: ""
   });
   const reset = () =>{
     setState({
-      projectName: "",
-      plateNo: ""
+      projectID: null,
+      actualPlate: ""
     });
     setCurState({
-      projectName: "",
-      plateNo: ""
+      projectID: null,
+      actualPlate: ""
     });
   }
   const [val, setVal] = useState({
-    projectName: "",
-    plateRegex: "",
-    plateNo: ""
+    projectID: null,
+    matchPlate: "",
+    actualPlate: ""
   });
   const [dummy, setDummy] = useState(false);
   const [projects, setProjects] = useState([]);
+  const [projectNames, setProjectNames] = useState({});
   const reload = () =>{
-    /*getProjects(["projectID", "projectName", "location", "projectType"])
+    getSpecialPlate(["projectID", "matchPlate", "actualPlate"])
       .then(async (data) => {
         console.log(data.content);
         setInitialRows(data.content);
       })
       .catch((error) => {
         console.error("There was an error!", error);
-      });*/
+      });
   }
+  const func = async (val) =>{
+    let temp = {};
+    val.forEach(async (element)=>{
+      temp[element.projectID] = element.projectName;
+    });
+    return await temp;
+  };
   useEffect(() => {
-    //reload();
     getProjects(["projectID", "projectName"])
     .then(async (data) => {
       setProjects(data.content);
+      func(data.content).then(async(list)=>{
+        setProjectNames(await list);
+      });
     })
     .catch((error) => {
       console.error("There was an error!", error);
     });
-    let res = [
-        {
-            id: 1,
-            projectName: "Sample 1",
-            plateRegex: "S%D1234T",
-            plateNo: "SXD1234T"
-        },
-        {
-            id: 2,
-            projectName: "Sample 2",
-            plateRegex: "S%D1234T",
-            plateNo: "SXD1234T"
-        },
-        {
-            id: 3,
-            projectName: "Sample 3",
-            plateRegex: "S%D1232T",
-            plateNo: "SXD1232T"
-        },
-        {
-            id: 4,
-            projectName: "Sample 4",
-            plateRegex: "S%D1234T",
-            plateNo: "SXD1234T"
-        },
-        {
-            id: 5,
-            projectName: "Sample 5",
-            plateRegex: "S%D1234T",
-            plateNo: "SXD1234T"
-        },
-        {
-            id: 6,
-            projectName: "Sample 6",
-            plateRegex: "S%D1234T",
-            plateNo: "SXD1234T"
-        }
-    ];
-    setInitialRows(res);
   }, [dummy]);
+
+  useEffect(()=>{
+    reload();
+  },projectNames);
 
   useEffect(() => {
     filter();
   }, [initialRows, curState]);
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
+    let { id, value } = e.target;
+    if(id==="projectID")value = parseInt(value);
     setState((prevState) => ({
       ...prevState,
       [id]: value
@@ -113,7 +93,8 @@ export function PlateRegex({ match }) {
   };
 
   const handleChangeVal = (e) =>{
-    const { id, value } = e.target;
+    let { id, value } = e.target;
+    if(id==="projectID")value = parseInt(value);
     setVal((prevState) => ({
       ...prevState,
       [id]: value
@@ -129,25 +110,24 @@ export function PlateRegex({ match }) {
   };
 
   const activateModal = (values) => {
-    let {id, plateRegex, plateNo} = values;
+    let {projectID, matchPlate, actualPlate} = values;
     setValidated(false);
     setVal({
-        plateRegex,
-        plateNo
-        });
-    setCurID(id);
+        projectID,
+        matchPlate,
+        actualPlate
+      });
     toggleModal("edit");
   };
 
   const filter = (e) => {
-    let { projectName, plateNo } = curState;
-    console.log(projectName, plateNo);
+    let { projectID, actualPlate } = curState;
     let curRows = initialRows;
     setRows(
       curRows.filter(
         (row) =>
-          row["projectName"].toLowerCase().indexOf(projectName.toLowerCase()) >= 0 &&
-          row["plateNo"].toLowerCase().indexOf(plateNo.toLowerCase()) >= 0
+          (projectID === null || row["projectID"] === projectID) &&
+          row["actualPlate"].toLowerCase().indexOf(actualPlate.toLowerCase()) >= 0
       )
     );
   };
@@ -162,8 +142,14 @@ export function PlateRegex({ match }) {
     setValidated(true);
     console.log(form.checkValidity());
     if (form.checkValidity()){
-        ///API for editing & reload
+      addSpecialPlate(val)
+      .then(async (data) => {
+        reload();
         toggleModal("add");
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
     }
   };
 
@@ -177,20 +163,26 @@ export function PlateRegex({ match }) {
     setValidated(true);
     console.log(form.checkValidity());
     if (form.checkValidity()){
-        ///API for editing & reload
-        toggleModal("edit");
+        updateSpecialPlate(val)
+        .then(async (data) => {
+          reload();
+          toggleModal("edit");
+        })
+        .catch((error) => {
+          console.error("There was an error!", error);
+        });
     }
   };
 
   const del = (id) => {
-    /*
-    API for removing 
-    reload();
-    filter();
-    */
-    console.log(id);
-    reload();
-    toggleModal("delete");
+    delSpecialPlate(id)
+    .then(async (data) => {
+      reload();
+      toggleModal("delete");
+    })
+    .catch((error) => {
+      console.error("There was an error!", error);
+    });
   };
 
   
@@ -228,32 +220,30 @@ export function PlateRegex({ match }) {
       </Modal.Header>
       <Modal.Body>
         <Form noValidate validated={validated} onSubmit={insert}>
-            <Form.Group as={Row}>
-                <Form.Label column sm={5}>
-                    Project Name
-                </Form.Label>
-                <Col
-                    sm={6}
-                >
-                    <Form.Control
-                        required
-                        custom
-                        as = "select"
-                        id="projectName"
-                        placeholder="Name"
-                        onChange={handleChangeVal}
-                        value={val.projectName}
-                    >
-                        <option value={""}>--Select Project--</option>
-                        {projects.map((project)=>(
-                            <option value={project.projectName}>{project.projectName}</option>
-                        ))}
-                    </Form.Control>
-                    <Form.Control.Feedback type="invalid">
-                    Regex is a required field.
-                    </Form.Control.Feedback>
-                </Col>
-            </Form.Group>
+        <Form.Group as={Row}>
+          <Form.Label column sm={5}>
+            Project Name
+          </Form.Label>
+          <Col sm={6}>
+              <Form.Control
+                custom
+                required
+                as = "select"
+                id="projectID"
+                placeholder="Name"
+                onChange={handleChangeVal}
+                value={val.projectID}
+              >
+                  <option value={null}>--Select a Project--</option>
+                  {projects.map((project)=>(
+                      <option value={project.projectID}>{project.projectName}</option>
+                  ))}
+              </Form.Control>
+              <Form.Control.Feedback type="invalid">
+                Project Name is a required field.
+                </Form.Control.Feedback>
+            </Col>
+        </Form.Group>
             <Form.Group as={Row}>
             <Form.Label column sm={5}>
                 Regex for Plate
@@ -264,9 +254,9 @@ export function PlateRegex({ match }) {
                 <Form.Control
                 required
                 placeholder="Regex"
-                id="plateRegex"
-                name="plateRegex"
-                value={val.plateRegex}
+                id="matchPlate"
+                name="matchPlate"
+                value={val.matchPlate}
                 onChange={handleChangeVal}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -276,21 +266,21 @@ export function PlateRegex({ match }) {
             </Form.Group>
             <Form.Group as={Row}>
             <Form.Label column sm={5}>
-                Plate No.
+                Actual Plate
             </Form.Label>
             <Col
                 sm={6}
             >
                 <Form.Control
                 required
-                placeholder="Plate No."
-                id="plateNo"
-                name="plateNo"
-                value={val.plateNo}
+                placeholder="Actual Plate"
+                id="actualPlate"
+                name="actualPlate"
+                value={val.actualPlate}
                 onChange={handleChangeVal}
                 />
                 <Form.Control.Feedback type="invalid">
-                Plate No. is a required field.
+                Actual Plate is a required field.
                 </Form.Control.Feedback>
             </Col>
             </Form.Group>
@@ -322,9 +312,9 @@ export function PlateRegex({ match }) {
                 <Form.Control
                 required
                 placeholder="Regex"
-                id="plateRegex"
-                name="plateRegex"
-                value={val.plateRegex}
+                id="matchPlate"
+                name="matchPlate"
+                value={val.matchPlate}
                 onChange={handleChangeVal}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -334,21 +324,21 @@ export function PlateRegex({ match }) {
             </Form.Group>
             <Form.Group as={Row}>
             <Form.Label column sm={5}>
-                Plate No.
+                Actual Plate
             </Form.Label>
             <Col
                 sm={6}
             >
                 <Form.Control
                 required
-                placeholder="Plate No."
-                id="plateNo"
-                name="plateNo"
-                value={val.plateNo}
+                placeholder="Actual Plate"
+                id="actualPlate"
+                name="actualPlate"
+                value={val.actualPlate}
                 onChange={handleChangeVal}
                 />
                 <Form.Control.Feedback type="invalid">
-                Plate No. is a required field.
+                Actual Plate is a required field.
                 </Form.Control.Feedback>
             </Col>
             </Form.Group>
@@ -374,23 +364,23 @@ export function PlateRegex({ match }) {
               <Form.Control
                 custom
                 as = "select"
-                id="projectName"
+                id="projectID"
                 placeholder="Name"
                 onChange={handleChange}
-                value={state.projectName}
+                value={state.projectID}
               >
-                  <option value={""}>All Projects</option>
+                  <option value={null}>All Projects</option>
                   {projects.map((project)=>(
-                      <option value={project.projectName}>{project.projectName}</option>
+                      <option value={project.projectID}>{project.projectName}</option>
                   ))}
               </Form.Control>
             </Col>
             <Col sm="auto">
               <Form.Control
-                id="plateNo"
-                placeholder="Plate No."
+                id="actualPlate"
+                placeholder="Actual Plate"
                 onChange={handleChange}
-                value={state.plateNo}
+                value={state.actualPlate}
               />
             </Col>
             <Col sm="auto">
@@ -409,9 +399,9 @@ export function PlateRegex({ match }) {
                 type="button"
                 onClick={() => {
                 setVal({
-                    projectName: "",
-                    plateRegex: "",
-                    plateNo: ""
+                    projectID: "",
+                    matchPlate: "",
+                    actualPlate: ""
                     });
                   setValidated(false);
                   toggleModal("add");
@@ -438,33 +428,33 @@ export function PlateRegex({ match }) {
               {(rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row) => (
-                <TableRow key={row.projectName}>
+                <TableRow key={row.matchPlate}>
                   <TableCell component="th" scope="row" align="center">
-                    {row.projectName}
+                    {projectNames[row.projectID]}
                   </TableCell>
                   <TableCell align="center">
                     <div className="outerPlate" >
                       <div className="innerPlate">
-                        <u>{row.plateRegex}</u>
+                        <u>{row.matchPlate}</u>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell align="center">
                     <div className="outerPlate" >
                       <div className="innerPlate">
-                        <u>{row.plateNo}</u>
+                        <u>{row.actualPlate}</u>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell align="right" style={{padding:0}}>
-                    <IconButton onClick={() => activateModal(row)}>
+                    <IconButton onClick={() => {activateModal(row)}}>
                       <PencilSquare
                         size={21}
                         color="royalblue"
                       />
                     </IconButton>
                     <IconButton onClick={() => {
-                        setCurID(row.id);
+                        setCurID(row.matchPlate);
                         toggleModal("delete");
                     }}>
                       <Trash color="red" size={21} />

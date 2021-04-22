@@ -47,6 +47,71 @@ const getMovementLogs = (columns, filters) =>{
     .then(returnFunc)
 }
 
+const getSpecialPlate = (columns, filters) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "getTable",
+          content: {
+            objName: "specialPlate",
+            columns,
+            filters
+          }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const addSpecialPlate = (state) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "createSpecialPlate",
+          content: state
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const delSpecialPlate = (matchPlate) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "deleteSpecialPlate",
+            content: {
+                matchPlate
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const updateSpecialPlate = (state) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "modifySpecialPlate",
+            content: {
+            matchPlate: state.matchPlate,
+            modifyParams: state
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 const addProject = () =>{
     const requestOptions = {
         method: "POST",
@@ -339,5 +404,9 @@ export {
     delProject,
     delGate,
     delDevice,
-    getMovementLogs
+    getMovementLogs,
+    getSpecialPlate,
+    delSpecialPlate,
+    updateSpecialPlate,
+    addSpecialPlate
 };

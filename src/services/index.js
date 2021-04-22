@@ -17,7 +17,11 @@ import {
     delProject,
     delGate,
     delDevice,
-    getMovementLogs} from "./api";
+    getMovementLogs,
+    getSpecialPlate,
+    delSpecialPlate,
+    updateSpecialPlate,
+    addSpecialPlate} from "./api";
 export {
     alertService,
     alertType,
@@ -38,5 +42,9 @@ export {
     delProject,
     delGate,
     delDevice,
-    getMovementLogs
+    getMovementLogs,
+    getSpecialPlate,
+    delSpecialPlate,
+    updateSpecialPlate,
+    addSpecialPlate
 };
