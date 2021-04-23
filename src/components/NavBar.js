@@ -17,6 +17,7 @@ import CodeIcon from '@material-ui/icons/Code';
 import StorageIcon from '@material-ui/icons/Storage';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LocalParkingIcon from '@material-ui/icons/LocalParking';
+import PaymentIcon from '@material-ui/icons/Payment';
 
 export function NavBar() {
   const storeContext = useContext(store);
@@ -130,9 +131,9 @@ export function NavBar() {
                 Parking Records
               </div>
             </MenuItem>
-            <SubMenu title="Components" icon={<MoreVertIcon/>}>
-              <MenuItem>Component 1</MenuItem>
-              <MenuItem>Component 2</MenuItem>
+            <SubMenu title="Access" icon={<PaymentIcon/>}>
+              <MenuItem  onClick={()=>direct("/accessRules")} >Access Rules</MenuItem>
+              <MenuItem>Tracking</MenuItem>
             </SubMenu>
           </Menu>
         </SidebarContent>
