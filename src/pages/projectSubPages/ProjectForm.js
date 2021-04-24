@@ -3,9 +3,10 @@ import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { alertService, getProjectInfo, updateProjectInfo } from '../../services/index.js';
+import {useParams} from "react-router-dom";
 
-export function ProjectForm(props) {
-  let ID = parseInt(props.ID);
+export function ProjectForm() {
+  let { projectID }= useParams();
   const [validated, setValidated] = useState(false);
   const [state, setState] = useState({
     projectName: "",
@@ -18,7 +19,7 @@ export function ProjectForm(props) {
   const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
-    getProjectInfo(ID)
+    getProjectInfo(projectID)
       .then(async (data) => {
         setState(data.message);
       })
@@ -49,7 +50,7 @@ export function ProjectForm(props) {
   };
 
   const update = () => {
-    updateProjectInfo(ID, state)
+    updateProjectInfo(projectID, state)
       .then(async (data) => {
         alertService.success('Update Successful!');
       })
@@ -74,7 +75,7 @@ export function ProjectForm(props) {
           <Col
             sm={4}
           >
-            <Form.Control type="text" placeholder={ID} readOnly />
+            <Form.Control type="text" placeholder={projectID} readOnly />
           </Col>
         </Form.Group>
 

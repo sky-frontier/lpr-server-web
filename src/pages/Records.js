@@ -68,21 +68,26 @@ export function Records({ match }) {
     image2: "50px",
     image3: "50px",
     plateImage: "50px",
-    isOpened: "50px"
+    isOpened: "30px"
   }
   const [state, setState] = useState({
     curField: "projectName",
-    val: ""
+    val: "",
+    startTime: "",
+    endTime: ""
   });
   const [curState, setCurState] = useState({
     curField: "projectName",
-    val: ""
+    val: "",
+    startTime: "",
+    endTime: ""
   });
   const [dummy, setDummy] = useState(false);
   const [projects, setProjects] = useState([]);
   const reload = () =>{
     getMovementLogs(fields.concat("logID"), [])
       .then(async (data) => {
+        console.log(data.content.slice(0,6));
         setInitialRows(data.content);
       })
       .catch((error) => {
@@ -179,6 +184,14 @@ export function Records({ match }) {
               />
             </Col>
             <Col sm="auto">
+              <Form.Control
+                id="val"
+                placeholder="Time Range Begin"
+                onChange={handleChange}
+                value={state.val}
+              />
+            </Col>
+            <Col sm="auto">
               <Button type="button" onClick={()=>{setCurState(state)}}>
                 Search
               </Button>
@@ -237,25 +250,24 @@ export function Records({ match }) {
                     </div>
                   </TableCell>
                   <TableCell className="padding-0" align="center">
+                    {row.confirmedPlate===null?null:
                     <div className="outerPlate" >
                       <div className="innerPlate">
-                        <u>{row.confirmedPlate === null ?
-                        "---------------":row.confirmedPlate
-                        }</u>
+                        <u>{row.confirmedPlate}</u>
                       </div>
-                    </div>
+                    </div>}
                   </TableCell>
                   <TableCell className="padding-0" align="center">
-                    <img style={{"height":fieldHeight.image1}} src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
+                    <img style={{"height":fieldHeight.image1}} src={row.image1}/>
                   </TableCell>
                   <TableCell className="padding-0" align="center">
-                    <img style={{"height":fieldHeight.image2}} src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
+                    <img style={{"height":fieldHeight.image2}} src={row.image2} />
                   </TableCell>
                   <TableCell className="padding-0" align="center">
-                    <img style={{"height":fieldHeight.image3}} src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
+                    <img style={{"height":fieldHeight.image3}} src={row.image3} />
                   </TableCell>
                   <TableCell className="padding-0" align="center">
-                    <img style={{"height":fieldHeight.plateImage}} src="https://s.blogcdn.com/slideshows/images/slides/501/681/4/S5016814/slug/l/img-8442-copy-1.jpg" />
+                    <img style={{"height":fieldHeight.plateImage}} src={row.plateImage} />
                   </TableCell>
                 </TableRow>
               ))}

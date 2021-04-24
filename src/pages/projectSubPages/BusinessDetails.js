@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Form, Row, Col, Button, InputGroup, Breadcrumb } from "react-bootstrap";
 import NumericInput from "react-numeric-input";
 import { alertService, getBusinessInfo, updateBusinessInfo } from '../../services/index.js';
+import {useParams} from "react-router-dom";
 
 export function BusinessDetails(props) {
-  let ID = props.ID;
+  let {projectID} = useParams();
   const [state, setState] = useState({
     barrierDelay: 5,
     networkWarningDuration: 5,
@@ -16,7 +17,7 @@ export function BusinessDetails(props) {
 
   useEffect(() => {
     /*   
-    getBusinessInfo(ID)
+    getBusinessInfo(projectID)
     .then(async (data) => {
       setState(data.message)
     })

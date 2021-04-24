@@ -1,29 +1,40 @@
 import { useState, useEffect, useContext } from "react";
 import { Form, Row, Col, Button, Modal } from "react-bootstrap";
 import TimeField from 'react-simple-timefield';
-import { alertService, getGateInfo, updateGateInfo } from '../services/index.js';
+import { alertService, createGate, getGateInfo, updateGateInfo } from '../services/index.js';
 
 export function GateModal(props) {
-    let ID = parseInt(props.id);
-    let toggleModel = props.toggleModal;
+    let {hide, gateID, toggleModal, success, newState, projectID } = props;
     const [validated, setValidated] = useState(false);
     const [state, setState] = useState({});
     const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
     setValidated(false);
-    getGateInfo(ID)
-    .then(async (data) => {
-      setState(data.message);
-    })
-    .catch((error) => {
-      alertService.error("There was an error!");
-      console.error("There was an error!", error);
-    });
-  }, [dummy, ID]);
+    console.log("gateModal", gateID, projectID, newState);
+    if(newState){
+      setState({
+        gateName: "",
+        gateType: "",
+  //      isOpenForInvalid: false,
+  //      isOpenForTemp: false,
+        isChargeable: false,
+        ledOnTime: "00:00:00",
+        ledOffTime: "00:00:00"
+      });
+    }else{
+      getGateInfo(gateID)
+      .then(async (data) => {
+        setState(data.message);
+      })
+      .catch((error) => {
+        alertService.error("There was an error!");
+        console.error("Get Gate, There was an error!", error);
+      });
+    }
+  }, [dummy,newState,gateID]);
 
   const handleChange = (e, filler, e2) => {
-      console.log(e,filler,e2);
     let id, value;
     if (e2 === undefined) {
       id = e.target.id;
@@ -54,44 +65,49 @@ export function GateModal(props) {
       e.stopPropagation();
     }
     setValidated(true);
-    if (form.checkValidity()) update();
+    if (form.checkValidity()){
+      if(newState) create();
+      else update();
+    }
   };
 
   const update = () => {
-    updateGateInfo(ID, state)
+    updateGateInfo(gateID, state)
     .then(async (data) => {
+      setValidated(false);
         alertService.success("Update Successful!");
+        success();
     })
     .catch((error) => {
       alertService.error("There was an error!");
-        console.error("There was an error!", error);
+        console.error("Update Gate, There was an error!", error);
     });
   };
 
-  return (
-    <div className ="posAbs">
-      <div className = "modal-dialog modalDevice modal-dialog-scrollable">
-        <div className = "modal-content">
-            <Modal.Header
-             onHide={toggleModel}
-             closeButton>
-                <Modal.Title>Gate Details</Modal.Title>
-            </Modal.Header>
-            <div className="modal-body">
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                <div>
-                    <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
-                        Gate ID
-                    </Form.Label>
-                    <Col
-                        sm={6}
-                        className="align-items-center d-flex justify-content-center"
-                    >
-                        <Form.Control type="text" placeholder={ID} readOnly />
-                    </Col>
-                    </Form.Group>
+  const create = () =>{
+    createGate(projectID, state)
+    .then(async (data) => {
+      setValidated(false);
+      alertService.success("Addition Successful!");
+      success();
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+        console.error("Add Gate, There was an error!", error);
+    });
+  }
 
+  return (
+    <Modal show={hide} onHide={()=>{
+      setValidated(false);
+      toggleModal();}}>
+            <Modal.Header
+             closeButton>
+                <Modal.Title>{newState?"Add Gate":"Edit Gate"}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+            <Form id='gateModal' noValidate validated={validated} onSubmit={handleSubmit}>
+                <div>
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
                         Gate Name
@@ -138,7 +154,7 @@ export function GateModal(props) {
                         </Form.Control.Feedback>
                     </Col>
                     </Form.Group>
-
+{/*
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
                         Open Gate for invalid/expired season pass holders
@@ -172,7 +188,7 @@ export function GateModal(props) {
                         />
                     </Col>
                     </Form.Group>
-
+*/}
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
                         Charge fee for entry
@@ -241,16 +257,19 @@ export function GateModal(props) {
                     </Form.Group>
 
                 </div>
-                <Form.Group as={Row}>
-                <Col sm={{ span: 1, offset: 9 }}>
-                    <Button type="submit">Update</Button>
-                </Col>
-                </Form.Group>
             </Form>
-            </div>
-            </div>
-        </div>
-    </div>
+          </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={()=>{
+    setValidated(false);
+    toggleModal();}}>
+            Cancel
+          </Button>
+          <Button form ="gateModal" variant="primary" type="submit">
+            Confirm
+          </Button>
+        </Modal.Footer>
+    </Modal>
   );
 }
 

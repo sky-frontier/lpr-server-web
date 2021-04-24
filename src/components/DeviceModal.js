@@ -1,28 +1,40 @@
 import { useState, useEffect, useContext } from "react";
 import { Form, Row, Col, Button, Modal } from "react-bootstrap";
-import TimeField from 'react-simple-timefield';
-import { alertService, getDeviceInfo, updateDeviceInfo } from '../services/index.js';
+import { alertService, createDevice, getDeviceInfo, updateDeviceInfo } from '../services/index.js';
 
 export function DeviceModal(props) {
-    let ID = props.id;
-    let toggleModel = props.toggleModal;
+    let {hide, gateID, toggleModal, success, newState, deviceID } = props;
     const [validated, setValidated] = useState(false);
     const [state, setState] = useState({});
+    const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
-    getDeviceInfo(ID)
-    .then(async (data) => {
-      console.log(data.message);
-      setState(data.message);
-    })
-    .catch((error) => {
-      alertService.error("There was an error!");
-      console.error("There was an error!", error);
-    });
-  }, [ID]);
+    setValidated(false);
+    if(newState){
+      setState({
+        gateID,
+        deviceID: "",
+        deviceName: "",
+        deviceType: "",
+        deviceCarpark: "",
+        manufacturer: "",
+        manufacturerCode: "",
+        direction: "",
+        isPrimaryDevice: false
+      });
+    }else{
+      getDeviceInfo(deviceID)
+      .then(async (data) => {
+        setState(data.message);
+      })
+      .catch((error) => {
+        alertService.error("There was an error!");
+        console.error("Get Gate, There was an error!", error);
+      });
+    }
+  }, [dummy,newState,gateID]);
 
   const handleChange = (e, filler, e2) => {
-      console.log(e,filler,e2);
     let id, value;
     if (e2 === undefined) {
       id = e.target.id;
@@ -31,7 +43,6 @@ export function DeviceModal(props) {
       id = e2.id;
       value = e;
     }
-    console.log(typeof state[id]);
     if (typeof state[id] === "boolean") {
         console.log("bool");
       setState((prevState) => ({
@@ -54,31 +65,48 @@ export function DeviceModal(props) {
       e.stopPropagation();
     }
     setValidated(true);
-    if (form.checkValidity()) update();
+    if (form.checkValidity()){
+      if(newState) create();
+      else update();
+    }
   };
 
   const update = () => {
-    updateDeviceInfo(ID,state)
+    updateDeviceInfo(deviceID, state)
     .then(async (data) => {
+        setValidated(false);
         alertService.success("Update Successful!");
+        success();
     })
     .catch((error) => {
-        alertService.error("There was an error!");
-        console.error("There was an error!", error);
+      alertService.error("There was an error!");
+        console.error("Update Device, There was an error!", error);
     });
   };
 
+  const create = () =>{
+    createDevice(gateID, state)
+    .then(async (data) => {
+        setValidated(false);
+      alertService.success("Addition Successful!");
+      success();
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+        console.error("Add Device, There was an error!", error);
+    });
+  }
+
   return (
-    <div className ="posAbs">
-      <div className = "modal-dialog modalDevice modal-dialog-scrollable">
-        <div className = "modal-content">
+    <Modal show={hide} onHide={()=>{
+    setValidated(false);
+    toggleModal();}}>
             <Modal.Header
-             onHide={toggleModel}
              closeButton>
-                <Modal.Title>Device Details</Modal.Title>
+                <Modal.Title>{newState?"Add Device":"Edit Device"}</Modal.Title>
             </Modal.Header>
-            <div className="modal-body">
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Modal.Body>
+            <Form id ="deviceModal" noValidate validated={validated} onSubmit={handleSubmit}>
                 <div>
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
@@ -98,8 +126,8 @@ export function DeviceModal(props) {
                     </Form.Label>
                     <Col
                         sm={6}
-                    >
-                        <Form.Control
+                    >{newState?
+                        <div><Form.Control
                         required
                         placeholder="ID"
                         id="deviceID"
@@ -109,7 +137,7 @@ export function DeviceModal(props) {
                         />
                         <Form.Control.Feedback type="invalid">
                         Device ID is a required field.
-                        </Form.Control.Feedback>
+                        </Form.Control.Feedback></div>:<Form.Control type="text" placeholder={state.deviceID} readOnly />}
                     </Col>
                     </Form.Group>
 
@@ -175,7 +203,7 @@ export function DeviceModal(props) {
                         </Form.Control.Feedback>
                     </Col>
                     </Form.Group>
-
+                    {newState?null:
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
                         Status
@@ -186,7 +214,7 @@ export function DeviceModal(props) {
                     >
                         <Form.Control type="text" placeholder={state.deviceStatus} readOnly />
                     </Col>
-                    </Form.Group>
+                    </Form.Group>}
 
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
@@ -221,7 +249,7 @@ export function DeviceModal(props) {
                         placeholder="Manufacturer Code"
                         id="manufacturerCode"
                         name="manufacturerCode"
-                        value={state.manufacturer}
+                        value={state.manufacturerCode}
                         onChange={handleChange}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -242,7 +270,7 @@ export function DeviceModal(props) {
                         placeholder="Direction"
                         id="direction"
                         name="direction"
-                        value={state.manufacturer}
+                        value={state.direction}
                         onChange={handleChange}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -269,16 +297,19 @@ export function DeviceModal(props) {
                     </Form.Group>
 
                 </div>
-                <Form.Group as={Row}>
-                <Col sm={{ span: 1, offset: 9 }}>
-                    <Button type="submit">Update</Button>
-                </Col>
-                </Form.Group>
             </Form>
-            </div>
-            </div>
-        </div>
-    </div>
+          </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={()=>{
+    setValidated(false);
+    toggleModal();}}>
+            Cancel
+          </Button>
+          <Button form ="deviceModal" variant="primary" type="submit">
+            Confirm
+          </Button>
+        </Modal.Footer>
+    </Modal>
   );
 }
 

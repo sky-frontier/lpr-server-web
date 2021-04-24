@@ -173,18 +173,12 @@ const getDevice = (ID, columns) =>{
     .then(returnFunc)
 }
 
-const createGate = (ID) =>{
+const createGate = (projectID,values) =>{
     const newGateReq = {
-        projectID: ID,
-        gateName: "New Gate",
-        gateType: "entry",
-        isOpenForInvalid: false,
-        isOpenForTemp: false,
-        isChargeable: false,
-        ledOnTime: "00:00:00",
-        ledOffTime: "00:00:00"
-        }
-        const requestOptions = {
+        ...values,
+        projectID
+    };
+    const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -197,18 +191,10 @@ const createGate = (ID) =>{
     .then(returnFunc)
 }
 
-const createDevice = (gateID, deviceID) =>{
+const createDevice = (gateID, values) =>{
     const newDeviceReq = {
-        deviceID,
-        gateID,
-        deviceName: "Front Entry Camera",
-        deviceType: "LPR camera",
-        deviceCarpark: "Trevista Car Park",
-        deviceStatus: "online",
-        manufacturer: "example manufacturer",
-        manufacturerCode: "xyz123",
-        direction: "entry",
-        isPrimaryDevice: 1
+        ...values,
+        gateID
     }
     const requestOptions = {
         method: "POST",

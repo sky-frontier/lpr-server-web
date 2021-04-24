@@ -37,7 +37,7 @@ export function App() {
         <PrivateRoute path="/home">
           <Home />
         </PrivateRoute>
-        <PrivateRoute path="/project/:projectId">
+        <PrivateRoute path="/project/:projectID">
           <EditProject />
         </PrivateRoute>
         <PrivateRoute path="/project">

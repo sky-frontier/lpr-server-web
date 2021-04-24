@@ -1,155 +1,40 @@
-import { Card, Button, CardDeck, Breadcrumb } from "react-bootstrap";
-import { useState, useEffect } from "react";
-import { DeviceModal, GateModal } from "../../components/index.js";
-import IconButton from "@material-ui/core/IconButton";
-import AddIcon from "@material-ui/icons/Add";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import { ConfirmModal, QueryModal } from "../../components/index.js";
-import { alertService, getDevice, getGate, createGate, createDevice, delGate, delDevice } from '../../services/index.js';
+import React, { useState, useContext, useEffect } from "react";
+import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
+import {Tooltip, TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
+import { PencilSquare, Trash, Cpu } from "react-bootstrap-icons";
 
+import { useHistory, useParams, useLocation } from "react-router-dom";
+import { ConfirmModal, DeviceModal, TablePaginationActions } from "../../components/index.js";
+import {getDevice, alertService, delDevice} from '../../services/index.js';
+import { Directions } from "@material-ui/icons";
+import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
+import SignalCellularConnectedNoInternet0BarIcon from '@material-ui/icons/SignalCellularConnectedNoInternet0Bar';
 
-import entry from '../../assets/entry.jpg';
-import exit from '../../assets/exit.png';
-import sample from '../../assets/sample.svg';
-
-function image(value){
-  switch(value){
-    case "entry":
-      return entry;
-    case "exit":
-      return exit;
-    default:
-      return sample;
-  }
-  return entry;
-}
-
-export function Devices(props) {
-  let ID = parseInt(props.ID);
-  const [dummy, setDummy] = useState(false);
-  const [gates, setGates] = useState([]);
-  const [devices, setDevices] = useState([]);
-  const [curGate, setCurGate] = useState(null);
-  const [curID,setCurID] = useState(null);
+export function Devices (){
+    let { projectID, gateID }= useParams();
+    let history = useHistory();
+    let {pathname} = useLocation();
+  const [rows, setRows] = useState([]);
   const [toggle, setToggle] = useState({
-    addGate: false,
-    delGate: false,
-    addDevice: false,
-    delDevice: false
+    delete: false,
+    edit: false
   });
-  const [info, setInfo] = useState({
-    type: null,
-    id: null
-  });
-
-  const reloadGates = () =>{
-    getGate(ID, ["gateID", "gateName", "gateType"])
-    .then(async (data) => {
-      setGates(data.content);
-    })
-    .catch((error) => {
-      alertService.error("There was an error!" + error);
-      console.error("There was an error!", error);
-    });
+  const [modal, setModal] = useState(true);
+  const [curID, setCurID] = useState("");
+  const [dummy, setDummy] = useState(false);
+  const reload = () =>{
+    getDevice(gateID, ["deviceID", "deviceName", "deviceType", "deviceStatus"])
+      .then(async (data) => {
+        console.log(data.content);
+        setRows(data.content);
+      })
+      .catch((error) => {
+        console.error("Get Device, there was an error!", error);
+      });
   }
-
   useEffect(() => {
-    reloadGates();
+    reload();
   }, [dummy]);
-
-  const reloadDevices = () =>{
-    getDevice(curGate,["deviceID", "deviceName", "deviceType", "deviceStatus"])
-    .then(async (data) => {
-      console.log(curGate);
-      console.log(data.content);
-      setDevices(data.content);
-    })
-    .catch((error) => {
-      alertService.error("There was an error!" + error);
-      console.error("There was an error!", error);
-    });
-  }
-
-  useEffect(() => {
-    reloadDevices();
-  }, [curGate]);
-
-  const handleAddGate = () => {    
-    createGate(ID)
-    .then(async (data) => {
-      reloadGates();
-      setCurGate(data.message.gateID);
-      setInfo({
-        type: "gate",
-        id: data.message.gateID
-      });
-      toggleModal("addGate");
-      alertService.success("Gate Added");
-    })
-    .catch((error) => {
-      alertService.error("There was an error!" + error);
-      console.error("There was an error!", error);
-    });
-  };
-
-  const handleAddDevice = (deviceID) => {
-    console.log("adding",deviceID);
-    createDevice(curGate, deviceID)
-    .then(async (data) => {
-      reloadDevices();
-      setInfo({
-        type: "device",
-        id: data.message.deviceID
-      });
-      toggleModal("addDevice");
-      alertService.success("Device Added");
-    })
-    .catch((error) => {
-        alertService.error("There was an error!" + error);
-      console.error("There was an error!", error);
-    });
-  };
-
-  const deleteDevice = (id) => {
-    delDevice(id)
-    .then(async (data) => {
-      reloadDevices();
-      if(info.type==="device"&&info.id===id){
-        setInfo({
-          type: null,
-          id: null
-        })
-      }
-      alertService.success("Device Deleted");
-      toggleModal("delDevice");
-    })
-    .catch((error) => {
-        alertService.error("There was an error!" + error);
-      console.error("There was an error!", error);
-    });
-  };
-
-  const deleteGate = (id) => {
-    delGate(id)
-    .then(async (data) => {
-      reloadGates();
-      if(info.type==="gate"&&info.id===id){
-        setInfo({
-          type: null,
-          id: null
-        })
-      }
-      if(curGate === id){
-        setCurGate(null);
-      }
-      toggleModal("delGate");
-      alertService.success("Gate Deleted");
-    })
-    .catch((error) => {
-        alertService.error("There was an error!" + error);
-      console.error("There was an error!", error);
-    });
-  };
 
   const toggleModal = (modal) => {
     let prevVal = toggle[modal];
@@ -159,167 +44,158 @@ export function Devices(props) {
     }));
   };
 
+  const del = async (deviceID) => {
+    delDevice(deviceID)
+    .then(async (data) => {
+      reload();
+      toggleModal("delete");
+      alertService.success("Device Deleted");
+    })
+    .catch((error) => {
+      console.error("Delete Device, There was an error!", error);
+    });
+  };
+
+  
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   return (
     <div>
       <ConfirmModal
-        hide={toggle.delGate}
+        hide={toggle.delete}
         success={() => {
-          deleteGate(curID);
+          del(curID);
         }}
         toggleModal={() => {
-          toggleModal("delGate");
-        }}
-        title="Confirm Deletion"
-        body="Delete this gate?"
-      />
-      <ConfirmModal
-        hide={toggle.addGate}
-        success={() => {
-          handleAddGate();
-        }}
-        toggleModal={() => {
-          toggleModal("addGate");
-        }}
-        title="Confirm Addition"
-        body="Add a new gate?"
-      />
-      <ConfirmModal
-        hide={toggle.delDevice}
-        success={() => {
-          deleteDevice(curID);
-        }}
-        toggleModal={() => {
-          toggleModal("delDevice");
+          toggleModal("delete");
         }}
         title="Confirm Deletion"
         body="Delete this device?"
       />
-      <QueryModal
-        hide={toggle.addDevice}
-        success={handleAddDevice}
-        toggleModal={() => {
-          toggleModal("addDevice");
+      <DeviceModal
+        hide={toggle.edit}
+        deviceID = {curID}
+        newState = {modal}
+        gateID = {gateID}
+        success={() => {
+            reload();
+            toggleModal("edit");
         }}
-        title="Confirm Addition"
-        body="Enter Device ID"
-      />      
+        toggleModal={() => {
+          toggleModal("edit");
+        }}
+      />
+
+      <div className="content">
       <Breadcrumb>
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item href="/project">Projects</Breadcrumb.Item>
+        <Breadcrumb.Item href={"/project/"+projectID+"/gate"}>Gates</Breadcrumb.Item>
         <Breadcrumb.Item active>Devices</Breadcrumb.Item>
       </Breadcrumb>
-      <div>
-      {info.type === null? null:(
-        info.type === "gate"? 
-        <GateModal 
-        id={info.id}
-        toggleModal={
-          ()=>setInfo({
-            type: null,
-            id: null
-          })}
-          />
-          :
-          <DeviceModal 
-        id={info.id}
-        toggleModal={
-          ()=>setInfo({
-            type: null,
-            id: null
-          })}
-          />
-      )}
+        <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
+          <Row>
+            <Col sm="auto">
+              <Button
+                className="btn btn-success"
+                type="button"
+                onClick={() => {
+                    setModal(true);
+                  toggleModal("edit");
+                }}
+              >
+                + Add
+              </Button>
+            </Col>
+          </Row>
+        </Form>
       </div>
-      <div className="gateContainer">
-        <div id="gateHeader">
-          <div className = "navbar-brand">Gates</div>
-        </div>
-        <div id="addGate">
-          <IconButton aria-label="add" onClick={()=> toggleModal("addGate")}>
-            <AddIcon style={{ color: "#4caf50" }} />
-          </IconButton>
-        </div>
-        <div className="deviceTab cardDiv scrollbar scrollbar-primary align-items-center d-flex">
-          <CardDeck>
-            {gates.map((gate) => (
-              <Card className = "deviceCard">
-                <div id="delGate">
-                  <IconButton onClick={() => {
-                    setCurID(gate.gateID);
-                    toggleModal("delGate");
-                  }}>
-                    <HighlightOffIcon style={{ color: "#d32f2f" }} />
-                  </IconButton>
-                </div>
-                <Card.Body>
-                  <Card.Text>{gate.gateName}</Card.Text>
-                  <Card.Img
-                    className = "cardImg primary-transform"
-                    variant="top"
-                    src={image(gate.gateType)}
-                  />
-                  <Button
-                    variant="primary"
-                    className = "cardButton"
-                    onClick={() => {
-                      setInfo({
-                        type: "gate",
-                        id: gate.gateID
-                      });
-                      setCurGate(gate.gateID);
-                    }}
-                  >
-                    Devices
-                  </Button>
-                </Card.Body>
-              </Card>
-            ))}
-          </CardDeck>
-        </div>
+      <div className="content">
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+            <TableHead >
+              <TableRow>
+                <TableCell align="left"><b>ID</b></TableCell>
+                <TableCell align="center"><b>Name</b></TableCell>
+                <TableCell align="center"><b>Type</b></TableCell>
+                <TableCell align="center"><b>Status</b></TableCell>
+                <TableCell align="right"><b>Actions</b></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(rowsPerPage > 0
+            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            : rows).map((row, index) => (
+                <TableRow key={row.gateName}>
+                <TableCell align="left">{row.deviceID}</TableCell>
+                  <TableCell align="center">{row.deviceName}</TableCell>
+                  <TableCell align="center">{row.deviceType}</TableCell>
+                  <TableCell align="center">{row.deviceStatus?
+                  <SignalCellularAltIcon style={{ color: "#4caf50" }}/>:<SignalCellularConnectedNoInternet0BarIcon style={{ color: "#f44336" }}/>
+                  }</TableCell>
+                  <TableCell align="right" style={{padding:0}}>
+                  <Tooltip title="Edit">
+                    <IconButton onClick={() => {
+                        setCurID(row.deviceID);
+                        setModal(false);
+                        toggleModal("edit");
+                    }}>
+                      <PencilSquare
+                        size={21}
+                        color="gold"
+                      />
+                    </IconButton>
+                    </Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton onClick={() => {
+                        setCurID(row.deviceID);
+                        toggleModal("delete");
+                    }}>
+                      <Trash color="red" size={21} />
+                    </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
+            <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
+                colSpan={4}
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: { 'aria-label': 'rows per page' },
+                  native: true,
+                }}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableRow>
+          </TableFooter>
+          </Table>
+        </TableContainer>
       </div>
-      {curGate === null ? null : 
-      <div className="deviceContainter">
-        <div id="gateHeader">
-        <div className = "navbar-brand">Devices</div>
-        </div>
-        <div id="addGate">
-          <IconButton aria-label="add" onClick={()=>toggleModal("addDevice")}>
-            <AddIcon style={{ color: "#4caf50" }} />
-          </IconButton>
-        </div>
-        <div className="deviceTab cardDiv scrollbar scrollbar-primary align-items-center d-flex">
-          <CardDeck>
-            {devices.map((device) => (
-              <Card className = "deviceCard">
-                <div id="delGate">
-                  <IconButton onClick={() => {
-                    setCurID(device.deviceID);
-                    toggleModal("delDevice");
-                  }}>
-                    <HighlightOffIcon style={{ color: "#d32f2f" }} />
-                  </IconButton>
-                </div>
-                <Card.Body>
-                  <Card.Text>{device.deviceName}</Card.Text>
-                  <Card.Img
-                    style = {{cursor: "pointer"}}
-                    className = {"cardImg" + device.deviceStatus === "Offline"? " primary-transform": ""}
-                    variant="top"
-                    src={image(device.deviceType)}
-                    onClick={() => {
-                      setInfo({
-                        type: "device",
-                        id: device.deviceID
-                      });
-                    }}
-                  />
-                </Card.Body>
-              </Card>
-            ))}
-          </CardDeck>
-        </div>
-      </div>
-      }
     </div>
   );
 }

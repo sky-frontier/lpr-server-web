@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Breadcrumb } from "react-bootstrap";
 import {Input , TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { TablePaginationActions } from "../../components/index.js";
+import {useParams} from "react-router-dom";
 
 import { PencilSquare } from "react-bootstrap-icons";
 import SaveIcon from '@material-ui/icons/Save';
@@ -9,7 +10,7 @@ import CloseIcon from '@material-ui/icons/Close';
 
 
 export function LedConfig(props) {
-  let ID = parseInt(props.ID);
+  let {projectID} = useParams();
   const [rows, setRows] = useState([]);
   const [curID, setCurID] = useState(null);
   const [state, setState] = useState({
