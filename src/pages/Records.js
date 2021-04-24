@@ -123,7 +123,7 @@ export function Records({ match }) {
     setRows(
       curRows.filter(
         (row) =>
-          row[curField].toLowerCase().indexOf(val.toLowerCase()) >= 0
+          row[curField].toLowerCase().indexOf(val.toLowerCase()) >= 0 
       )
     );
   };
@@ -179,14 +179,6 @@ export function Records({ match }) {
               <Form.Control
                 id="val"
                 placeholder={fieldPlaceholder[state.curField]}
-                onChange={handleChange}
-                value={state.val}
-              />
-            </Col>
-            <Col sm="auto">
-              <Form.Control
-                id="val"
-                placeholder="Time Range Begin"
                 onChange={handleChange}
                 value={state.val}
               />
