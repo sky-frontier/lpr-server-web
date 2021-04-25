@@ -65,6 +65,26 @@ const getSpecialPlate = (columns, filters) =>{
     .then(returnFunc)
 }
 
+const getAccessRule = (projectID, columns) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "getTable",
+          content: {
+            objName: "accessRule",
+            columns,
+            filters:{
+                projectID
+            }
+          }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 const addSpecialPlate = (state) =>{
     const requestOptions = {
         method: "POST",
@@ -372,6 +392,56 @@ const updateDeviceInfo = (ID, state) =>{
     .then(returnFunc)
 }
 
+const createAccessRule = (values) =>{
+    const newDeviceReq = {
+        ...values
+    }
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "createAccessRule",
+            content: newDeviceReq
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const getAccessRuleInfo = (ID) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "getAccessRule",
+          content: {
+            accessRuleID: ID
+          }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const updateAccessRuleInfo = (ID, state) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "modifyAccessRule",
+            content: {
+                accessRuleID: ID,
+                modifyParams: state
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 export {
     getGate,
     getDevice,
@@ -394,5 +464,9 @@ export {
     getSpecialPlate,
     delSpecialPlate,
     updateSpecialPlate,
-    addSpecialPlate
+    addSpecialPlate,
+    getAccessRule,
+    createAccessRule,
+    getAccessRuleInfo,
+    updateAccessRuleInfo
 };

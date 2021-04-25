@@ -1,105 +1,78 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Form, Row, Col, Button, Breadcrumb, Modal } from "react-bootstrap";
-import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
-import { PencilSquare, Trash } from "react-bootstrap-icons";
-import { ConfirmModal, TablePaginationActions } from "../components/index.js";
-import {getProjects, 
-  getSpecialPlate,
-  delSpecialPlate,
-  updateSpecialPlate,
-  addSpecialPlate } from '../services/index.js';
+import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
+import {Tooltip, TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
+import { PencilSquare, Trash, Cpu } from "react-bootstrap-icons";
 
-export function ParkingRules({ match }) {
-  const [initialRows, setInitialRows] = useState([]);
-  const [validated, setValidated] = useState(false);
-  const [curID, setCurID] = useState("");
+import { useHistory, useParams, useLocation } from "react-router-dom";
+import { ConfirmModal, RulesModal, TablePaginationActions } from "../components/index.js";
+import {getGate, alertService, delGate, getProjects, getAccessRule} from '../services/index.js';
+import { Directions } from "@material-ui/icons";
+
+export function ParkingRules (){
   const [rows, setRows] = useState([]);
   const [toggle, setToggle] = useState({
     delete: false,
-    add: false,
     edit: false
   });
-  const [state, setState] = useState({
-    projectID: null,
-    actualPlate: ""
-  });
-  const [curState, setCurState] = useState({
-    projectID: null,
-    actualPlate: ""
-  });
-  const reset = () =>{
-    setState({
-      projectID: null,
-      actualPlate: ""
-    });
-    setCurState({
-      projectID: null,
-      actualPlate: ""
-    });
-  }
-  const [val, setVal] = useState({
-    projectID: null,
-    matchPlate: "",
-    actualPlate: ""
-  });
+  const [project,setProject] = useState(null);
+  const [curID, setCurID] = useState("");
   const [dummy, setDummy] = useState(false);
-  const [projects, setProjects] = useState([]);
   const [projectNames, setProjectNames] = useState({});
-  const reload = () =>{
-    getSpecialPlate(["projectID", "matchPlate", "actualPlate"])
-      .then(async (data) => {
-        console.log(data.content);
-        setInitialRows(data.content);
-      })
-      .catch((error) => {
-        console.error("There was an error!", error);
-      });
-  }
-  const func = async (val) =>{
+  const [gateNames, setGateNames] = useState({});
+  const [projects,setProjects] = useState([]);
+  const func = async (val, inputField, outputField) =>{
     let temp = {};
     val.forEach(async (element)=>{
-      temp[element.projectID] = element.projectName;
+      temp[element[inputField]] = element[outputField];
     });
     return await temp;
   };
-  useEffect(() => {
+  const reloadProjects = () =>{
     getProjects(["projectID", "projectName"])
-    .then(async (data) => {
-      setProjects(data.content);
-      func(data.content).then(async(list)=>{
-        setProjectNames(await list);
+      .then(async (data) => {
+        console.log(data.content);
+        setProjects(data.content);
+        func(data.content, "projectID", "projectName").then(async(list)=>{
+          setProjectNames(await list);
+        });
+      })
+      .catch((error) => {
+        console.error("Get Gate, there was an error!", error);
       });
+  }
+  useEffect(() => {
+    reloadProjects();
+  }, [dummy]);
+
+  const reload = () =>{
+    getAccessRule(project, ["accessRuleID", "accessRuleName", "isChargeable", "gates"])
+    .then(async (data) => {
+      console.log(data.content);
+      //setRows(data.content);
+      setRows((data.content).map((val)=>{return{...val,
+      gates:[1,2]}}));
     })
     .catch((error) => {
-      console.error("There was an error!", error);
+      console.error("Get Gate, there was an error!", error);
     });
-  }, [dummy]);
+  }
+
+  const reloadGates = () =>{
+    getGate(project,["gateID","gateName"])
+      .then(async (data) => {
+        func(data.content, "gateID", "gateName").then(async(list)=>{
+          setGateNames(await list);
+        });
+      })
+      .catch((error) => {
+        console.error("Get Gate, there was an error!", error);
+      });
+  }
 
   useEffect(()=>{
     reload();
-  },projectNames);
-
-  useEffect(() => {
-    filter();
-  }, [initialRows, curState]);
-
-  const handleChange = (e) => {
-    let { id, value } = e.target;
-    if(id==="projectID")value = parseInt(value);
-    setState((prevState) => ({
-      ...prevState,
-      [id]: value
-    }));
-  };
-
-  const handleChangeVal = (e) =>{
-    let { id, value } = e.target;
-    if(id==="projectID")value = parseInt(value);
-    setVal((prevState) => ({
-      ...prevState,
-      [id]: value
-    }));
-  }
+    if(project!==null)reloadGates();
+  },[project]);
 
   const toggleModal = (modal) => {
     let prevVal = toggle[modal];
@@ -109,82 +82,18 @@ export function ParkingRules({ match }) {
     }));
   };
 
-  const activateModal = (values) => {
-    let {projectID, matchPlate, actualPlate} = values;
-    setValidated(false);
-    setVal({
-        projectID,
-        matchPlate,
-        actualPlate
-      });
-    toggleModal("edit");
-  };
-
-  const filter = (e) => {
-    let { projectID, actualPlate } = curState;
-    let curRows = initialRows;
-    setRows(
-      curRows.filter(
-        (row) =>
-          (projectID === null || row["projectID"] === projectID) &&
-          row["actualPlate"].toLowerCase().indexOf(actualPlate.toLowerCase()) >= 0
-      )
-    );
-  };
-
-  const insert = (e) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    if (form.checkValidity() === false) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    setValidated(true);
-    console.log(form.checkValidity());
-    if (form.checkValidity()){
-      addSpecialPlate(val)
-      .then(async (data) => {
-        reload();
-        toggleModal("add");
-      })
-      .catch((error) => {
-        console.error("There was an error!", error);
-      });
-    }
-  };
-
-  const edit = (e) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    if (form.checkValidity() === false) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    setValidated(true);
-    console.log(form.checkValidity());
-    if (form.checkValidity()){
-        updateSpecialPlate(val)
-        .then(async (data) => {
-          reload();
-          toggleModal("edit");
-        })
-        .catch((error) => {
-          console.error("There was an error!", error);
-        });
-    }
-  };
-
-  const del = (id) => {
-    delSpecialPlate(id)
+  const del = async (accessRuleID) => {
+    /*
+    delGate(gateID)
     .then(async (data) => {
       reload();
       toggleModal("delete");
+      alertService.success("Rule Deleted");
     })
     .catch((error) => {
-      console.error("There was an error!", error);
-    });
+      console.error("Delete Rule, There was an error!", error);
+    });*/
   };
-
   
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -213,150 +122,25 @@ export function ParkingRules({ match }) {
         title="Confirm Deletion"
         body="Delete this rule?"
       />
-      <Modal show={toggle.add} onHide={()=>toggleModal("add")}
-      centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Add Plate Regex Record</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form noValidate validated={validated} onSubmit={insert}>
-        <Form.Group as={Row}>
-          <Form.Label column sm={5}>
-            Project Name
-          </Form.Label>
-          <Col sm={6}>
-              <Form.Control
-                custom
-                required
-                as = "select"
-                id="projectID"
-                placeholder="Name"
-                onChange={handleChangeVal}
-                value={val.projectID}
-              >
-                  <option value={null}>--Select a Project--</option>
-                  {projects.map((project)=>(
-                      <option value={project.projectID}>{project.projectName}</option>
-                  ))}
-              </Form.Control>
-              <Form.Control.Feedback type="invalid">
-                Project Name is a required field.
-                </Form.Control.Feedback>
-            </Col>
-        </Form.Group>
-            <Form.Group as={Row}>
-            <Form.Label column sm={5}>
-                Regex for Plate
-            </Form.Label>
-            <Col
-                sm={6}
-            >
-                <Form.Control
-                required
-                placeholder="Regex"
-                id="matchPlate"
-                name="matchPlate"
-                value={val.matchPlate}
-                onChange={handleChangeVal}
-                />
-                <Form.Control.Feedback type="invalid">
-                Regex is a required field.
-                </Form.Control.Feedback>
-            </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-            <Form.Label column sm={5}>
-                Actual Plate
-            </Form.Label>
-            <Col
-                sm={6}
-            >
-                <Form.Control
-                required
-                placeholder="Actual Plate"
-                id="actualPlate"
-                name="actualPlate"
-                value={val.actualPlate}
-                onChange={handleChangeVal}
-                />
-                <Form.Control.Feedback type="invalid">
-                Actual Plate is a required field.
-                </Form.Control.Feedback>
-            </Col>
-            </Form.Group>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={()=>toggleModal("add")}>
-                Cancel
-                </Button>
-                <Button variant="primary" type="submit">
-                Confirm
-                </Button>
-            </Modal.Footer>
-        </Form>
-      </Modal.Body>
-    </Modal>
-    <Modal show={toggle.edit} onHide={()=>toggleModal("edit")}
-      centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Plate Regex Record</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form noValidate validated={validated} onSubmit={edit}>
-            <Form.Group as={Row}>
-            <Form.Label column sm={5}>
-                Regex for Plate
-            </Form.Label>
-            <Col
-                sm={6}
-            >
-                <Form.Control
-                required
-                placeholder="Regex"
-                id="matchPlate"
-                name="matchPlate"
-                value={val.matchPlate}
-                onChange={handleChangeVal}
-                />
-                <Form.Control.Feedback type="invalid">
-                Regex is a required field.
-                </Form.Control.Feedback>
-            </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-            <Form.Label column sm={5}>
-                Actual Plate
-            </Form.Label>
-            <Col
-                sm={6}
-            >
-                <Form.Control
-                required
-                placeholder="Actual Plate"
-                id="actualPlate"
-                name="actualPlate"
-                value={val.actualPlate}
-                onChange={handleChangeVal}
-                />
-                <Form.Control.Feedback type="invalid">
-                Actual Plate is a required field.
-                </Form.Control.Feedback>
-            </Col>
-            </Form.Group>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={()=>toggleModal("edit")}>
-                Cancel
-                </Button>
-                <Button variant="primary" type="submit">
-                Confirm
-                </Button>
-            </Modal.Footer>
-        </Form>
-      </Modal.Body>
-    </Modal>
+      {toggle.edit?
+      <RulesModal
+        hide={toggle.edit}
+        projectID = {project}
+        projectName = {projectNames[project]}
+        accessRuleID = {curID}
+        success={() => {
+            reload();
+            toggleModal("edit");
+        }}
+        toggleModal={() => {
+          toggleModal("edit");
+        }}
+      />:null}
+
       <div className="content">
       <Breadcrumb>
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
-        <Breadcrumb.Item active>Plate Regex</Breadcrumb.Item>
+        <Breadcrumb.Item active>Access Rules</Breadcrumb.Item>
       </Breadcrumb>
         <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
           <Row>
@@ -365,96 +149,67 @@ export function ParkingRules({ match }) {
                 custom
                 as = "select"
                 id="projectID"
-                placeholder="Name"
-                onChange={handleChange}
-                value={state.projectID}
+                onChange={(e)=>{
+                  setProject(e.target.value);
+                }}
+                value={project}
               >
-                  <option value={null}>All Projects</option>
-                  {projects.map((project)=>(
-                      <option value={project.projectID}>{project.projectName}</option>
+                <option value="">--Select a Project--</option>
+                  {projects.map((val)=>(
+                      <option value={val.projectID}>{val.projectName}</option>
                   ))}
               </Form.Control>
-            </Col>
-            <Col sm="auto">
-              <Form.Control
-                id="actualPlate"
-                placeholder="Actual Plate"
-                onChange={handleChange}
-                value={state.actualPlate}
-              />
-            </Col>
-            <Col sm="auto">
-              <Button type="button" onClick={()=>{setCurState(state)}}>
-                Search
-              </Button>
-            </Col>
-            <Col sm="auto">
-              <Button type="button" variant="secondary" onClick={reset}>
-                Cancel
-              </Button>
             </Col>
             <Col sm="auto">
               <Button
                 className="btn btn-success"
                 type="button"
                 onClick={() => {
-                setVal({
-                    projectID: "",
-                    matchPlate: "",
-                    actualPlate: ""
-                    });
-                  setValidated(false);
-                  toggleModal("add");
+                  setCurID(null);
+                  toggleModal("edit");
                 }}
               >
-                Add +
+                + Add
               </Button>
             </Col>
           </Row>
         </Form>
       </div>
-      <div className="content greyBackground">
+      <div className="content">
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
-            <TableHead>
+            <TableHead >
               <TableRow>
-                <TableCell align="center">Project</TableCell>
-                <TableCell align="center">Regex of Plate</TableCell>
-                <TableCell align="center">Actual Plate</TableCell>
-                <TableCell align="right">Actions</TableCell>
+                <TableCell align="left"><b>Project</b></TableCell>
+                <TableCell align="center"><b>Name</b></TableCell>
+                <TableCell align="center"><b>Gates</b></TableCell>
+                <TableCell align="center"><b>Chargeable</b></TableCell>
+                <TableCell align="right"><b>Actions</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : rows).map((row) => (
-                <TableRow key={row.matchPlate}>
-                  <TableCell component="th" scope="row" align="center">
-                    {projectNames[row.projectID]}
-                  </TableCell>
-                  <TableCell align="center">
-                    <div className="outerPlate" >
-                      <div className="innerPlate">
-                        <u>{row.matchPlate}</u>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell align="center">
-                    <div className="outerPlate" >
-                      <div className="innerPlate">
-                        <u>{row.actualPlate}</u>
-                      </div>
-                    </div>
-                  </TableCell>
+            : rows).map((row, index) => (
+                <TableRow key={row.gateName}>
+                <TableCell align="left">{projectNames[project]}</TableCell>
+                  <TableCell align="center">{row.accessRuleName}</TableCell>
+                  <TableCell align="center">{(row.gates).map((gate)=>(
+                    <div>{gateNames[gate]} <br/></div> 
+                  ))}</TableCell>
+                  <TableCell align="center">{row.isChargeable}</TableCell>
                   <TableCell align="right" style={{padding:0}}>
-                    <IconButton onClick={() => {activateModal(row)}}>
+                    <IconButton onClick={() => {
+                        setCurID(row.accessRuleID);
+                        toggleModal("edit");
+                    }}>
                       <PencilSquare
                         size={21}
-                        color="royalblue"
+                        color="gold"
                       />
                     </IconButton>
                     <IconButton onClick={() => {
-                        setCurID(row.matchPlate);
+                        setCurID(row.accessRuleID);
                         toggleModal("delete");
                     }}>
                       <Trash color="red" size={21} />

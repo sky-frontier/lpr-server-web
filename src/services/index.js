@@ -21,7 +21,11 @@ import {
     getSpecialPlate,
     delSpecialPlate,
     updateSpecialPlate,
-    addSpecialPlate} from "./api";
+    addSpecialPlate,
+    getAccessRule,
+    createAccessRule,
+    getAccessRuleInfo,
+    updateAccessRuleInfo} from "./api";
 export {
     alertService,
     alertType,
@@ -46,5 +50,9 @@ export {
     getSpecialPlate,
     delSpecialPlate,
     updateSpecialPlate,
-    addSpecialPlate
+    addSpecialPlate,
+    getAccessRule,
+    createAccessRule,
+    getAccessRuleInfo,
+    updateAccessRuleInfo
 };
