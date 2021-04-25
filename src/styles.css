@@ -175,3 +175,11 @@ div.react-tel-input input.form-control {
 td.padding-0{
   padding: 0;
 }
+.dateTimePopper {
+  width: 330px;
+}
+.dateTimeClear::after{
+  background-color: transparent;
+  font-size: 20px;
+  color:gray;
+}

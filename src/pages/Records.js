@@ -5,6 +5,7 @@ import { TablePaginationActions } from "../components/index.js";
 import {getMovementLogs } from '../services/index.js';
 import closeGate from '../assets/closeGate.png';
 import openGate from '../assets/openGate.jpg';
+import DatePicker from 'react-datepicker';
 
 export function Records({ match }) {
   const [initialRows, setInitialRows] = useState([]);
@@ -73,14 +74,14 @@ export function Records({ match }) {
   const [state, setState] = useState({
     curField: "projectName",
     val: "",
-    startTime: "",
-    endTime: ""
+    startTime: null,
+    endTime: null
   });
   const [curState, setCurState] = useState({
     curField: "projectName",
     val: "",
-    startTime: "",
-    endTime: ""
+    startTime: null,
+    endTime: null
   });
   const [dummy, setDummy] = useState(false);
   const [projects, setProjects] = useState([]);
@@ -105,10 +106,10 @@ export function Records({ match }) {
   const handleChange = (e) => {
     const { id, value } = e.target;
     if(id==="curField"){
-      setState({
+      setState((prevState) => ({
         curField: value,
         val: ""
-      });
+      }));
     }else{
       setState((prevState) => ({
         ...prevState,
@@ -131,11 +132,15 @@ export function Records({ match }) {
   const reset = async (e) =>{
     setState({
       curField: "projectName",
-      val: ""
+      val: "",
+      startTime: null,
+      endTime: null
     });
     setCurState({
       curField: "projectName",
-      val: ""
+      val: "",
+      startTime: null,
+      endTime: null
     });
   }
   
@@ -182,6 +187,62 @@ export function Records({ match }) {
                 onChange={handleChange}
                 value={state.val}
               />
+            </Col>
+            <Col sm="auto" className="d-flex">
+            <Form.Label>From:</Form.Label>
+            </Col>
+            <Col sm="auto">
+            <DatePicker
+            isClearable
+              className="dateRecord"
+              selected={state.startTime}
+              maxDate={state.endTime}
+              popperClassName="dateTimePopper"
+              className="form-control"
+              placeholderText="YYYY-MM-DD HH:MM:SS"
+              onChange={date => handleChange({
+                target:{
+                  value:date,
+                  id: "startTime"
+                }
+              })}
+              showTimeSelect
+              dateFormat="yyyy-MM-dd"
+              timeFormat="HH:mm:ss"
+              timeIntervals={15}
+              timeCaption="time"
+              dateFormat="yyyy-MM-dd HH:mm:ss"
+              title="Start Time"
+              clearButtonClassName="dateTimeClear"
+            />
+            </Col>
+            <Col sm="auto" className="d-flex">
+            <Form.Label>To:</Form.Label>
+            </Col>
+            <Col sm="auto">
+            <DatePicker
+            isClearable
+              className="dateRecord"
+              selected={state.endTime}
+              minDate={state.startTime}
+              popperClassName="dateTimePopper"
+              className="form-control"
+              placeholderText="YYYY-MM-DD HH:MM:SS"
+              onChange={date => handleChange({
+                target:{
+                  value:date,
+                  id: "endTime"
+                }
+              })}
+              showTimeSelect
+              dateFormat="yyyy-MM-dd"
+              timeFormat="HH:mm:ss"
+              timeIntervals={15}
+              timeCaption="time"
+              dateFormat="yyyy-MM-dd HH:mm:ss"
+              title="Start Time"
+              clearButtonClassName="dateTimeClear"
+            />
             </Col>
             <Col sm="auto">
               <Button type="button" onClick={()=>{setCurState(state)}}>
