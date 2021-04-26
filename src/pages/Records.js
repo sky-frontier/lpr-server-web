@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
-import { TablePaginationActions } from "../components/index.js";
+import { ImageModal, TablePaginationActions } from "../components/index.js";
 import {getMovementLogs } from '../services/index.js';
 import closeGate from '../assets/closeGate.png';
 import openGate from '../assets/openGate.jpg';
@@ -11,6 +11,7 @@ export function Records({ match }) {
   const [initialRows, setInitialRows] = useState([]);
   const [validated, setValidated] = useState(false);
   const [rows, setRows] = useState([]);
+  const [imageSrc, setImageSrc] = useState(null);
   const  queryFields = [
     "projectName",
     "vehicleType",
@@ -125,6 +126,8 @@ export function Records({ match }) {
       curRows.filter(
         (row) =>
           row[curField].toLowerCase().indexOf(val.toLowerCase()) >= 0 
+      ).sort(
+        (a,b)=> (a.detectionTime < b.detectionTime) ? 1 : -1
       )
     );
   };
@@ -160,6 +163,12 @@ export function Records({ match }) {
 
   return (
     <div>
+      <ImageModal
+      src = {imageSrc}
+      toggleModal={()=>{
+        setImageSrc(null);
+      }}
+      />
       <div className="content">
       <Breadcrumb>
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
@@ -311,16 +320,32 @@ export function Records({ match }) {
                     </div>}
                   </TableCell>
                   <TableCell className="padding-0" align="center">
-                    <img style={{"height":fieldHeight.image1}} src={row.image1}/>
+                    <img 
+                    className="imageClick"
+                    onClick = {()=>setImageSrc(row.image1)} 
+                    style={{"height":fieldHeight.image1}} 
+                    src={row.image1}/>
                   </TableCell>
                   <TableCell className="padding-0" align="center">
-                    <img style={{"height":fieldHeight.image2}} src={row.image2} />
+                    <img 
+                    className="imageClick"
+                    onClick = {()=>setImageSrc(row.image2)} 
+                    style={{"height":fieldHeight.image2}} 
+                    src={row.image2} />
                   </TableCell>
                   <TableCell className="padding-0" align="center">
-                    <img style={{"height":fieldHeight.image3}} src={row.image3} />
+                    <img 
+                    className="imageClick"
+                    onClick = {()=>setImageSrc(row.image3)} 
+                    style={{"height":fieldHeight.image3}} 
+                    src={row.image3} />
                   </TableCell>
                   <TableCell className="padding-0" align="center">
-                    <img style={{"height":fieldHeight.plateImage}} src={row.plateImage} />
+                    <img 
+                    className="imageClick"
+                    onClick = {()=>setImageSrc(row.plateImage)} 
+                    style={{"height":fieldHeight.plateImage}} 
+                    src={row.plateImage} />
                   </TableCell>
                 </TableRow>
               ))}

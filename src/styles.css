@@ -183,3 +183,7 @@ td.padding-0{
   font-size: 20px;
   color:gray;
 }
+.imageClick:hover{
+  opacity: 0.7;
+  cursor: pointer;
+}
