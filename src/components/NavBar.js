@@ -18,11 +18,13 @@ import StorageIcon from '@material-ui/icons/Storage';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LocalParkingIcon from '@material-ui/icons/LocalParking';
 import PaymentIcon from '@material-ui/icons/Payment';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 
 export function NavBar() {
   const storeContext = useContext(store);
-  const [toggled, setToggled] = useState(true);
   const { dispatch } = storeContext;
+  const globalState = storeContext.state;
+  const {toggled, user}  = globalState;
   let history = useHistory();
   const logout = () => {
     dispatch({
@@ -37,22 +39,78 @@ export function NavBar() {
   };
   const direct = (path) => {
     console.log("clicked", path);
-    setToggled(true);
     history.push(path);
   };
   const toggleSideBar = () => {
-    setToggled(!toggled);
+    dispatch({
+      type: "setToggled"
+    });
   };
   return (
     <div className="h-100 fixed-top clickThrough">
-      <Navbar bg="dark" variant="dark" expand="lg" className="clickAble">
-        <Navbar.Brand className="d-none d-sm-block" onClick={toggleSideBar}>
+      <ProSidebar
+        className="clickAble navbar-default navbar-static-top sideBar"
+        collapsed={toggled}
+        width="250px"
+        //collapsedWidth="px"
+      >
+        <SidebarContent>
+          <Menu iconShape="circle">
+            <MenuItem 
+              style={{"background":"#2c3b41","height":"60px", "pointer-events":"none"}}
+              className="d-flex justify-content-center align-items-center">
+              <div style={{"padding-top":"10px", "color":"white"}}>
+                <h5>Admin</h5>
+              </div>
+            </MenuItem>
+            <MenuItem 
+              icon={<AccountCircleIcon fontSize='large'/>}
+              style={{"pointer-events":"none", "border-bottom":"1px solid gray"}}>
+              <div style={{ "color":"white"}}>
+                Welcome, {user}
+              </div>
+            </MenuItem>
+            <MenuItem icon={<HomeIcon onClick={()=>direct("/home")}/>}>
+              <div onClick={()=>direct("/home")}>
+                Home
+              </div>
+            </MenuItem>
+            <MenuItem icon={<InfoIcon onClick={()=>direct("/project")} />}>
+              <div onClick={()=>direct("/projet")}>
+                Project
+              </div>
+            </MenuItem>
+            <MenuItem icon={<CodeIcon onClick={()=>direct("/regex")} />}>
+              <div onClick={()=>direct("/regex")}>
+                Plate Regex
+              </div>
+            </MenuItem>
+            <MenuItem icon={<StorageIcon onClick={()=>direct("/records")} />}>
+              <div onClick={()=>direct("/records")}>
+                Exit/Entry Records
+              </div>
+            </MenuItem>
+            <MenuItem icon={<LocalParkingIcon onClick={()=>direct("/parking")} />}>
+              <div onClick={()=>direct("/parking")}>
+                Parking Records
+              </div>
+            </MenuItem>
+            <SubMenu title="Access" icon={<PaymentIcon/>}>
+              <MenuItem  onClick={()=>direct("/accessRules")} >Access Rules</MenuItem>
+              <MenuItem>Tracking</MenuItem>
+            </SubMenu>
+          </Menu>
+        </SidebarContent>
+      </ProSidebar>
+      <Navbar bg="light" variant="light" expand="lg" className={"clickAble navBar"+(toggled?" navBar-collapsed":" navBar-expand")}>
+        <Navbar.Brand 
+        className="sideBar" 
+        onClick={toggleSideBar}>
           <List />
         </Navbar.Brand>
-        <Navbar.Brand>Admin</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Toggle aria-controls="basic-navbar-nav" className="nav-dropdown" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto d-sm-block d-md-none">
+          <Nav className="mr-auto nav-dropdown">
             <Nav.Link>
               <div onClick={()=>direct("/home")}>
                 Home
@@ -99,45 +157,6 @@ export function NavBar() {
           </Navbar.Text>
         </Navbar.Collapse>
       </Navbar>
-      <ProSidebar
-        className="clickAble d-none d-sm-block navbar-default navbar-static-top"
-        collapsed={toggled}
-        //collapsedWidth="px"
-      >
-        <SidebarContent>
-          <Menu iconShape="circle">
-            <MenuItem icon={<HomeIcon onClick={()=>direct("/home")}/>}>
-              <div onClick={()=>direct("/home")}>
-                Home
-              </div>
-            </MenuItem>
-            <MenuItem icon={<InfoIcon onClick={()=>direct("/project")} />}>
-              <div onClick={()=>direct("/projet")}>
-                Project
-              </div>
-            </MenuItem>
-            <MenuItem icon={<CodeIcon onClick={()=>direct("/regex")} />}>
-              <div onClick={()=>direct("/regex")}>
-                Plate Regex
-              </div>
-            </MenuItem>
-            <MenuItem icon={<StorageIcon onClick={()=>direct("/records")} />}>
-              <div onClick={()=>direct("/records")}>
-                Exit/Entry Records
-              </div>
-            </MenuItem>
-            <MenuItem icon={<LocalParkingIcon onClick={()=>direct("/parking")} />}>
-              <div onClick={()=>direct("/parking")}>
-                Parking Records
-              </div>
-            </MenuItem>
-            <SubMenu title="Access" icon={<PaymentIcon/>}>
-              <MenuItem  onClick={()=>direct("/accessRules")} >Access Rules</MenuItem>
-              <MenuItem>Tracking</MenuItem>
-            </SubMenu>
-          </Menu>
-        </SidebarContent>
-      </ProSidebar>
     </div>
   );
 }

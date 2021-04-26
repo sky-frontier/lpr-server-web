@@ -1,27 +1,28 @@
 import { func } from "prop-types";
 import { useState, useEffect, useContext } from "react";
-import { Form, Row, Col, Button, Modal } from "react-bootstrap";
+import { Form, Row, Col, Button, Modal, Spinner } from "react-bootstrap";
 import { alertService, createAccessRule, getAccessRuleInfo, updateAccessRuleInfo, getGate } from '../services/index.js';
 
 export function RulesModal(props) {
     let {hide, accessRuleID, projectID, success, projectName, toggleModal } = props;
+    let cnt = 0;
     const [validated, setValidated] = useState(false);
     const [state, setState] = useState({});
     const [dummy, setDummy] = useState(false);
     const [gates, setGates] = useState([]);
     const [curGates, setCurGates] = useState({});
     const [initialGates, setInitialGates] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const func = async (val) =>{
         let temp = {};
         val.forEach(async (element)=>{
             temp[element["gateID"]] = false;
         });
-        [...initialGates].forEach(async (element)=>{
+        initialGates.forEach(async (element)=>{
             console.log(element);
             temp[element] = true;
         });
-        console.log("temp", await temp);
         return await temp;
     };
     const loadGates = () =>{
@@ -39,6 +40,7 @@ export function RulesModal(props) {
     }
   useEffect(() => {
     setValidated(false);
+    setTimeout(()=>setLoading(false), 600);
     if(accessRuleID===null){
       setState({
         projectID,
@@ -58,14 +60,13 @@ export function RulesModal(props) {
         console.error("Get Access Rule, There was an error!", error);
       });
     }
-  }, [dummy, accessRuleID]);
+  }, [dummy]);
 
   useEffect(()=>{
     setState((prevState)=>({
         ...prevState,
         gates: (Object.keys(curGates)).filter((gate)=>curGates[gate])
       }));
-      console.log(state.gates);
   },[curGates]);
 
   useEffect(()=>{
@@ -96,7 +97,11 @@ export function RulesModal(props) {
   };
 
   const handleGateChange = (e) =>{
-      console.log(e);
+    let id = e.target.id;
+    setCurGates((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id]
+    }));
   }
 
   const handleSubmit = (e) => {
@@ -143,6 +148,13 @@ export function RulesModal(props) {
     <Modal show={hide} onHide={()=>{
     setValidated(false);
     toggleModal();}}>
+      {loading?
+      <Row className="d-flex justify-content-center" style={{margin:"200px"}}>
+      <Spinner size="lg" animation="border" role="status">
+      <span className="sr-only">Loading...</span>
+    </Spinner>
+    </Row>:
+        <div>
             <Modal.Header
              closeButton>
                 <Modal.Title>{accessRuleID===null?"Add Rule":"Edit Rule"}</Modal.Title>
@@ -199,7 +211,7 @@ export function RulesModal(props) {
                                 custom
                                 type={'checkbox'}
                                 id={gate.gateID}
-                                value={curGates[gate.gateID]}
+                                checked={curGates[gate.gateID]}
                                 onChange={handleGateChange}
                                 label={gate.gateName}
                             />:null
@@ -216,7 +228,7 @@ export function RulesModal(props) {
                                 custom
                                 type={'checkbox'}
                                 id={gate.gateID}
-                                value={curGates[gate.gateID]}
+                                checked={curGates[gate.gateID]}
                                 onChange={handleGateChange}
                                 label={gate.gateName}
                             />:null
@@ -255,6 +267,8 @@ export function RulesModal(props) {
             Confirm
           </Button>
         </Modal.Footer>
+        </div>
+      }
     </Modal>
   );
 }

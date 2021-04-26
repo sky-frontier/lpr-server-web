@@ -12,12 +12,40 @@ body,
   background-color: #ebeff2;
 }
 #content-body {
-  padding-left:80px;
   padding-top: 70px;
-  background-color: #ebeff2;
+  background-image: url('./assets/grey.png');
+    background-repeat: repeat;
   height: 100%;
+  transition: width, left, right, 0.3s;
 }
-@media only screen and (max-width: 990px) {
+.content-body-collapsed{
+  padding-left: 80px;
+}
+.content-body-expand{
+  padding-left:  250px;
+}
+.pro-sidebar nav.pro-menu{
+  padding-top: 0;
+}
+.sideBar{
+  display:block;
+}
+.nav-dropdown{
+  display:none;
+}
+@media only screen and (min-width: 769px) {
+  .navBar{
+    height: 60px;
+    background: #ffffff !important;
+  }
+}
+@media only screen and (max-width: 768px) {
+  .sideBar{
+    display:none;
+  }
+  .nav-dropdown{
+    display:block;
+  }
   #content-body {
     padding-top: 55px;
     padding-left:0px;
@@ -27,6 +55,10 @@ body,
   }
   #gateHeader {
     display: none;
+  }
+  nav.navBar-expand, nav.navBar-collapsed{
+    left: 0px;
+    width: 100%;
   }
 }
 .content {
@@ -186,4 +218,80 @@ td.padding-0{
 .imageClick:hover{
   opacity: 0.7;
   cursor: pointer;
+}
+.navBar-collapsed{
+  left: 75px;
+  width: calc(100% - 75px);
+}
+.navBar-expand{
+  left: 250px;
+  width: calc(100% - 250px);
+}
+.navBar{
+  top: 0;
+  position: fixed;
+  transition: width, left, right, 0.3s;
+  border-bottom: 1px solid #eee;
+}
+.breadcrumb{
+  background-color: transparent;
+}
+.cardIcon{
+  width: 80px;
+    height: 80px;
+    overflow: unset;
+    text-align: center;
+    margin-bottom: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.cardIconDiv{
+  float: left;
+    padding: 15px;
+    margin-top: -35px;
+    border-radius: 3px;
+    display: flex;
+    width: 95px;
+      height: 95px;
+      justify-content: center;
+      align-items: center;
+}
+.dangerCardIcon{
+  background: linear-gradient(
+60deg
+, #ef5350, #e53935);
+    box-shadow: 0 4px 20px 0 rgb(0 0 0 / 14%), 0 7px 10px -5px rgb(244 67 54 / 40%);
+}
+.successCardIcon{
+  background: linear-gradient(
+60deg
+, #66bb6a, #43a047);
+    box-shadow: 0 4px 20px 0 rgb(0 0 0 / 14%), 0 7px 10px -5px rgb(76 175 80 / 40%);  
+}
+.warningCardIcon{
+  background: linear-gradient(
+60deg
+, #ffa726, #fb8c00);
+    box-shadow: 0 4px 20px 0 rgb(0 0 0 / 14%), 0 7px 10px -5px rgb(255 152 0 / 40%);
+}
+.infoCardIcon{
+  background: linear-gradient(
+60deg
+, #26c6da, #00acc1);
+    box-shadow: 0 4px 20px 0 rgb(0 0 0 / 14%), 0 7px 10px -5px rgb(0 172 193 / 40%);
+}
+.cardHomeText{
+  display: inline-block;
+  text-align: right;
+  padding:10px;
+  color: #999;
+}
+.cardHomeNumber{
+  font-weight: 400;
+}
+.dashboard{
+  padding-bottom:20px;
+  margin-top:-10px;
+  margin-bottom:0;
 }

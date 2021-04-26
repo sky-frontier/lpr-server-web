@@ -20,25 +20,25 @@ export function PlateRegex({ match }) {
     edit: false
   });
   const [state, setState] = useState({
-    projectID: null,
+    projectID: NaN,
     actualPlate: ""
   });
   const [curState, setCurState] = useState({
-    projectID: null,
+    projectID: NaN,
     actualPlate: ""
   });
   const reset = () =>{
     setState({
-      projectID: null,
+      projectID: NaN,
       actualPlate: ""
     });
     setCurState({
-      projectID: null,
+      projectID: NaN,
       actualPlate: ""
     });
   }
   const [val, setVal] = useState({
-    projectID: null,
+    projectID: NaN,
     matchPlate: "",
     actualPlate: ""
   });
@@ -126,8 +126,8 @@ export function PlateRegex({ match }) {
     setRows(
       curRows.filter(
         (row) =>
-          (projectID === null || row["projectID"] === projectID) &&
-          row["actualPlate"].toLowerCase().indexOf(actualPlate.toLowerCase()) >= 0
+          (Number.isNaN(projectID) || row["projectID"] === projectID) &&
+          String(row["actualPlate"]).toLowerCase().indexOf(actualPlate.toLowerCase()) >= 0
       )
     );
   };
@@ -413,7 +413,7 @@ export function PlateRegex({ match }) {
           </Row>
         </Form>
       </div>
-      <div className="content greyBackground">
+      <div className="content">
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>

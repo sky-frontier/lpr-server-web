@@ -142,8 +142,14 @@ export function Devices (){
                 <TableCell align="left">{row.deviceID}</TableCell>
                   <TableCell align="center">{row.deviceName}</TableCell>
                   <TableCell align="center">{row.deviceType}</TableCell>
-                  <TableCell align="center">{row.deviceStatus?
-                  <SignalCellularAltIcon style={{ color: "#4caf50" }}/>:<SignalCellularConnectedNoInternet0BarIcon style={{ color: "#f44336" }}/>
+                  <TableCell align="center">{row.deviceStatus==='online'?
+                  <Tooltip title="Online">
+                  <SignalCellularAltIcon style={{ color: "#4caf50" }}/>
+                  </Tooltip>
+                  :
+                  <Tooltip title="Offline">
+                  <SignalCellularConnectedNoInternet0BarIcon style={{ color: "#f44336" }}/>
+                  </Tooltip>
                   }</TableCell>
                   <TableCell align="right" style={{padding:0}}>
                   <Tooltip title="Edit">

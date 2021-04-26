@@ -69,6 +69,7 @@ function PrivateRoute({ children, ...rest }) {
   const storeContext = useContext(store);
   const globalState = storeContext.state;
   let auth = globalState.auth;
+  let toggled = globalState.toggled;
   return (
     <Route
       {...rest}
@@ -77,7 +78,7 @@ function PrivateRoute({ children, ...rest }) {
           <div className="h-100">
               <AlertGroup />
             <NavBar />
-            <div id="content-body">
+            <div id="content-body" className={toggled?"content-body-collapsed":"content-body-expand"}>
               {React.cloneElement(children, { params: props.match.params })}
             </div>
           </div>

@@ -48,9 +48,7 @@ export function ParkingRules (){
     getAccessRule(project, ["accessRuleID", "accessRuleName", "isChargeable", "gates"])
     .then(async (data) => {
       console.log(data.content);
-      //setRows(data.content);
-      setRows((data.content).map((val)=>{return{...val,
-      gates:[1,2]}}));
+      setRows(data.content);
     })
     .catch((error) => {
       console.error("Get Gate, there was an error!", error);

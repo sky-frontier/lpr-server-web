@@ -213,7 +213,7 @@ export function Projects({ match }) {
           </Row>
         </Form>
       </div>
-      <div className="content greyBackground">
+      <div className="content">
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>

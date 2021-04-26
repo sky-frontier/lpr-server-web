@@ -266,7 +266,7 @@ export function Records({ match }) {
           </Row>
         </Form>
       </div>
-      <div className="content greyBackground">
+      <div className="content">
         <TableContainer component={Paper} className="overflowTable">
           <Table aria-label="simple table">
             <TableHead>
