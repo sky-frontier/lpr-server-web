@@ -5,7 +5,7 @@ import { PencilSquare, Trash, Cpu } from "react-bootstrap-icons";
 
 import { useHistory, useParams, useLocation } from "react-router-dom";
 import { ConfirmModal, DeviceModal, TablePaginationActions } from "../../components/index.js";
-import {getDevice, alertService, delDevice} from '../../services/index.js';
+import {getDevice, alertService, delDevice, getObjectTypes} from '../../services/index.js';
 import { Directions } from "@material-ui/icons";
 import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
 import SignalCellularConnectedNoInternet0BarIcon from '@material-ui/icons/SignalCellularConnectedNoInternet0Bar';
@@ -22,6 +22,8 @@ export function Devices (){
   const [modal, setModal] = useState(true);
   const [curID, setCurID] = useState("");
   const [dummy, setDummy] = useState(false);
+  const [deviceTypes, setDeviceTypes] = useState([]);
+  const [deviceTypeNames, setDeviceTypeNames] = useState([]);
   const reload = () =>{
     getDevice(gateID, ["deviceID", "deviceName", "deviceType", "deviceStatus"])
       .then(async (data) => {
@@ -29,8 +31,21 @@ export function Devices (){
         setRows(data.content);
       })
       .catch((error) => {
+        alertService.error("There was an error!");
         console.error("Get Device, there was an error!", error);
       });
+      getObjectTypes("device")
+    .then(async (data) => {
+      setDeviceTypeNames(data.message);
+      setDeviceTypes(Object.entries(data.message).map((type)=>({
+        id: type[0],
+        name: type[1].name
+      })));
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("There was an error Get Device Types!", error);
+    });
   }
   useEffect(() => {
     reload();
@@ -85,6 +100,7 @@ export function Devices (){
         body="Delete this device?"
       />
       <DeviceModal
+        deviceTypes = {deviceTypes}
         hide={toggle.edit}
         deviceID = {curID}
         newState = {modal}
@@ -141,7 +157,7 @@ export function Devices (){
                 <TableRow key={row.gateName}>
                 <TableCell align="left">{row.deviceID}</TableCell>
                   <TableCell align="center">{row.deviceName}</TableCell>
-                  <TableCell align="center">{row.deviceType}</TableCell>
+                  <TableCell align="center">{deviceTypeNames[row.deviceType].name}</TableCell>
                   <TableCell align="center">{row.deviceStatus==='online'?
                   <Tooltip title="Online">
                   <SignalCellularAltIcon style={{ color: "#4caf50" }}/>

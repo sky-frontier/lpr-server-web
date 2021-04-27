@@ -3,7 +3,7 @@ import { Form, Row, Col, Button, Modal } from "react-bootstrap";
 import { alertService, createDevice, getDeviceInfo, updateDeviceInfo } from '../services/index.js';
 
 export function DeviceModal(props) {
-    let {hide, gateID, toggleModal, success, newState, deviceID } = props;
+    let {hide, gateID, toggleModal, success, newState, deviceID, deviceTypes } = props;
     const [validated, setValidated] = useState(false);
     const [state, setState] = useState({});
     const [dummy, setDummy] = useState(false);
@@ -25,11 +25,12 @@ export function DeviceModal(props) {
     }else{
       getDeviceInfo(deviceID)
       .then(async (data) => {
+        console.log(data.message);
         setState(data.message);
       })
       .catch((error) => {
         alertService.error("There was an error!");
-        console.error("Get Gate, There was an error!", error);
+        console.error("Get Device, There was an error!", error);
       });
     }
   }, [dummy,newState,gateID]);
@@ -72,7 +73,10 @@ export function DeviceModal(props) {
   };
 
   const update = () => {
-    updateDeviceInfo(deviceID, state)
+    let tempState = state;
+    delete tempState["deviceStatus"];
+    console.log(tempState);
+    updateDeviceInfo(deviceID, tempState)
     .then(async (data) => {
         setValidated(false);
         alertService.success("Update Successful!");
@@ -170,13 +174,19 @@ export function DeviceModal(props) {
                         sm={6}
                     >
                         <Form.Control
+                        custom
                         required
-                        placeholder="Type"
+                        as="select"
                         id="deviceType"
                         name="deviceType"
                         value={state.deviceType}
                         onChange={handleChange}
-                        />
+                        >
+                        <option value={""}>--Select Type--</option>
+                        {deviceTypes.map((type)=>(
+                          <option value={type.id}>{type.name}</option>
+                        ))}
+                        </Form.Control>
                         <Form.Control.Feedback type="invalid">
                         Device Type is a required field.
                         </Form.Control.Feedback>
@@ -212,7 +222,7 @@ export function DeviceModal(props) {
                         sm={6}
                         className="align-items-center d-flex justify-content-center"
                     >
-                        <Form.Control type="text" placeholder={state.deviceStatus} readOnly />
+                        <Form.Control type="text" placeholder={state.deviceStatus === "online"?"Online":"Offline"} readOnly />
                     </Col>
                     </Form.Group>}
 

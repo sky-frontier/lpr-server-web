@@ -1,11 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import {Tooltip, TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
-import { PencilSquare, Trash, Cpu } from "react-bootstrap-icons";
+import { PencilSquare, Trash, Cpu, DoorOpenFill } from "react-bootstrap-icons";
 
 import { useHistory, useParams, useLocation } from "react-router-dom";
 import { ConfirmModal, GateModal, TablePaginationActions } from "../../components/index.js";
-import {getGate, alertService, delGate} from '../../services/index.js';
+import {getGate, alertService, delGate, getObjectTypes, openGate} from '../../services/index.js';
 import { Directions } from "@material-ui/icons";
 
 export function Gates (){
@@ -13,6 +13,8 @@ export function Gates (){
     let history = useHistory();
     let {pathname} = useLocation();
   const [rows, setRows] = useState([]);
+  const [gateTypes, setGateTypes] = useState([]);
+  const [gateTypeNames, setGateTypeNames] = useState([]);
   const [toggle, setToggle] = useState({
     delete: false,
     edit: false
@@ -22,17 +24,41 @@ export function Gates (){
   const [dummy, setDummy] = useState(false);
   const reload = () =>{
     getGate(projectID, ["gateID", "gateName", "gateType"])
-      .then(async (data) => {
-        console.log(data.content);
-        setRows(data.content);
-      })
-      .catch((error) => {
-        console.error("Get Gate, there was an error!", error);
-      });
+    .then(async (data) => {
+      console.log(data.content);
+      setRows(data.content);
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get Gate, there was an error!", error);
+    });
+    getObjectTypes("gate")
+    .then(async (data) => {
+      setGateTypeNames(data.message);
+      setGateTypes(Object.entries(data.message).map((type)=>({
+        id: type[0],
+        name: type[1].name
+      })));
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("There was an error Get Gate Types!", error);
+    });
   }
   useEffect(() => {
     reload();
   }, [dummy]);
+
+  const openGateFunc = (gateID, gateName) =>{
+    openGate(gateID)
+    .then(async (data) => {
+      alertService.success("Opened Gate "+gateName);
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("There was an error Open Gate!", error);
+    });
+  }
 
   const toggleModal = (modal) => {
     let prevVal = toggle[modal];
@@ -87,6 +113,7 @@ export function Gates (){
         body="Delete this gate?"
       />
       <GateModal
+        gateTypes = {gateTypes}
         hide={toggle.edit}
         gateID = {curID}
         newState = {modal}
@@ -141,8 +168,18 @@ export function Gates (){
                 <TableRow key={row.gateName}>
                 <TableCell align="left">{row.gateID}</TableCell>
                   <TableCell align="center">{row.gateName}</TableCell>
-                  <TableCell align="center">{row.gateType}</TableCell>
+                  <TableCell align="center">{gateTypeNames[row.gateType].name}</TableCell>
                   <TableCell align="right" style={{padding:0}}>
+                  <Tooltip title="Open Gate">
+                    <IconButton onClick={() => {
+                        openGateFunc(row.gateID, row.gateName);
+                    }}>
+                      <DoorOpenFill
+                        size={21}
+                        color="#28a745"
+                      />
+                    </IconButton>
+                    </Tooltip>
                   <Tooltip title="Devices">
                     <IconButton onClick={() => {
                         devices(row.gateID);

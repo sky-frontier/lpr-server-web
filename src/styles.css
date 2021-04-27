@@ -257,25 +257,25 @@ td.padding-0{
       justify-content: center;
       align-items: center;
 }
-.dangerCardIcon{
+.danger{
   background: linear-gradient(
 60deg
 , #ef5350, #e53935);
     box-shadow: 0 4px 20px 0 rgb(0 0 0 / 14%), 0 7px 10px -5px rgb(244 67 54 / 40%);
 }
-.successCardIcon{
+.success{
   background: linear-gradient(
 60deg
 , #66bb6a, #43a047);
     box-shadow: 0 4px 20px 0 rgb(0 0 0 / 14%), 0 7px 10px -5px rgb(76 175 80 / 40%);  
 }
-.warningCardIcon{
+.warning{
   background: linear-gradient(
 60deg
 , #ffa726, #fb8c00);
     box-shadow: 0 4px 20px 0 rgb(0 0 0 / 14%), 0 7px 10px -5px rgb(255 152 0 / 40%);
 }
-.infoCardIcon{
+.info{
   background: linear-gradient(
 60deg
 , #26c6da, #00acc1);
@@ -294,4 +294,7 @@ td.padding-0{
   padding-bottom:20px;
   margin-top:-10px;
   margin-bottom:0;
+}
+.cardTitle{
+  padding:10px 20px;
 }

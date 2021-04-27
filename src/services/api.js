@@ -193,6 +193,23 @@ const getDevice = (ID, columns) =>{
     .then(returnFunc)
 }
 
+const getAllDevice = (columns) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "getTable",
+          content: {
+            objName: "device",
+            columns
+          }
+        })
+      };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 const createGate = (projectID,values) =>{
     const newGateReq = {
         ...values,
@@ -327,6 +344,7 @@ const delGate = (ID) =>{
 }
 
 const updateGateInfo = (ID, state) =>{
+    console.log(state);
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -388,6 +406,7 @@ const updateDeviceInfo = (ID, state) =>{
             }
         })
     };
+    console.log(state);
     return fetch(server_URL, requestOptions)
     .then(returnFunc)
 }
@@ -442,6 +461,51 @@ const updateAccessRuleInfo = (ID, state) =>{
     .then(returnFunc)
 }
 
+const getObjectTypes = (obj) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "getObjectTypes",
+            content: {
+                objName: obj
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const getWhitelistTags = () =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "getWhitelistTags"
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const openGate = (gateID) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "openGate",
+            content:{
+                gateID
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 export {
     getGate,
     getDevice,
@@ -468,5 +532,9 @@ export {
     getAccessRule,
     createAccessRule,
     getAccessRuleInfo,
-    updateAccessRuleInfo
+    updateAccessRuleInfo,
+    getObjectTypes,
+    getWhitelistTags,
+    openGate,
+    getAllDevice
 };

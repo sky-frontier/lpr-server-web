@@ -25,7 +25,11 @@ import {
     getAccessRule,
     createAccessRule,
     getAccessRuleInfo,
-    updateAccessRuleInfo} from "./api";
+    updateAccessRuleInfo,
+    getObjectTypes,
+    getWhitelistTags,
+    openGate,
+    getAllDevice} from "./api";
 export {
     alertService,
     alertType,
@@ -54,5 +58,9 @@ export {
     getAccessRule,
     createAccessRule,
     getAccessRuleInfo,
-    updateAccessRuleInfo
+    updateAccessRuleInfo,
+    getObjectTypes,
+    getWhitelistTags,
+    openGate,
+    getAllDevice
 };

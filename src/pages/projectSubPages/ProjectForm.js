@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { alertService, getProjectInfo, updateProjectInfo } from '../../services/index.js';
+import { alertService, getProjectInfo, updateProjectInfo , getObjectTypes} from '../../services/index.js';
 import {useParams} from "react-router-dom";
 
 export function ProjectForm() {
@@ -17,6 +17,7 @@ export function ProjectForm() {
     equipManu: ""
   });
   const [dummy, setDummy] = useState(false);
+  const [projectTypes, setProjectTypes] = useState([]);
 
   useEffect(() => {
     getProjectInfo(projectID)
@@ -25,7 +26,18 @@ export function ProjectForm() {
       })
       .catch((error) => {
         alertService.error("There was an error!");
-        console.error("There was an error!", error);
+        console.error("There was an error Get Project Info!", error);
+      });
+      getObjectTypes("project")
+      .then(async (data) => {
+        setProjectTypes(Object.entries(data.message).map((type)=>({
+          id: type[0],
+          name: type[1].name
+        })));
+      })
+      .catch((error) => {
+        alertService.error("There was an error!");
+        console.error("There was an error Get Project Types!", error);
       });
   }, [dummy]);
 
@@ -116,9 +128,12 @@ export function ProjectForm() {
               value={state.projectType}
               onChange={handleChange}
             >
-              <option value={""}>--Select Type--</option>
-              <option>condo</option>
-              <option>hdb</option>
+              <option value={''}>--Select Type--</option>
+              {
+                projectTypes.map((type)=>(
+                  <option value={type.id}>{type.name}</option>
+                ))
+              }
             </Form.Control>
             <Form.Control.Feedback type="invalid">
               Project Type is a required field.
@@ -164,7 +179,7 @@ export function ProjectForm() {
               Equipment Manufacturer is a required field.
             </Form.Control.Feedback>
           </Col>
-        </Form.Group>
+      </Form.Group>
 
         <Form.Group as={Row}>
           <Form.Label column sm={4}>
@@ -185,7 +200,6 @@ export function ProjectForm() {
             </Form.Control.Feedback>
           </Col>
         </Form.Group>
-
         <Form.Group as={Row}>
           <Form.Label column sm={4}>
             Contact No.
@@ -202,11 +216,11 @@ export function ProjectForm() {
               id="contactNumber"
               name="contactNumber"
               country={"sg"}
-              value={state.contactNumber}
+              value={String(state.contactNumber)}
               onChange={(e)=>{
                 setState((prevState) => ({
                   ...prevState,
-                  ["contactNumber"]: e
+                  ["contactNumber"]: parseInt(e)
                 }));
               }}
               isValid={(value, country) => {
