@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Form, Row, Col, Button, InputGroup, Breadcrumb } from "react-bootstrap";
 import NumericInput from "react-numeric-input";
-import { alertService, getBusinessInfo, updateBusinessInfo } from '../../services/index.js';
+import { alertService, getBusinessInfo, updateBusinessInfo, getProjectInfo } from '../../services/index.js';
 import {useParams} from "react-router-dom";
 
 export function BusinessDetails(props) {
   let {projectID} = useParams();
+  const [projectName, setProjectName] = useState("");
   const [state, setState] = useState({
     barrierDelay: 5,
     networkWarningDuration: 5,
@@ -16,6 +17,14 @@ export function BusinessDetails(props) {
   const [dummy, setDummy] = useState(false);
 
   useEffect(() => {
+    getProjectInfo(projectID)
+    .then(async (data) => {
+      setProjectName(data.message.projectName);
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get Project Info, there was an error!", error);
+    });
     /*   
     getBusinessInfo(projectID)
     .then(async (data) => {
@@ -76,6 +85,9 @@ export function BusinessDetails(props) {
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item href="/project">Projects</Breadcrumb.Item>
         <Breadcrumb.Item active>Business Details</Breadcrumb.Item>
+      </Breadcrumb>
+      <Breadcrumb>
+      <h5 style={{color:"#6c757d"}}>{projectName}</h5>
       </Breadcrumb>
       <Form onSubmit={handleSubmit}>
         <Form.Group as={Row}>
@@ -176,7 +188,8 @@ export function BusinessDetails(props) {
         </Form.Group>
 
         <Form.Group as={Row}>
-          <Col sm={{ span: 8, offset: 7 }}>
+          <Col sm={8}
+           className="d-flex justify-content-end">
             <Button type="submit">Update</Button>
           </Col>
         </Form.Group>

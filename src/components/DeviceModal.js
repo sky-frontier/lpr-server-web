@@ -34,7 +34,7 @@ export function DeviceModal(props) {
         console.error("Get Device, There was an error!", error);
       });
     }
-  }, [dummy,newState,gateID]);
+  }, [dummy,newState,deviceID]);
 
   const handleChange = (e, filler, e2) => {
     let id, value;
@@ -76,7 +76,6 @@ export function DeviceModal(props) {
   const update = () => {
     let tempState = state;
     delete tempState["deviceStatus"];
-    console.log(tempState);
     updateDeviceInfo(deviceID, tempState)
     .then(async (data) => {
         setValidated(false);
@@ -115,18 +114,6 @@ export function DeviceModal(props) {
                 <div>
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
-                        Gate ID
-                    </Form.Label>
-                    <Col
-                        sm={6}
-                        className="align-items-center d-flex justify-content-center"
-                    >
-                        <Form.Control type="text" placeholder={state.gateID} readOnly />
-                    </Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
                         Device ID
                     </Form.Label>
                     <Col
@@ -137,6 +124,7 @@ export function DeviceModal(props) {
                         placeholder="ID"
                         id="deviceID"
                         name="deviceID"
+                        type ="text"
                         value={state.deviceID}
                         onChange={handleChange}
                         />

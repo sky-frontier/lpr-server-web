@@ -26,8 +26,8 @@ export function EditProject(props) {
     history.push(url+path);
   }
   return (
-    <div className="tabModal">
-      <Tab.Container id="left-tabs-example">
+    <div className="tabModal" style={{background:"transparent"}}>
+      <Tab.Container id="left-tabs-example" >
         <Row>
           <Col xs="auto">
             <Nav variant="pills" className="flex-column">

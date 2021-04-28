@@ -5,7 +5,7 @@ import { PencilSquare, Trash, Cpu } from "react-bootstrap-icons";
 
 import { useHistory, useParams, useLocation } from "react-router-dom";
 import { ConfirmModal, DeviceModal, TablePaginationActions } from "../../components/index.js";
-import {getDevice, alertService, delDevice, getObjectTypes} from '../../services/index.js';
+import {getDevice, alertService, delDevice, getObjectTypes, getProjectInfo, getGateInfo} from '../../services/index.js';
 import { Directions } from "@material-ui/icons";
 import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
 import SignalCellularConnectedNoInternet0BarIcon from '@material-ui/icons/SignalCellularConnectedNoInternet0Bar';
@@ -19,12 +19,30 @@ export function Devices (){
     delete: false,
     edit: false
   });
+  const [projectName, setProjectName] = useState("");
+  const [gateName, setGateName] = useState("");
   const [modal, setModal] = useState(true);
   const [curID, setCurID] = useState("");
   const [dummy, setDummy] = useState(false);
   const [deviceTypes, setDeviceTypes] = useState([]);
   const [deviceTypeNames, setDeviceTypeNames] = useState([]);
   const reload = () =>{
+    getProjectInfo(projectID)
+    .then(async (data) => {
+      setProjectName(data.message.projectName);
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get Project Info, there was an error!", error);
+    });
+    getGateInfo(gateID)
+    .then(async (data) => {
+      setGateName(data.message.gateName);
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get Gate Info, there was an error!", error);
+    });
     getDevice(gateID, ["deviceID", "deviceName", "deviceType", "deviceStatus"])
       .then(async (data) => {
         console.log(data.content);
@@ -121,6 +139,9 @@ export function Devices (){
         <Breadcrumb.Item href={"/project/"+projectID+"/gate"}>Gates</Breadcrumb.Item>
         <Breadcrumb.Item active>Devices</Breadcrumb.Item>
       </Breadcrumb>
+      <div className="d-flex align-items-center">
+      <h5 style={{color:"#6c757d"}}>{projectName} / {gateName}</h5>
+      <div style={{"flex-grow":"1"}}></div>
         <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
           <Row>
             <Col sm="auto">
@@ -137,6 +158,7 @@ export function Devices (){
             </Col>
           </Row>
         </Form>
+        </div>
       </div>
       <div className="content">
         <TableContainer component={Paper}>

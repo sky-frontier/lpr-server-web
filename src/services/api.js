@@ -406,7 +406,6 @@ const updateDeviceInfo = (ID, state) =>{
             }
         })
     };
-    console.log(state);
     return fetch(server_URL, requestOptions)
     .then(returnFunc)
 }

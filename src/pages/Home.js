@@ -1,17 +1,22 @@
 import React, { useState, useContext, useEffect } from "react";
 import {Jumbotron, Row, Col, Card } from 'react-bootstrap';
-import {getAllDevice, getObjectTypes, alertService} from '../services/index.js';
-import {Typography  , TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, TableHead, TableRow, Paper, CardActions } from '@material-ui/core';
+import {getAllDevice, getObjectTypes, alertService, getGateInfo} from '../services/index.js';
+import {IconButton, Typography  , TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, TableHead, TableRow, Paper, CardActions } from '@material-ui/core';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import { TablePaginationActions } from "../components/index.js";
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import { Directions } from "@material-ui/icons";
+import { useHistory } from "react-router";
+
 
 export function Home() {
   const [rows, setRows] = useState([]);
   const [dummy, setDummy] = useState(null);
   const [devices, setDevices] = useState([]);
   const [deviceTypes, setDeviceTypes] = useState([]);
+  let history = useHistory();
   useEffect(()=>{
-    getAllDevice(["deviceID", "deviceName", "deviceType","deviceStatus"])
+    getAllDevice(["deviceID", "deviceName", "deviceType","deviceStatus", "gateID"])
     .then(async (data) => {
       setDevices(data.content.filter((device)=>device.deviceType!=="online"));
     })
@@ -28,6 +33,18 @@ export function Home() {
       console.error("There was an error Get Device Types!", error);
     });
   }, [dummy]);
+
+  const direct = (gateID) =>{
+    getGateInfo(gateID)
+    .then(async (data) => {
+      let projectID = data.message.projectID;
+      history.push('/project/'+String(projectID)+'/gate/'+String(gateID));
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get Gate Info, there was an error!", error);
+    });
+  }
 
   return (
   <div>
@@ -109,6 +126,7 @@ export function Home() {
                   <TableCell align="left"><b>ID</b></TableCell>
                   <TableCell align="left"><b>Name</b></TableCell>
                   <TableCell align="left"><b>Type</b></TableCell>
+                  <TableCell align="left"></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -117,6 +135,15 @@ export function Home() {
                   <TableCell align="left">{row.deviceID}</TableCell>
                     <TableCell align="left">{row.deviceName}</TableCell>
                     <TableCell align="left">{deviceTypes[row.deviceType]===undefined ? row.deviceType : deviceTypes[row.deviceType].name}</TableCell>
+                    <TableCell align="right">
+                      <IconButton style={{padding:0}}
+                      onClick={() => {
+                          direct(row.gateID);
+                      }}>
+                        <OpenInNewIcon
+                        />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

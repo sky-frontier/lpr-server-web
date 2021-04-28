@@ -234,8 +234,10 @@ export function ProjectForm() {
           </Form.Label>
         </Form.Group>
 
+        
         <Form.Group as={Row}>
-          <Col sm={{ span: 8, offset: 7 }}>
+          <Col sm={8}
+           className="d-flex justify-content-end">
             <Button type="submit">Update</Button>
           </Col>
         </Form.Group>

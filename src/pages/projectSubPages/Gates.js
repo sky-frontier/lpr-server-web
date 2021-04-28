@@ -5,7 +5,7 @@ import { PencilSquare, Trash, Cpu, DoorOpenFill } from "react-bootstrap-icons";
 
 import { useHistory, useParams, useLocation } from "react-router-dom";
 import { ConfirmModal, GateModal, TablePaginationActions } from "../../components/index.js";
-import {getGate, alertService, delGate, getObjectTypes, openGate} from '../../services/index.js';
+import {getGate, alertService, delGate, getObjectTypes, openGate, getProjectInfo, getProjects} from '../../services/index.js';
 import { Directions } from "@material-ui/icons";
 
 export function Gates (){
@@ -15,6 +15,7 @@ export function Gates (){
   const [rows, setRows] = useState([]);
   const [gateTypes, setGateTypes] = useState([]);
   const [gateTypeNames, setGateTypeNames] = useState([]);
+  const [projectName, setProjectName] = useState("");
   const [toggle, setToggle] = useState({
     delete: false,
     edit: false
@@ -23,6 +24,14 @@ export function Gates (){
   const [curID, setCurID] = useState("");
   const [dummy, setDummy] = useState(false);
   const reload = () =>{
+    getProjectInfo(projectID)
+    .then(async (data) => {
+      setProjectName(data.message.projectName);
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get Project Info, there was an error!", error);
+    });
     getGate(projectID, ["gateID", "gateName", "gateType"])
     .then(async (data) => {
       console.log(data.content);
@@ -133,7 +142,10 @@ export function Gates (){
         <Breadcrumb.Item href="/project">Projects</Breadcrumb.Item>
         <Breadcrumb.Item active>Gates</Breadcrumb.Item>
       </Breadcrumb>
-        <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
+      <div className="d-flex align-items-center">
+      <h5 style={{color:"#6c757d"}}>{projectName}</h5>
+      <div style={{"flex-grow":"1"}}></div>
+        <Form inline onSubmit={(e)=>{e.preventDefault();}}>
           <Row>
             <Col sm="auto">
               <Button
@@ -149,6 +161,7 @@ export function Gates (){
             </Col>
           </Row>
         </Form>
+        </div>
       </div>
       <div className="content">
         <TableContainer component={Paper}>
@@ -170,18 +183,10 @@ export function Gates (){
                   <TableCell align="center">{row.gateName}</TableCell>
                   <TableCell align="center">{gateTypeNames[row.gateType].name}</TableCell>
                   <TableCell align="right" style={{padding:0}}>
-                  <Tooltip title="Open Gate">
-                    <IconButton onClick={() => {
-                        openGateFunc(row.gateID, row.gateName);
-                    }}>
-                      <DoorOpenFill
-                        size={21}
-                        color="#28a745"
-                      />
-                    </IconButton>
-                    </Tooltip>
                   <Tooltip title="Devices">
-                    <IconButton onClick={() => {
+                    <IconButton 
+                    style={{padding:"5px"}}
+                    onClick={() => {
                         devices(row.gateID);
                     }}>
                       <Cpu
@@ -190,8 +195,22 @@ export function Gates (){
                       />
                     </IconButton>
                     </Tooltip>
+                    <Tooltip title="Open Gate">
+                    <IconButton
+                    style={{padding:"5px"}}
+                     onClick={() => {
+                        openGateFunc(row.gateID, row.gateName);
+                    }}>
+                      <DoorOpenFill
+                        size={21}
+                        color="#28a745"
+                      />
+                    </IconButton>
+                    </Tooltip>
                   <Tooltip title="Edit">
-                    <IconButton onClick={() => {
+                    <IconButton
+                    style={{padding:"5px"}}
+                     onClick={() => {
                         setCurID(row.gateID);
                         setModal(false);
                         toggleModal("edit");
@@ -203,7 +222,9 @@ export function Gates (){
                     </IconButton>
                     </Tooltip>
                   <Tooltip title="Delete">
-                    <IconButton onClick={() => {
+                    <IconButton
+                    style={{padding:"5px"}}
+                     onClick={() => {
                         setCurID(row.gateID);
                         toggleModal("delete");
                     }}>

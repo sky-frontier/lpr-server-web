@@ -3,6 +3,7 @@ import { Breadcrumb } from "react-bootstrap";
 import {Input , TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { TablePaginationActions } from "../../components/index.js";
 import {useParams} from "react-router-dom";
+import {getProjectInfo, alertService} from '../../services/index.js';
 
 import { PencilSquare } from "react-bootstrap-icons";
 import SaveIcon from '@material-ui/icons/Save';
@@ -13,6 +14,7 @@ export function LedConfig(props) {
   let {projectID} = useParams();
   const [rows, setRows] = useState([]);
   const [curID, setCurID] = useState(null);
+  const [projectName, setProjectName] = useState("");
   const [state, setState] = useState({
     trigger: "",
     voiceMsg: "",
@@ -20,6 +22,14 @@ export function LedConfig(props) {
   });
   const [dummy, setDummy] = useState(false);
   const reload = () =>{
+    getProjectInfo(projectID)
+    .then(async (data) => {
+      setProjectName(data.message.projectName);
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get Project Info, there was an error!", error);
+    });
     /*getProjects(["projectID", "projectName", "location", "projectType"])
     .then(async (data) => {
       console.log(data.content);
@@ -30,7 +40,7 @@ export function LedConfig(props) {
     });*/
   }
   useEffect(() => {
-    //reload();
+    reload();
     let res = [
         {
             id: 1,
@@ -116,6 +126,9 @@ export function LedConfig(props) {
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item href="/project">Projects</Breadcrumb.Item>
         <Breadcrumb.Item active>LED Configuration</Breadcrumb.Item>
+      </Breadcrumb>
+      <Breadcrumb>
+      <h5 style={{color:"#6c757d"}}>{projectName}</h5>
       </Breadcrumb>
       </div>
       <div className="content">

@@ -235,6 +235,7 @@ td.padding-0{
 }
 .breadcrumb{
   background-color: transparent;
+  padding:0;
 }
 .cardIcon{
   width: 80px;
