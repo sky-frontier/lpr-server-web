@@ -20,7 +20,8 @@ export function DeviceModal(props) {
         manufacturer: "",
         manufacturerCode: "",
         direction: "",
-        isPrimaryDevice: false
+        isPrimaryDevice: false,
+        isGateControl: false
       });
     }else{
       getDeviceInfo(deviceID)
@@ -291,7 +292,7 @@ export function DeviceModal(props) {
 
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
-                        Is Primary Device
+                        Primary Device?
                     </Form.Label>
                     <Col
                         sm={6}
@@ -301,6 +302,22 @@ export function DeviceModal(props) {
                         checked={state.isPrimaryDevice}
                         type="switch"
                         id="isPrimaryDevice"
+                        onChange={handleChange}
+                        />
+                    </Col>
+                    </Form.Group>
+                    <Form.Group as={Row}>
+                    <Form.Label column sm={6}>
+                        Control Gate?
+                    </Form.Label>
+                    <Col
+                        sm={6}
+                        className="align-items-center d-flex justify-content-center"
+                    >
+                        <Form.Check
+                        checked={state.isGateControl}
+                        type="switch"
+                        id="isGateControl"
                         onChange={handleChange}
                         />
                     </Col>
