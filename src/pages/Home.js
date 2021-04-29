@@ -18,7 +18,7 @@ export function Home() {
   useEffect(()=>{
     getAllDevice(["deviceID", "deviceName", "deviceType","deviceStatus", "gateID"])
     .then(async (data) => {
-      setDevices(data.content.filter((device)=>device.deviceType!=="online"));
+      setDevices(data.content.filter((device)=>device.deviceStatus!=="online"));
     })
     .catch((error) => {
       alertService.error("There was an error!");
