@@ -76,7 +76,7 @@ export function NavBar() {
               </div>
             </MenuItem>
             <MenuItem icon={<InfoIcon onClick={()=>direct("/project")} />}>
-              <div onClick={()=>direct("/projet")}>
+              <div onClick={()=>direct("/project")}>
                 Project
               </div>
             </MenuItem>

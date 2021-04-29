@@ -3,7 +3,7 @@ import React, { createContext, useReducer } from "react";
 const initialState = {
   auth: true,
   user: "huajun",
-  toggled: true
+  toggled: false
 };
 const store = createContext(initialState);
 const { Provider } = store;
