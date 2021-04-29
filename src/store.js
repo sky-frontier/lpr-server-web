@@ -3,7 +3,6 @@ import React, { createContext, useReducer } from "react";
 const initialState = {
   auth: true,
   user: "huajun",
-  server_URL: "http://34.87.50.188:8000/api/router",
   toggled: true
 };
 const store = createContext(initialState);

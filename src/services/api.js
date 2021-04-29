@@ -1,6 +1,6 @@
 import { alertService } from './index.js';
 
-const server_URL = "http://34.87.50.188:8000/api/router";
+const server_URL = process.env.REACT_APP_SERVER_URL;
 
 const returnFunc = async (response) => {
     const data = await response.json();
