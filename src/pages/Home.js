@@ -104,7 +104,7 @@ export function Home() {
               </span>
             </div>
               Sample
-              <h3 className="cardHomeNumber" >
+              <h3 className="cardHomeNumber" style={{color:"#66bb6a"}}>
                 ~
               </h3>
           </p>
@@ -119,7 +119,7 @@ export function Home() {
               </span>
             </div>
               Sample
-              <h3 className="cardHomeNumber" >
+              <h3 className="cardHomeNumber" style={{color:"#ffa726"}} >
               ~
               </h3>
           </p>
@@ -133,9 +133,9 @@ export function Home() {
               <InfoOutlinedIcon fontSize='large' style={{color:"white"}}/>
               </span>
             </div>
-              Sample
-              <h3 className="cardHomeNumber" >
-              ~
+              New Devices
+              <h3 className="cardHomeNumber" style={{color:"#26c6da"}}>
+              {newDevices.length}
               </h3>
           </p>
           </Card>

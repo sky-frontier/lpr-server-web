@@ -3,8 +3,8 @@ import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { ImageModal, TablePaginationActions } from "../components/index.js";
 import {getMovementLogs, getObjectTypes, alertService } from '../services/index.js';
-import closeGate from '../assets/closeGate.png';
-import openGate from '../assets/openGate.jpg';
+import { LockFill, UnlockFill } from "react-bootstrap-icons";
+
 import DatePicker from 'react-datepicker';
 
 export function Records({ match }) {
@@ -299,8 +299,8 @@ export function Records({ match }) {
                   </TableCell>
                   <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.isOpened === true?
-                    <img style={{"height":fieldHeight.isOpened}} src={openGate} className="success-transform"/>:
-                    <img style={{"height":fieldHeight.isOpened}} src={closeGate} className="danger-transform"/>}
+                    <UnlockFill color="#64D381" size={25} />:
+                    <LockFill color="red" size={25} />}
             </TableCell>
                   <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.gateName}

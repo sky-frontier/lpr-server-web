@@ -188,7 +188,9 @@ div.react-tel-input input.form-control {
     background-color: #64D381;
     border: 0.2px solid white;
     border-radius: 3px;
-    padding: 2px 15px;
+    width:120px;
+    height:30px;
+    padding: 2px 0px;
     font-family: 'Charles Wright';
     color: white;
     font-size: 17px;

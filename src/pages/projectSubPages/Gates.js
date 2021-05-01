@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import {Tooltip, TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
-import { PencilSquare, Trash, Cpu, DoorOpenFill } from "react-bootstrap-icons";
+import { PencilSquare, Trash, Cpu, Unlock } from "react-bootstrap-icons";
 
 import { useHistory, useParams, useLocation } from "react-router-dom";
 import { ConfirmModal, GateModal, TablePaginationActions } from "../../components/index.js";
@@ -185,7 +185,7 @@ export function Gates (){
                   <TableCell align="right" style={{padding:0}}>
                   <Tooltip title="Devices">
                     <IconButton 
-                    style={{padding:"5px"}}
+                    style={{padding:"5px 10px"}}
                     onClick={() => {
                         devices(row.gateID);
                     }}>
@@ -195,21 +195,9 @@ export function Gates (){
                       />
                     </IconButton>
                     </Tooltip>
-                    <Tooltip title="Open Gate">
-                    <IconButton
-                    style={{padding:"5px"}}
-                     onClick={() => {
-                        openGateFunc(row.gateID, row.gateName);
-                    }}>
-                      <DoorOpenFill
-                        size={21}
-                        color="#28a745"
-                      />
-                    </IconButton>
-                    </Tooltip>
                   <Tooltip title="Edit">
                     <IconButton
-                    style={{padding:"5px"}}
+                    style={{padding:"5px 10px"}}
                      onClick={() => {
                         setCurID(row.gateID);
                         setModal(false);
@@ -217,13 +205,25 @@ export function Gates (){
                     }}>
                       <PencilSquare
                         size={21}
-                        color="gold"
+                        color="royalblue"
+                      />
+                    </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Open Gate">
+                    <IconButton
+                    style={{padding:"5px 10px"}}
+                     onClick={() => {
+                        openGateFunc(row.gateID, row.gateName);
+                    }}>
+                      <Unlock
+                        size={21}
+                        color="green"
                       />
                     </IconButton>
                     </Tooltip>
                   <Tooltip title="Delete">
                     <IconButton
-                    style={{padding:"5px"}}
+                    style={{padding:"5px 10px"}}
                      onClick={() => {
                         setCurID(row.gateID);
                         toggleModal("delete");

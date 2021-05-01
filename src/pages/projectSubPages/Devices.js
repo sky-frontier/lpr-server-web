@@ -196,7 +196,7 @@ export function Devices (){
                     }}>
                       <PencilSquare
                         size={21}
-                        color="gold"
+                        color="royalblue"
                       />
                     </IconButton>
                     </Tooltip>

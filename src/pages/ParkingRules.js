@@ -197,7 +197,7 @@ export function ParkingRules (){
                     <div>{gateNames[gate]} <br/></div> 
                   ))}</TableCell>
                   <TableCell align="center">{row.isChargeable?
-                  <AttachMoneyIcon style={{color:"green"}}/>
+                  <AttachMoneyIcon style={{color:"#66bb6a"}}/>
                   :<MoneyOffIcon style={{color:"red"}}/>
                   }</TableCell>
                   <TableCell align="right" style={{padding:0}}>
@@ -207,7 +207,7 @@ export function ParkingRules (){
                     }}>
                       <PencilSquare
                         size={21}
-                        color="gold"
+                        color="royalblue"
                       />
                     </IconButton>
                     <IconButton onClick={() => {
