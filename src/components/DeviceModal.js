@@ -1,16 +1,19 @@
 import { useState, useEffect, useContext } from "react";
 import { Form, Row, Col, Button, Modal } from "react-bootstrap";
-import { alertService, createDevice, getDeviceInfo, updateDeviceInfo } from '../services/index.js';
+import { alertService, createDevice, getDeviceInfo, updateDeviceInfo, getGate, getProjects } from '../services/index.js';
 
 export function DeviceModal(props) {
-    let {hide, gateID, toggleModal, success, newState, deviceID, deviceTypes } = props;
+    let {hide, gateID, toggleModal, success, deviceID, deviceTypes } = props;
     const [validated, setValidated] = useState(false);
     const [state, setState] = useState({});
     const [dummy, setDummy] = useState(false);
+    const [projects, setProjects] = useState([]);
+    const [curProject, setCurProject] = useState("");
+    const [gates, setGates] = useState([]);
 
   useEffect(() => {
     setValidated(false);
-    if(newState){
+    if(deviceID===null){
       setState({
         gateID,
         deviceID: "",
@@ -33,8 +36,45 @@ export function DeviceModal(props) {
         alertService.error("There was an error!");
         console.error("Get Device, There was an error!", error);
       });
+      if(gateID===null){
+        handleChange({
+          target:{
+            id: "gateID",
+            value: ""
+          }
+        });
+        getProjects(["projectID","projectName"])
+        .then(async (data) => {
+          setCurProject("");
+          setProjects(data.content);
+        })
+        .catch((error) => {
+          alertService.error("There was an error!");
+          console.error("Get Projects, There was an error!", error);
+        });
+      }
     }
-  }, [dummy,newState,deviceID]);
+  }, [dummy,hide]);
+
+  useEffect(()=>{
+    handleChange({
+      target:{
+        id: "gateID",
+        value: ""
+      }
+    });
+    if(curProject === null)setGates([]);
+    else{
+      getGate(curProject,["gateID","gateName"])
+      .then(async (data) => {
+        setGates(data.content);
+      })
+      .catch((error) => {
+        alertService.error("There was an error!");
+        console.error("Get Gates, There was an error!", error);
+      });
+    }
+  },[curProject])
 
   const handleChange = (e, filler, e2) => {
     let id, value;
@@ -68,7 +108,7 @@ export function DeviceModal(props) {
     }
     setValidated(true);
     if (form.checkValidity()){
-      if(newState) create();
+      if(deviceID===null) create();
       else update();
     }
   };
@@ -107,7 +147,7 @@ export function DeviceModal(props) {
     toggleModal();}}>
             <Modal.Header
              closeButton>
-                <Modal.Title>{newState?"Add Device":"Edit Device"}</Modal.Title>
+                <Modal.Title>{deviceID===null?"Add Device":"Edit Device"}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
             <Form id ="deviceModal" noValidate validated={validated} onSubmit={handleSubmit}>
@@ -118,7 +158,7 @@ export function DeviceModal(props) {
                     </Form.Label>
                     <Col
                         sm={6}
-                    >{newState?
+                    >{deviceID===null?
                         <div><Form.Control
                         required
                         placeholder="ID"
@@ -133,7 +173,66 @@ export function DeviceModal(props) {
                         </Form.Control.Feedback></div>:<Form.Control type="text" placeholder={state.deviceID} readOnly />}
                     </Col>
                     </Form.Group>
-
+                    {gateID===null?
+                    <div>
+                      <Form.Group as={Row}>
+                        <Form.Label column sm={6}>
+                            Project
+                        </Form.Label>
+                        <Col
+                            sm={6}
+                        >
+                          <Form.Control
+                            custom
+                            required
+                            as="select"
+                            id="project"
+                            name="project"
+                            value={curProject}
+                            onChange={(e)=>{
+                              setCurProject(e.target.value);
+                            }}
+                            >
+                            <option value={""}>--Select Project--</option>
+                            {projects.map((project)=>(
+                              <option value={project.projectID}>{project.projectName}</option>
+                            ))}
+                          </Form.Control>
+                          <Form.Control.Feedback type="invalid">
+                            Project is a required field.
+                          </Form.Control.Feedback>
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row}>
+                        <Form.Label column sm={6}>
+                            Gate
+                        </Form.Label>
+                        <Col
+                            sm={6}
+                        >
+                          <Form.Control
+                            disabled = {curProject===""}
+                            custom
+                            required
+                            as="select"
+                            id="gateID"
+                            name="gateID"
+                            value={state.gateID}
+                            onChange={handleChange}
+                            >
+                            <option value={""}>--Select Project--</option>
+                            {gates.map((gate)=>(
+                              <option value={gate.gateID}>{gate.gateName}</option>
+                            ))}
+                          </Form.Control>
+                          <Form.Control.Feedback type="invalid">
+                            Gate is a required field.
+                          </Form.Control.Feedback>
+                        </Col>
+                      </Form.Group>
+                      </div>
+                      :null
+                    }
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
                         Device Name
@@ -184,7 +283,7 @@ export function DeviceModal(props) {
 
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>
-                        Carpark which the device belongs to
+                        Carpark
                     </Form.Label>
                     <Col
                         sm={6}
@@ -202,18 +301,6 @@ export function DeviceModal(props) {
                         </Form.Control.Feedback>
                     </Col>
                     </Form.Group>
-                    {newState?null:
-                    <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
-                        Status
-                    </Form.Label>
-                    <Col
-                        sm={6}
-                        className="align-items-center d-flex justify-content-center"
-                    >
-                        <Form.Control type="text" placeholder={state.deviceStatus === "online"?"Online":"Offline"} readOnly />
-                    </Col>
-                    </Form.Group>}
 
                     <Form.Group as={Row}>
                     <Form.Label column sm={6}>

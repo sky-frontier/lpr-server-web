@@ -1,10 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
 import {Jumbotron, Row, Col, Card } from 'react-bootstrap';
-import {getAllDevice, getObjectTypes, alertService, getGateInfo} from '../services/index.js';
+import {getAllDevice, getObjectTypes, alertService, getGateInfo, getNewDevices} from '../services/index.js';
 import {IconButton, Typography  , TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, TableHead, TableRow, Paper, CardActions } from '@material-ui/core';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
-import { TablePaginationActions } from "../components/index.js";
+import { TablePaginationActions , DeviceModal} from "../components/index.js";
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import BuildIcon from '@material-ui/icons/Build';
 import { Directions } from "@material-ui/icons";
 import { useHistory } from "react-router";
 
@@ -13,20 +14,43 @@ export function Home() {
   const [rows, setRows] = useState([]);
   const [dummy, setDummy] = useState(null);
   const [devices, setDevices] = useState([]);
+  const [newDevices, setNewDevices] = useState([]);
   const [deviceTypes, setDeviceTypes] = useState([]);
+  const [deviceTypeNames, setDeviceTypeNames] = useState({});
+  const [curID, setCurID] = useState(null);
+  const [toggle, setToggle] = useState({
+    edit: false
+  });
   let history = useHistory();
-  useEffect(()=>{
+
+  const reload = () =>{
     getAllDevice(["deviceID", "deviceName", "deviceType","deviceStatus", "gateID"])
     .then(async (data) => {
-      setDevices(data.content.filter((device)=>device.deviceStatus!=="online"));
+      setDevices(data.content.filter((device)=>device.deviceStatus!=="online"&&device.gateID !== null));
     })
     .catch((error) => {
       alertService.error("There was an error!");
       console.error("Get All Device, there was an error!", error);
     });
+    getNewDevices()
+    .then(async (data) => {
+      setNewDevices(data.message);
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get All Device, there was an error!", error);
+    });
+  }
+
+  useEffect(()=>{
+    reload();
     getObjectTypes("device")
     .then(async (data) => {
-      setDeviceTypes(data.message);
+      setDeviceTypeNames(data.message);
+      setDeviceTypes(Object.entries(data.message).map((type)=>({
+        id: type[0],
+        name: type[1].name
+      })));
     })
     .catch((error) => {
       alertService.error("There was an error!");
@@ -46,8 +70,29 @@ export function Home() {
     });
   }
 
+  const toggleModal = (modal) => {
+    let prevVal = toggle[modal];
+    setToggle((prevState) => ({
+      ...prevState,
+      [modal]: !prevVal
+    }));
+  };
+
   return (
   <div>
+    <DeviceModal
+      deviceTypes = {deviceTypes}
+      hide={toggle.edit}
+      gateID = {null}
+      deviceID = {curID}
+      success={() => {
+          reload();
+          toggleModal("edit");
+      }}
+      toggleModal={() => {
+        toggleModal("edit");
+      }}
+    />
     <Jumbotron className="dashboard">
       <Row>
         <Col sm={3}>
@@ -114,13 +159,47 @@ export function Home() {
     </Jumbotron>
     <div className="content">
     <Row>
-        <Col sm={8}>
-          <Card>
+    <Col sm={4}>
+          <Card style={{height:"465px"}}>
           <Typography className="cardTitle" variant="h6" component="h2">
-            Disconnected Devices
+            New Devices
           </Typography>
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} className="scrollbar-primary" style={{"box-shadow":"none"}}>
             <Table aria-label="simple table">
+              <TableHead >
+                <TableRow>
+                  <TableCell align="left"><b>ID</b></TableCell>
+                  <TableCell align="left"></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {newDevices.map((row, index) => (
+                  <TableRow key={row.deviceID}>
+                  <TableCell align="left">{row.deviceID}</TableCell>
+                  <TableCell align="right">
+                      <IconButton style={{padding:0}}
+                      onClick={() => {
+                          setCurID(row.deviceID);
+                          toggleModal("edit");
+                      }}>
+                        <BuildIcon
+                        />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          </Card>
+        </Col>
+        <Col sm={8}>
+          <Card style={{height:"465px"}} >
+          <Typography className="cardTitle" variant="h6" component="h2">
+             Disconnected Devices
+          </Typography>
+          <TableContainer component={Paper} className="scrollbar-primary" style={{"box-shadow":"none"}}>
+            <Table stickyHeader aria-label="simple table">
               <TableHead >
                 <TableRow>
                   <TableCell align="left"><b>ID</b></TableCell>
@@ -134,7 +213,7 @@ export function Home() {
                   <TableRow key={row.deviceID}>
                   <TableCell align="left">{row.deviceID}</TableCell>
                     <TableCell align="left">{row.deviceName}</TableCell>
-                    <TableCell align="left">{deviceTypes[row.deviceType]===undefined ? row.deviceType : deviceTypes[row.deviceType].name}</TableCell>
+                    <TableCell align="left">{deviceTypeNames[row.deviceType]===undefined ? row.deviceType : deviceTypeNames[row.deviceType].name}</TableCell>
                     <TableCell align="right">
                       <IconButton style={{padding:0}}
                       onClick={() => {

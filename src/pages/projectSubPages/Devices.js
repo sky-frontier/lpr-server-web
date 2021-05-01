@@ -22,7 +22,7 @@ export function Devices (){
   const [projectName, setProjectName] = useState("");
   const [gateName, setGateName] = useState("");
   const [modal, setModal] = useState(true);
-  const [curID, setCurID] = useState("");
+  const [curID, setCurID] = useState(null);
   const [dummy, setDummy] = useState(false);
   const [deviceTypes, setDeviceTypes] = useState([]);
   const [deviceTypeNames, setDeviceTypeNames] = useState([]);
@@ -121,7 +121,6 @@ export function Devices (){
         deviceTypes = {deviceTypes}
         hide={toggle.edit}
         deviceID = {curID}
-        newState = {modal}
         gateID = {gateID}
         success={() => {
             reload();
@@ -149,7 +148,7 @@ export function Devices (){
                 className="btn btn-success"
                 type="button"
                 onClick={() => {
-                    setModal(true);
+                  setCurID(null);
                   toggleModal("edit");
                 }}
               >
@@ -193,7 +192,6 @@ export function Devices (){
                   <Tooltip title="Edit">
                     <IconButton onClick={() => {
                         setCurID(row.deviceID);
-                        setModal(false);
                         toggleModal("edit");
                     }}>
                       <PencilSquare

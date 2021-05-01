@@ -505,6 +505,19 @@ const openGate = (gateID) =>{
     .then(returnFunc)
 }
 
+const getNewDevices = () =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "getNewDevice"
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 export {
     getGate,
     getDevice,
@@ -535,5 +548,6 @@ export {
     getObjectTypes,
     getWhitelistTags,
     openGate,
-    getAllDevice
+    getAllDevice,
+    getNewDevices
 };
