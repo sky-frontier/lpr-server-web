@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { ImageModal, TablePaginationActions } from "../components/index.js";
-import {getMovementLogs } from '../services/index.js';
+import {getMovementLogs, getObjectTypes, alertService } from '../services/index.js';
 import closeGate from '../assets/closeGate.png';
 import openGate from '../assets/openGate.jpg';
 import DatePicker from 'react-datepicker';
@@ -11,6 +11,7 @@ export function Records({ match }) {
   const [initialRows, setInitialRows] = useState([]);
   const [validated, setValidated] = useState(false);
   const [rows, setRows] = useState([]);
+  const [gateTypes, setGateTypes] = useState({});
   const [imageSrc, setImageSrc] = useState(null);
   const  queryFields = [
     "projectName",
@@ -93,11 +94,20 @@ export function Records({ match }) {
         setInitialRows(data.content);
       })
       .catch((error) => {
+        alertService.error("There was an error!");
         console.error("There was an error!", error);
       });
   }
   useEffect(() => {
     reload();
+    getObjectTypes("gate")
+    .then(async (data) => {
+      setGateTypes(data.message);
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("There was an error Get Gate Types!", error);
+    });
   }, [dummy]);
 
   useEffect(() => {
@@ -267,7 +277,7 @@ export function Records({ match }) {
         </Form>
       </div>
       <div className="content">
-        <TableContainer component={Paper} className="overflowTable">
+        <TableContainer component={Paper} className="overflowTable scrollbar-grey">
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -296,7 +306,7 @@ export function Records({ match }) {
                     {row.gateName}
                   </TableCell>
                   <TableCell className="padding-0" component="th" scope="row" align="center">
-                    {row.gateType}
+                    {gateTypes[row.gateType].name}
                   </TableCell>
                   <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.detectionTime}

@@ -5,8 +5,10 @@ import { PencilSquare, Trash, Cpu } from "react-bootstrap-icons";
 
 import { useHistory, useParams, useLocation } from "react-router-dom";
 import { ConfirmModal, RulesModal, TablePaginationActions } from "../components/index.js";
-import {getGate, alertService, delGate, getProjects, getAccessRule} from '../services/index.js';
-import { Directions } from "@material-ui/icons";
+import {getGate, alertService, delGate, getProjects, getAccessRule, delAccessRule} from '../services/index.js';
+import { Directions, MonetizationOn } from "@material-ui/icons";
+import MoneyOffIcon from '@material-ui/icons/MoneyOff';
+import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 
 export function ParkingRules (){
   const [rows, setRows] = useState([]);
@@ -81,8 +83,7 @@ export function ParkingRules (){
   };
 
   const del = async (accessRuleID) => {
-    /*
-    delGate(gateID)
+    delAccessRule(accessRuleID)
     .then(async (data) => {
       reload();
       toggleModal("delete");
@@ -90,7 +91,7 @@ export function ParkingRules (){
     })
     .catch((error) => {
       console.error("Delete Rule, There was an error!", error);
-    });*/
+    });
   };
   
   const [page, setPage] = React.useState(0);
@@ -195,7 +196,10 @@ export function ParkingRules (){
                   <TableCell align="center">{(row.gates).map((gate)=>(
                     <div>{gateNames[gate]} <br/></div> 
                   ))}</TableCell>
-                  <TableCell align="center">{row.isChargeable}</TableCell>
+                  <TableCell align="center">{row.isChargeable?
+                  <AttachMoneyIcon style={{color:"green"}}/>
+                  :<MoneyOffIcon style={{color:"red"}}/>
+                  }</TableCell>
                   <TableCell align="right" style={{padding:0}}>
                     <IconButton onClick={() => {
                         setCurID(row.accessRuleID);

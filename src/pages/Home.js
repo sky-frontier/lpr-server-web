@@ -164,7 +164,7 @@ export function Home() {
           <Typography className="cardTitle" variant="h6" component="h2">
             New Devices
           </Typography>
-          <TableContainer component={Paper} className="scrollbar-primary" style={{"box-shadow":"none"}}>
+          <TableContainer component={Paper} className="scrollbar-grey" style={{"box-shadow":"none"}}>
             <Table aria-label="simple table">
               <TableHead >
                 <TableRow>
@@ -198,7 +198,7 @@ export function Home() {
           <Typography className="cardTitle" variant="h6" component="h2">
              Disconnected Devices
           </Typography>
-          <TableContainer component={Paper} className="scrollbar-primary" style={{"box-shadow":"none"}}>
+          <TableContainer component={Paper} className="scrollbar-grey" style={{"box-shadow":"none"}}>
             <Table stickyHeader aria-label="simple table">
               <TableHead >
                 <TableRow>

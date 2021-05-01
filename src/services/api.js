@@ -518,6 +518,22 @@ const getNewDevices = () =>{
     .then(returnFunc)
 }
 
+const delAccessRule = (ID) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "deleteAccessRule",
+          content: {
+              accessRuleID: ID
+          }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 export {
     getGate,
     getDevice,
@@ -549,5 +565,6 @@ export {
     getWhitelistTags,
     openGate,
     getAllDevice,
-    getNewDevices
+    getNewDevices,
+    delAccessRule
 };

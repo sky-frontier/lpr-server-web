@@ -30,7 +30,8 @@ import {
     getWhitelistTags,
     openGate,
     getAllDevice,
-    getNewDevices} from "./api";
+    getNewDevices,
+    delAccessRule} from "./api";
 export {
     alertService,
     alertType,
@@ -64,5 +65,6 @@ export {
     getWhitelistTags,
     openGate,
     getAllDevice,
-    getNewDevices
+    getNewDevices,
+    delAccessRule
 };
