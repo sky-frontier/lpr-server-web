@@ -111,9 +111,10 @@ function PublicRoute({ children, ...rest }) {
             }}
           />
         ) : 
-        <AlertGroup />(
-          children
-        )
+        <div className="h-100">
+        <AlertGroup />
+          {children}
+        </div>
       }
     />
   );
