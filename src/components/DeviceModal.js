@@ -217,7 +217,7 @@ export function DeviceModal(props) {
                             as="select"
                             id="gateID"
                             name="gateID"
-                            value={state.gateID}
+                            value={state.gateID===null?"":state.gateID}
                             onChange={handleChange}
                             >
                             <option value={""}>--Select Project--</option>
@@ -267,7 +267,7 @@ export function DeviceModal(props) {
                         as="select"
                         id="deviceType"
                         name="deviceType"
-                        value={state.deviceType}
+                        value={state.deviceType===null?null:state.deviceType}
                         onChange={handleChange}
                         >
                         <option value={""}>--Select Type--</option>

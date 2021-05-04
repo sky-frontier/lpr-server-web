@@ -1,26 +1,30 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
 import {Tooltip, TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
-import { PencilSquare, Trash, Cpu } from "react-bootstrap-icons";
+import { PencilSquare, Trash } from "react-bootstrap-icons";
 
 import { useHistory, useParams, useLocation } from "react-router-dom";
-import { ConfirmModal, RulesModal, TablePaginationActions } from "../components/index.js";
-import {getGate, alertService, delGate, getProjects, getAccessRule, delAccessRule} from '../services/index.js';
-import { Directions, MonetizationOn } from "@material-ui/icons";
-import MoneyOffIcon from '@material-ui/icons/MoneyOff';
-import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import { ConfirmModal, WhitelistModal, TablePaginationActions } from "../components/index.js";
+import {alertService, getProjects, getAccessRule, 
+    getWhitelistEntry,
+    delWhitelistEntryInfo} from '../services/index.js';
+import { Directions } from "@material-ui/icons";
 
-export function ParkingRules (){
+export function Whitelist (){
+  const [initialRows, setInitialRows] = useState([]);
+  const [pNumber, setPNumber] = useState("");
+  const [curPNo, setCurPNo] = useState("");
   const [rows, setRows] = useState([]);
   const [toggle, setToggle] = useState({
     delete: false,
     edit: false
   });
   const [project,setProject] = useState("");
-  const [curID, setCurID] = useState("");
+  const [curID, setCurID] = useState(null);
   const [dummy, setDummy] = useState(false);
+  const [accessRules, setAccessRules] = useState([]);
+  const [accessRuleVals, setAccessRuleVals] = useState({});
   const [projectNames, setProjectNames] = useState({});
-  const [gateNames, setGateNames] = useState({});
   const [projects,setProjects] = useState([]);
   const func = async (val, inputField, outputField) =>{
     let temp = {};
@@ -29,6 +33,7 @@ export function ParkingRules (){
     });
     return await temp;
   };
+
   const reloadProjects = () =>{
     getProjects(["projectID", "projectName"])
       .then(async (data) => {
@@ -39,40 +44,67 @@ export function ParkingRules (){
         });
       })
       .catch((error) => {
-        console.error("Get Gate, there was an error!", error);
+        console.error("Get Project, there was an error!", error);
       });
   }
+
   useEffect(() => {
     reloadProjects();
   }, [dummy]);
 
-  const reload = () =>{
-    getAccessRule(project, ["accessRuleID", "accessRuleName", "isChargeable", "gates"])
-    .then(async (data) => {
-      console.log(data.content);
-      setRows(data.content);
-    })
-    .catch((error) => {
-      console.error("Get Gate, there was an error!", error);
-    });
-  }
-
-  const reloadGates = () =>{
-    getGate(project,["gateID","gateName"])
+  
+  const reloadAccessRules = () =>{
+    getAccessRule(project,["accessRuleID","accessRuleName","projectID"])
       .then(async (data) => {
-        func(data.content, "gateID", "gateName").then(async(list)=>{
-          setGateNames(await list);
+        setAccessRules(data.content);
+        func(data.content,"accessRuleID", "accessRuleName").then(async(list)=>{
+          setAccessRuleVals(await list);
         });
       })
       .catch((error) => {
-        console.error("Get Gate, there was an error!", error);
+        console.error("Get Access Rule, there was an error!", error);
       });
   }
 
   useEffect(()=>{
-    reload();
-    reloadGates();
+    reloadAccessRules();
+    setPNumber("");
+    setCurPNo("");
   },[project]);
+
+
+  const reload = () =>{
+    getWhitelistEntry(["plateNumber", "accessRuleID", "tag", "startDateTime","endDateTime"])
+    .then(async (data) => {
+        setInitialRows(
+            data.content.filter((entry)=>
+                entry.accessRuleID !== null &&
+                accessRuleVals[entry.accessRuleID] !== undefined
+            )
+        );
+    })
+    .catch((error) => {
+      console.error("Get entry, there was an error!", error);
+    });
+  }
+
+  useEffect(()=>{
+    reload();
+  },[accessRuleVals]);
+
+  const filter = () => {
+    let curRows = initialRows;
+    setRows(
+      curRows.filter(
+        (row) =>
+          row["plateNumber"].toLowerCase().indexOf(pNumber.toLowerCase()) >= 0
+      )
+    );
+  };
+
+  useEffect(()=>{
+    filter();
+  },[initialRows, pNumber]);
 
   const toggleModal = (modal) => {
     let prevVal = toggle[modal];
@@ -82,15 +114,15 @@ export function ParkingRules (){
     }));
   };
 
-  const del = async (accessRuleID) => {
-    delAccessRule(accessRuleID)
+  const del = async (plateNumber, accessRuleID) => {
+    delWhitelistEntryInfo(plateNumber, accessRuleID)
     .then(async (data) => {
       reload();
       toggleModal("delete");
-      alertService.success("Rule Deleted");
+      alertService.success("Entry Deleted");
     })
     .catch((error) => {
-      console.error("Delete Rule, There was an error!", error);
+      console.error("Delete Entry, There was an error!", error);
     });
   };
   
@@ -113,20 +145,20 @@ export function ParkingRules (){
       <ConfirmModal
         hide={toggle.delete}
         success={() => {
-          del(curID);
+          del(curID.plateNumber, curID.accessRuleID);
         }}
         toggleModal={() => {
           toggleModal("delete");
         }}
         title="Confirm Deletion"
-        body="Delete this rule?"
+        body="Delete this entry?"
       />
       {toggle.edit?
-      <RulesModal
+      <WhitelistModal
         hide={toggle.edit}
-        projectID = {project}
         projectName = {projectNames[project]}
-        accessRuleID = {curID}
+        ID = {curID}
+        accessRules = {accessRules}
         success={() => {
             reload();
             toggleModal("edit");
@@ -139,10 +171,10 @@ export function ParkingRules (){
       <div className="content">
       <Breadcrumb>
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
-        <Breadcrumb.Item active>Access Rules</Breadcrumb.Item>
+        <Breadcrumb.Item active>Whitelist Entries</Breadcrumb.Item>
       </Breadcrumb>
-        <Form inline onSubmit={(e)=>{e.preventDefault();}}>
-          <Row>
+        <Form onSubmit={(e)=>{e.preventDefault();}}>
+          <Row className="d-flex">
             <Col sm="auto">
               <Form.Control
                 custom
@@ -172,6 +204,35 @@ export function ParkingRules (){
                 + Add
               </Button>
             </Col>
+            <div style={{"flex-grow":"1"}}></div>
+            <Col sm="auto">
+              <Form.Control
+                placeholder="Plate No."
+                onChange={(e)=>{
+                    setCurPNo(e.target.value);
+                }}
+                value={pNumber}
+              />
+            </Col>
+            <Col sm="auto">
+              <Button
+                className="btn btn-primary"
+                type="button"
+                onClick={() => {
+                    setPNumber(curPNo);
+                }}
+              >
+                Search
+              </Button>
+            </Col>
+            <Col sm="auto">
+            <Button type="button" variant="secondary" onClick={()=>{
+                setCurPNo("");
+                setPNumber("");
+            }}>
+                Cancel
+              </Button>
+            </Col>
           </Row>
         </Form>
       </div>
@@ -180,10 +241,12 @@ export function ParkingRules (){
           <Table aria-label="simple table">
             <TableHead >
               <TableRow>
-                <TableCell align="left"><b>Project</b></TableCell>
-                <TableCell align="center"><b>Name</b></TableCell>
-                <TableCell align="center"><b>Gates</b></TableCell>
-                <TableCell align="center"><b>Chargeable</b></TableCell>
+                <TableCell align="center"><b>Plate Number</b></TableCell>
+                <TableCell align="center"><b>Project</b></TableCell>
+                <TableCell align="center"><b>Access Rule</b></TableCell>
+                <TableCell align="center"><b>Tag</b></TableCell>
+                <TableCell align="center"><b>Start Date</b></TableCell>
+                <TableCell align="center"><b>End Date</b></TableCell>
                 <TableCell align="right"><b>Actions</b></TableCell>
               </TableRow>
             </TableHead>
@@ -192,18 +255,24 @@ export function ParkingRules (){
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row, index) => (
                 <TableRow key={row.gateName}>
-                <TableCell align="left">{projectNames[project]}</TableCell>
-                  <TableCell align="center">{row.accessRuleName}</TableCell>
-                  <TableCell align="center">{row.gates===null?null:((row.gates).map((gate)=>(
-                    <div>{gate===null?null:gateNames[gate]} <br/></div> 
-                  )))}</TableCell>
-                  <TableCell align="center">{row.isChargeable?
-                  <AttachMoneyIcon style={{color:"#66bb6a"}}/>
-                  :<MoneyOffIcon style={{color:"red"}}/>
-                  }</TableCell>
+                <TableCell align="center">
+                    <div className="outerPlate" >
+                      <div className="innerPlate">
+                        <u>{row.plateNumber}</u>
+                      </div>
+                    </div>
+                </TableCell>
+                  <TableCell align="center">{projectNames[project]}</TableCell>
+                  <TableCell align="center">{row.accessRuleID === null? null: accessRuleVals[row.accessRuleID]}</TableCell>
+                  <TableCell align="center">{row.tag}</TableCell>
+                  <TableCell align="center">{row.startDateTime}</TableCell>
+                  <TableCell align="center">{row.endDateTime}</TableCell>
                   <TableCell align="right" style={{padding:0}}>
                     <IconButton onClick={() => {
-                        setCurID(row.accessRuleID);
+                        setCurID({
+                            accessRuleID: row.accessRuleID,
+                            plateNumber: row.plateNumber    
+                        });
                         toggleModal("edit");
                     }}>
                       <PencilSquare
@@ -212,7 +281,10 @@ export function ParkingRules (){
                       />
                     </IconButton>
                     <IconButton onClick={() => {
-                        setCurID(row.accessRuleID);
+                        setCurID({
+                            accessRuleID: row.accessRuleID,
+                            plateNumber: row.plateNumber    
+                        });
                         toggleModal("delete");
                     }}>
                       <Trash color="red" size={21} />
@@ -251,4 +323,4 @@ export function ParkingRules (){
   );
 }
 
-export default { ParkingRules };
+export default { Whitelist };

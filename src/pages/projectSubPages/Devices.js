@@ -43,7 +43,7 @@ export function Devices (){
       alertService.error("There was an error!");
       console.error("Get Gate Info, there was an error!", error);
     });
-    getDevice(gateID, ["deviceID", "deviceName", "deviceType", "deviceStatus"])
+    getDevice(gateID, ["deviceID", "deviceName", "deviceType", "deviceStatus","deviceIP"])
       .then(async (data) => {
         console.log(data.content);
         setRows(data.content);
@@ -167,6 +167,7 @@ export function Devices (){
                 <TableCell align="left"><b>ID</b></TableCell>
                 <TableCell align="center"><b>Name</b></TableCell>
                 <TableCell align="center"><b>Type</b></TableCell>
+                <TableCell align="center"><b>IP</b></TableCell>
                 <TableCell align="center"><b>Status</b></TableCell>
                 <TableCell align="right"><b>Actions</b></TableCell>
               </TableRow>
@@ -178,7 +179,10 @@ export function Devices (){
                 <TableRow key={row.gateName}>
                 <TableCell align="left">{row.deviceID}</TableCell>
                   <TableCell align="center">{row.deviceName}</TableCell>
-                  <TableCell align="center">{deviceTypeNames[row.deviceType].name}</TableCell>
+                  <TableCell align="center">
+                  {row.deviceType===null?null: (deviceTypeNames[row.deviceType]===undefined? null: deviceTypeNames[row.deviceType].name)}
+                   </TableCell>
+                  <TableCell align="center">{row.deviceIP}</TableCell>
                   <TableCell align="center">{row.deviceStatus==='online'?
                   <Tooltip title="Online">
                   <SignalCellularAltIcon style={{ color: "#4caf50" }}/>

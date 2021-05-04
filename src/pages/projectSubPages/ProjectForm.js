@@ -125,7 +125,7 @@ export function ProjectForm() {
               as="select"
               id="projectType"
               name="projectType"
-              value={state.projectType}
+              value={state.projectType===null? '':state.projectType}
               onChange={handleChange}
             >
               <option value={''}>--Select Type--</option>

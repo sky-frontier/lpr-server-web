@@ -306,7 +306,7 @@ export function Records({ match }) {
                     {row.gateName}
                   </TableCell>
                   <TableCell className="padding-0" component="th" scope="row" align="center">
-                    {gateTypes[row.gateType].name}
+                    {row.gateType===null?null: (gateTypes[row.gateType]===undefined? null: gateTypes[row.gateType].name)}
                   </TableCell>
                   <TableCell className="padding-0" component="th" scope="row" align="center">
                     {row.detectionTime}

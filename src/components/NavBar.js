@@ -97,7 +97,7 @@ export function NavBar() {
             </MenuItem>
             <SubMenu title="Access" icon={<PaymentIcon/>}>
               <MenuItem  onClick={()=>direct("/accessRules")} >Access Rules</MenuItem>
-              <MenuItem>Tracking</MenuItem>
+              <MenuItem onClick={()=>direct("/whitelist")}>Whitelist Entries</MenuItem>
             </SubMenu>
           </Menu>
         </SidebarContent>

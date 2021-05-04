@@ -181,7 +181,9 @@ export function Gates (){
                 <TableRow key={row.gateName}>
                 <TableCell align="left">{row.gateID}</TableCell>
                   <TableCell align="center">{row.gateName}</TableCell>
-                  <TableCell align="center">{gateTypeNames[row.gateType].name}</TableCell>
+                  <TableCell align="center">
+                  {row.gateType===null?null: (gateTypeNames[row.gateType]===undefined? null: gateTypeNames[row.gateType].name)}
+                  </TableCell>
                   <TableCell align="right" style={{padding:0}}>
                   <Tooltip title="Devices">
                     <IconButton 

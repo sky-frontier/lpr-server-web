@@ -24,7 +24,7 @@ export function Home() {
   let history = useHistory();
 
   const reload = () =>{
-    getAllDevice(["deviceID", "deviceName", "deviceType","deviceStatus", "gateID"])
+    getAllDevice(["deviceID", "deviceName", "deviceType","deviceStatus", "gateID","deviceIP"])
     .then(async (data) => {
       setDevices(data.content.filter((device)=>device.deviceStatus!=="online"&&device.gateID !== null));
     })
@@ -169,6 +169,7 @@ export function Home() {
               <TableHead >
                 <TableRow>
                   <TableCell align="left"><b>ID</b></TableCell>
+                  <TableCell align="left"><b>IP</b></TableCell>
                   <TableCell align="left"></TableCell>
                 </TableRow>
               </TableHead>
@@ -176,6 +177,7 @@ export function Home() {
                 {newDevices.map((row, index) => (
                   <TableRow key={row.deviceID}>
                   <TableCell align="left">{row.deviceID}</TableCell>
+                  <TableCell align="left">{row.deviceIP}</TableCell>
                   <TableCell align="right">
                       <IconButton style={{padding:0}}
                       onClick={() => {
@@ -205,6 +207,7 @@ export function Home() {
                   <TableCell align="left"><b>ID</b></TableCell>
                   <TableCell align="left"><b>Name</b></TableCell>
                   <TableCell align="left"><b>Type</b></TableCell>
+                  <TableCell align="left"><b>IP</b></TableCell>
                   <TableCell align="left"></TableCell>
                 </TableRow>
               </TableHead>
@@ -213,7 +216,8 @@ export function Home() {
                   <TableRow key={row.deviceID}>
                   <TableCell align="left">{row.deviceID}</TableCell>
                     <TableCell align="left">{row.deviceName}</TableCell>
-                    <TableCell align="left">{deviceTypeNames[row.deviceType]===undefined ? row.deviceType : deviceTypeNames[row.deviceType].name}</TableCell>
+                    <TableCell align="left">{row.deviceType===null?null:(deviceTypeNames[row.deviceType]===undefined ? row.deviceType : deviceTypeNames[row.deviceType].name)}</TableCell>
+                  <TableCell align="left">{row.deviceIP}</TableCell>
                     <TableCell align="right">
                       <IconButton style={{padding:0}}
                       onClick={() => {

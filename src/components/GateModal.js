@@ -28,7 +28,14 @@ export function GateModal(props) {
     }else{
       getGateInfo(gateID)
       .then(async (data) => {
-        setState(data.message);
+        if(data.message.allowedTypes!==null){
+          setState(data.message);
+        }else{
+          setState({
+            ...data.message,
+            allowedTypes: []
+          })
+        }
         console.log(data.message);
       })
       .catch((error) => {
@@ -173,7 +180,7 @@ export function GateModal(props) {
                         as="select"
                         id="gateType"
                         name="gateType"
-                        value={state.gateType}
+                        value={state.gateType===null?"":state.gateType}
                         onChange={handleChange}
                         >
                         <option value={""}>--Select Type--</option>

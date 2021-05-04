@@ -31,7 +31,12 @@ import {
     openGate,
     getAllDevice,
     getNewDevices,
-    delAccessRule} from "./api";
+    delAccessRule,
+    getWhitelistEntry,
+    getWhitelistEntryInfo,
+    updateWhitelistEntryInfo,
+    delWhitelistEntryInfo,
+    createWhitelistEntry} from "./api";
 export {
     alertService,
     alertType,
@@ -66,5 +71,10 @@ export {
     openGate,
     getAllDevice,
     getNewDevices,
-    delAccessRule
+    delAccessRule,
+    getWhitelistEntry,
+    getWhitelistEntryInfo,
+    updateWhitelistEntryInfo,
+    delWhitelistEntryInfo,
+    createWhitelistEntry
 };

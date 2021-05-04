@@ -7,4 +7,5 @@ import { AlertGroup } from "./AlertGroup.js"
 import {TablePaginationActions} from './TablePaginationActions';
 import { RulesModal } from './RulesModal';
 import { ImageModal } from './ImageModal';
-export { NavBar, ConfirmModal, DeviceModal, GateModal, QueryModal, AlertGroup, TablePaginationActions, RulesModal, ImageModal };
+import { WhitelistModal } from './WhitelistModal';
+export { NavBar, ConfirmModal, DeviceModal, GateModal, QueryModal, AlertGroup, TablePaginationActions, RulesModal, ImageModal, WhitelistModal };
