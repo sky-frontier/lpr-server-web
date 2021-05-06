@@ -5,7 +5,26 @@ import { ImageModal, TablePaginationActions } from "../components/index.js";
 import {getMovementLogs, getObjectTypes, alertService } from '../services/index.js';
 import { LockFill, UnlockFill } from "react-bootstrap-icons";
 
-import DatePicker from 'react-datepicker';
+import { InputGroup, DatePicker } from 'rsuite';
+
+function pad2(n) { return n < 10 ? '0' + n : n }
+function dateToString(date){
+  if(date===null)return "";
+  else return date.getFullYear().toString() +'-'+ pad2(date.getMonth() + 1) +'-'+ pad2( date.getDate()) +' '+ pad2( date.getHours() ) +':'+ pad2( date.getMinutes() ) +':'+ pad2( date.getSeconds() );
+}
+
+function minStr(str1, str2){
+  if(str1==="")return str2;
+  if(str2==="")return "";
+  if(str1 > str2)return str2;
+  else return str1;
+}
+function maxStr(str1, str2){
+  if(str1==="")return str2;
+  if(str2==="")return "";
+  if(str1 < str2)return str2;
+  else return str1;
+}
 
 export function Records({ match }) {
   const [initialRows, setInitialRows] = useState([]);
@@ -75,20 +94,28 @@ export function Records({ match }) {
   }
   const [state, setState] = useState({
     curField: "projectName",
-    val: "",
-    startTime: null,
-    endTime: null
+    val: ""
   });
+  const [timeState, setTimeState] = useState({
+    startTime: "",
+    endTime: ""
+  })
+  const [curTimeState, setCurTimeState] = useState({
+    startTime: "",
+    endTime: ""
+  })
   const [curState, setCurState] = useState({
     curField: "projectName",
-    val: "",
-    startTime: null,
-    endTime: null
+    val: ""
   });
   const [dummy, setDummy] = useState(false);
   const [projects, setProjects] = useState([]);
   const reload = () =>{
-    getMovementLogs(fields.concat("logID"), [])
+    let filters = (timeState.startTime===""&&timeState.endTime==="")?{}:{
+      detectionTime : timeState.startTime+'|'+timeState.endTime
+    };
+    console.log(filters);
+    getMovementLogs(fields.concat("logID"), filters)
       .then(async (data) => {
         console.log(data.content.slice(0,6));
         setInitialRows(data.content);
@@ -114,6 +141,10 @@ export function Records({ match }) {
     filter();
   }, [initialRows, curState]);
 
+  useEffect(()=>{
+    reload();
+  },[curTimeState]);
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     if(id==="curField"){
@@ -127,6 +158,13 @@ export function Records({ match }) {
         [id]: value
       }));
     }
+  };
+
+  const handleTimeChange = (value, id) => {
+    setTimeState((prevState)=>({
+      ...prevState,
+      [id]:value
+    }));
   };
 
   const filter = (e) => {
@@ -145,15 +183,19 @@ export function Records({ match }) {
   const reset = async (e) =>{
     setState({
       curField: "projectName",
-      val: "",
-      startTime: null,
-      endTime: null
+      val: ""
     });
     setCurState({
       curField: "projectName",
-      val: "",
-      startTime: null,
-      endTime: null
+      val: ""
+    });
+    setCurTimeState({
+      startTime: "",
+      endTime: ""
+    });
+    setTimeState({
+      startTime: "",
+      endTime: ""
     });
   }
   
@@ -184,8 +226,8 @@ export function Records({ match }) {
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item active>Entry Exit Records</Breadcrumb.Item>
       </Breadcrumb>
-        <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
-          <Row>
+        <Form onSubmit={(e)=>{e.preventDefault();}}>
+          <Row className="d-flex">
             <Col sm="auto">
               <Form.Control
                 custom
@@ -205,68 +247,47 @@ export function Records({ match }) {
                 placeholder={fieldPlaceholder[state.curField]}
                 onChange={handleChange}
                 value={state.val}
-              />
-            </Col>
-            <Col sm="auto" className="d-flex">
-            <Form.Label>From:</Form.Label>
+              />  
             </Col>
             <Col sm="auto">
-            <DatePicker
-            isClearable
-              className="dateRecord"
-              selected={state.startTime}
-              maxDate={state.endTime}
-              popperClassName="dateTimePopper"
-              className="form-control"
-              placeholderText="YYYY-MM-DD HH:MM:SS"
-              onChange={date => {handleChange({
-                target:{
-                  value:date,
-                  id: "startTime"
-                }
-              });
-            console.log(date);
+            <InputGroup style={{"background-color":"white"}}>
+              <InputGroup.Addon>From</InputGroup.Addon>
+              <DatePicker 
+              format="YYYY-MM-DD HH:mm:ss" 
+              block appearance="subtle"
+              value={timeState.startTime}
+              onChange={(val)=>{
+                handleTimeChange(dateToString(val), "startTime");
+                handleTimeChange(maxStr(dateToString(val),timeState.endTime), "endTime");
               }}
-              showTimeSelect
-              dateFormat="yyyy-MM-dd"
-              timeFormat="HH:mm:ss"
-              timeIntervals={15}
-              timeCaption="time"
-              dateFormat="yyyy-MM-dd HH:mm:ss"
-              title="Start Time"
-              clearButtonClassName="dateTimeClear"
-            />
-            </Col>
-            <Col sm="auto" className="d-flex">
-            <Form.Label>To:</Form.Label>
-            </Col>
-            <Col sm="auto">
-            <DatePicker
-            isClearable
-              className="dateRecord"
-              selected={state.endTime}
-              minDate={state.startTime}
-              popperClassName="dateTimePopper"
-              className="form-control"
-              placeholderText="YYYY-MM-DD HH:MM:SS"
-              onChange={date => handleChange({
-                target:{
-                  value:date,
-                  id: "endTime"
+              ranges={[
+                {
+                  label: 'Now',
+                  value: new Date()
                 }
-              })}
-              showTimeSelect
-              dateFormat="yyyy-MM-dd"
-              timeFormat="HH:mm:ss"
-              timeIntervals={15}
-              timeCaption="time"
-              dateFormat="yyyy-MM-dd HH:mm:ss"
-              title="Start Time"
-              clearButtonClassName="dateTimeClear"
-            />
+              ]}
+              placeholder="YYYY-MM-DD HH:MM:SS"/>
+              <InputGroup.Addon>To</InputGroup.Addon>
+              <DatePicker 
+              format="YYYY-MM-DD HH:mm:ss" 
+              block appearance="subtle"
+              value={timeState.endTime}
+              onChange={(val)=>{
+                handleTimeChange(dateToString(val), "endTime");
+                handleTimeChange(minStr(dateToString(val),timeState.startTime), "startTime");
+              }} 
+              ranges={[
+                {
+                  label: 'Now',
+                  value: new Date()
+                }
+              ]}
+              placeholder="YYYY-MM-DD HH:MM:SS"/>
+            </InputGroup>
             </Col>
+            <div style={{"flex-grow":"1"}}></div>
             <Col sm="auto">
-              <Button type="button" onClick={()=>{setCurState(state)}}>
+              <Button type="button" onClick={()=>{setCurState(state);setCurTimeState(timeState)}}>
                 Search
               </Button>
             </Col>
