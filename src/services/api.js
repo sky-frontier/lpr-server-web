@@ -551,7 +551,7 @@ const getWhitelistEntry = (columns) =>{
     .then(returnFunc)
 }
 
-const getWhitelistEntryInfo = (plateNumber, accessRuleID) =>{
+const getWhitelistEntryInfo = (recordID) =>{
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -559,8 +559,7 @@ const getWhitelistEntryInfo = (plateNumber, accessRuleID) =>{
           authID: "",
           serviceName: "getWhitelistEntry",
           content: {
-            plateNumber,
-            accessRuleID
+            recordID
           }
         })
       };
@@ -568,25 +567,21 @@ const getWhitelistEntryInfo = (plateNumber, accessRuleID) =>{
     .then(returnFunc)
 }
 
-const updateWhitelistEntryInfo = (plateNumber, accessRuleID, state) =>{
+const updateWhitelistEntryInfo = (state) =>{
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             authID: "",
-            serviceName: "modifyWhitelistEntry",
-            content: {
-                plateNumber,
-                accessRuleID,
-                modifyParams: state
-            }
+            serviceName: "editWhitelistEntry",
+            content: state
         })
     };
     return fetch(server_URL, requestOptions)
     .then(returnFunc)
 }
 
-const delWhitelistEntryInfo = (plateNumber, accessRuleID) =>{
+const delWhitelistEntryInfo = (recordID) =>{
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -594,8 +589,7 @@ const delWhitelistEntryInfo = (plateNumber, accessRuleID) =>{
           authID: "",
           serviceName: "deleteWhitelistEntry",
           content: {
-            plateNumber,
-            accessRuleID
+            recordID
           }
         })
       };
@@ -612,10 +606,27 @@ const createWhitelistEntry = (values) =>{
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             authID: "",
-            serviceName: "addWhitelistEntry",
+            serviceName: "editWhitelistEntry",
             content: newDeviceReq
         })
     };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const getPlates = (columns) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "getTable",
+          content: {
+            objName: "plate",
+            columns
+          }
+        })
+      };
     return fetch(server_URL, requestOptions)
     .then(returnFunc)
 }
@@ -657,5 +668,6 @@ export {
     getWhitelistEntryInfo,
     updateWhitelistEntryInfo,
     delWhitelistEntryInfo,
-    createWhitelistEntry
+    createWhitelistEntry,
+    getPlates
 };

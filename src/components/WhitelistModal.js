@@ -1,9 +1,27 @@
 import { func } from "prop-types";
 import { useState, useEffect, useContext } from "react";
 import { Form, Row, Col, Button, Modal, Spinner } from "react-bootstrap";
-import { alertService, getWhitelistEntryInfo, updateWhitelistEntryInfo, createWhitelistEntry, getWhitelistTags } from '../services/index.js';
+import { alertService, getWhitelistEntryInfo, updateWhitelistEntryInfo, createWhitelistEntry, getWhitelistTags, getPlates } from '../services/index.js';
+import {DatePicker, SelectPicker} from 'rsuite';
 
-import DatePicker from 'react-datepicker';
+function pad2(n) { return n < 10 ? '0' + n : n }
+function dateToString(date){
+  if(date===null)return "";
+  else return date.getFullYear().toString() +'-'+ pad2(date.getMonth() + 1) +'-'+ pad2( date.getDate()) +' '+ pad2( date.getHours() ) +':'+ pad2( date.getMinutes() ) +':'+ pad2( date.getSeconds() );
+}
+
+function minStr(str1, str2){
+  if(str1==="")return str2;
+  if(str2==="")return "";
+  if(str1 > str2)return str2;
+  else return str1;
+}
+function maxStr(str1, str2){
+  if(str1==="")return str2;
+  if(str2==="")return "";
+  if(str1 < str2)return str2;
+  else return str1;
+}
 
 export function WhitelistModal(props) {
     let {hide, ID, success, projectName, accessRules, toggleModal } = props;
@@ -12,6 +30,8 @@ export function WhitelistModal(props) {
     const [state, setState] = useState({});
     const [dummy, setDummy] = useState(false);
     const [whitelistTags, setWhitelistTags] = useState([]);
+    const [plates,setPlates] = useState([]);
+    const [loading, setLoading] = useState(false);
 
 
   const reloadTags = ()=>{
@@ -25,9 +45,21 @@ export function WhitelistModal(props) {
     });
   }
 
+  const reloadPlate = ()=>{
+    getPlates(["plateNumber"])
+    .then(async (data) => {
+      setPlates(data.content.map((plate)=>plate.plateNumber));
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get Plate Number, There was an error!", error);
+    });
+  }
+
   useEffect(() => {
     setValidated(false);
     reloadTags();
+    reloadPlate();
     if(ID===null){
       setState({
         plateNumber: "",
@@ -37,9 +69,12 @@ export function WhitelistModal(props) {
         endDateTime: ""
       });
     }else{
-      getWhitelistEntryInfo(ID.plateNumber, ID.accessRuleID)
+      setLoading(true);
+      getWhitelistEntryInfo(ID)
       .then(async (data) => {
+          console.log(data.message);
         setState(data.message);
+        setLoading(false);
       })
       .catch((error) => {
         alertService.error("There was an error!");
@@ -86,27 +121,33 @@ export function WhitelistModal(props) {
   };
 
   const update = () => {
-    updateWhitelistEntryInfo(ID.plateNumber, ID.accessRuleID, state)
+    setLoading(true);
+    console.log(state);
+    updateWhitelistEntryInfo(state)
     .then(async (data) => {
         setValidated(false);
+        setLoading(false);
         alertService.success("Update Successful!");
         success();
     })
     .catch((error) => {
+      setLoading(false);
       alertService.error("There was an error!");
         console.error("Update Whitelist Entry, There was an error!", error);
     });
   };
 
   const create = () =>{
-      console.log(state);
+    setLoading(true);
     createWhitelistEntry(state)
     .then(async (data) => {
+      setLoading(false);
         setValidated(false);
       alertService.success("Addition Successful!");
       success();
     })
     .catch((error) => {
+      setLoading(false);
       alertService.error("There was an error!");
         console.error("Add Whitelist Entry, There was an error!", error);
     });
@@ -120,11 +161,16 @@ export function WhitelistModal(props) {
             closeButton>
             <Modal.Title>{ID===null?"Add Entry":"Edit Entry"}</Modal.Title>
         </Modal.Header>
+          <div className={"loadingModal"+(loading?"":" invisible")}>
+            <Spinner animation="border" role="status">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
+          </div>
         <Modal.Body>
         <Form id ="whitelistModal" noValidate validated={validated} onSubmit={handleSubmit}>
             <div>
                 <Form.Group as={Row}>
-                <Form.Label column sm={6}>
+                <Form.Label column sm={4}  align="right">
                     Project Name
                 </Form.Label>
                 <Col
@@ -136,7 +182,7 @@ export function WhitelistModal(props) {
                 </Form.Group>
 
                 <Form.Group as={Row}>
-                <Form.Label column sm={6}>
+                <Form.Label column sm={4}  align="right">
                     Plate Number
                 </Form.Label>
                 <Col
@@ -151,9 +197,11 @@ export function WhitelistModal(props) {
                         name="plateNumber"
                         value={state.plateNumber}
                         onChange={handleChange}
+                        isValid={plates.includes(state.plateNumber)}
+                        isInvalid={!plates.includes(state.plateNumber)&&validated}
                         />
                         <Form.Control.Feedback type="invalid">
-                        Plate Number is a required field.
+                        Please enter a registered plate no.
                         </Form.Control.Feedback>
                     </div>
                     :<Form.Control type="text" placeholder={state.plateNumber} readOnly />
@@ -162,7 +210,7 @@ export function WhitelistModal(props) {
                 </Form.Group>
 
                 <Form.Group as={Row}>
-                <Form.Label column sm={6}>
+                <Form.Label column sm={4}  align="right">
                     Access Rule
                 </Form.Label>
                 <Col
@@ -189,7 +237,7 @@ export function WhitelistModal(props) {
                 </Form.Group>
 
                 <Form.Group as={Row}>
-                <Form.Label column sm={6}>
+                <Form.Label column sm={4} align="right">
                     Tag
                 </Form.Label>
                 <Col
@@ -210,75 +258,77 @@ export function WhitelistModal(props) {
                     </Form.Control>
                 </Col>
                 </Form.Group>
-
                 <Form.Group as={Row}>
-                <Form.Label column sm={6}>
+                <Form.Label column sm={4}  align="right">
                     Start Date Time
                 </Form.Label>
                 <Col
                     sm={6}
                 >
                     <DatePicker
-                        isClearable
-                        className="dateRecord"
-                        wrapperClassName="form-control"
-                        selected={state.startDateTime}
-                        maxDate={state.endDateTime}
-                        popperClassName="dateTimePopper"
-                        className="form-control"
-                        placeholderText="YYYY-MM-DD HH:MM:SS"
-                        onChange={date => handleChange({
-                            target:{
-                            value:date,
-                            id: "startDateTime"
-                            }
-                        })}
-                        showTimeSelect
-                        dateFormat="yyyy-MM-dd"
-                        timeFormat="HH:mm:ss"
-                        timeIntervals={15}
-                        timeCaption="time"
-                        dateFormat="yyyy-MM-dd HH:mm:ss"
-                        title="Start Date Time"
-                        clearButtonClassName="dateTimeClear"
+                className="width-100"
+                    value={state.startDateTime}
+                    onChange={(val)=>{
+                      handleChange({
+                        target:{
+                          id: "startDateTime",
+                          value: dateToString(val)
+                        }
+                      });
+                      handleChange({
+                        target:{
+                          id: "endDateTime",
+                          value: maxStr(dateToString(val),state.endDateTime)
+                        }
+                      });
+                    }}
+                      format="YYYY-MM-DD HH:mm:ss"
+                      ranges={[
+                        {
+                          label: 'Now',
+                          value: new Date()
+                        }
+                      ]}
+                      placeholder="Start DateTime"
                     />
                 </Col>
                 </Form.Group>
 
                 <Form.Group as={Row}>
-                <Form.Label column sm={6}>
+                <Form.Label column sm={4}  align="right">
                     End Date Time
                 </Form.Label>
                 <Col
                     sm={6}
                 >
-                    <DatePicker
-                        isClearable
-                        className="dateRecord"
-                        wrapperClassName="form-control"
-                        selected={state.endDateTime}
-                        minDate={state.startDateTime}
-                        popperClassName="dateTimePopper"
-                        className="form-control"
-                        placeholderText="YYYY-MM-DD HH:MM:SS"
-                        onChange={date => handleChange({
-                            target:{
-                            value:date,
-                            id: "endDateTime"
-                            }
-                        })}
-                        showTimeSelect
-                        dateFormat="yyyy-MM-dd"
-                        timeFormat="HH:mm:ss"
-                        timeIntervals={15}
-                        timeCaption="time"
-                        dateFormat="yyyy-MM-dd HH:mm:ss"
-                        title="End Date Time"
-                        clearButtonClassName="dateTimeClear"
-                    />
+                <DatePicker
+                className="width-100"
+                    value={state.endDateTime}
+                    onChange={(val)=>{
+                      handleChange({
+                        target:{
+                          id: "endDateTime",
+                          value: dateToString(val)
+                        }
+                      });
+                      handleChange({
+                        target:{
+                          id: "startDateTime",
+                          value: minStr(dateToString(val),state.startDateTime)
+                        }
+                      });
+                    }}
+                  format="YYYY-MM-DD HH:mm:ss"
+                  ranges={[
+                    {
+                      label: 'Now',
+                      value: new Date()
+                    }
+                  ]}
+                  placeholder="End DateTime"
+                />
                 </Col>
                 </Form.Group>
-
             </div>
         </Form>
         </Modal.Body>

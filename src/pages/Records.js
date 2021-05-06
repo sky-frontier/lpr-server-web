@@ -219,12 +219,14 @@ export function Records({ match }) {
               popperClassName="dateTimePopper"
               className="form-control"
               placeholderText="YYYY-MM-DD HH:MM:SS"
-              onChange={date => handleChange({
+              onChange={date => {handleChange({
                 target:{
                   value:date,
                   id: "startTime"
                 }
-              })}
+              });
+            console.log(date);
+              }}
               showTimeSelect
               dateFormat="yyyy-MM-dd"
               timeFormat="HH:mm:ss"

@@ -57,6 +57,10 @@ export function Whitelist (){
     getAccessRule(project,["accessRuleID","accessRuleName","projectID"])
       .then(async (data) => {
         setAccessRules(data.content);
+        /*setAccessRules(data.content.map((rule)=>({
+          value: rule.accessRuleID,
+          label: rule.accessRuleName
+        })));*/
         func(data.content,"accessRuleID", "accessRuleName").then(async(list)=>{
           setAccessRuleVals(await list);
         });
@@ -74,7 +78,7 @@ export function Whitelist (){
 
 
   const reload = () =>{
-    getWhitelistEntry(["plateNumber", "accessRuleID", "tag", "startDateTime","endDateTime"])
+    getWhitelistEntry(["recordID","plateNumber", "accessRuleID", "tag", "startDateTime","endDateTime"])
     .then(async (data) => {
         setInitialRows(
             data.content.filter((entry)=>
@@ -94,6 +98,7 @@ export function Whitelist (){
 
   const filter = () => {
     let curRows = initialRows;
+    console.log(curRows);
     setRows(
       curRows.filter(
         (row) =>
@@ -114,8 +119,8 @@ export function Whitelist (){
     }));
   };
 
-  const del = async (plateNumber, accessRuleID) => {
-    delWhitelistEntryInfo(plateNumber, accessRuleID)
+  const del = async (recordID) => {
+    delWhitelistEntryInfo(recordID)
     .then(async (data) => {
       reload();
       toggleModal("delete");
@@ -145,7 +150,7 @@ export function Whitelist (){
       <ConfirmModal
         hide={toggle.delete}
         success={() => {
-          del(curID.plateNumber, curID.accessRuleID);
+          del(curID);
         }}
         toggleModal={() => {
           toggleModal("delete");
@@ -211,7 +216,7 @@ export function Whitelist (){
                 onChange={(e)=>{
                     setCurPNo(e.target.value);
                 }}
-                value={pNumber}
+                value={curPNo}
               />
             </Col>
             <Col sm="auto">
@@ -269,10 +274,7 @@ export function Whitelist (){
                   <TableCell align="center">{row.endDateTime}</TableCell>
                   <TableCell align="right" style={{padding:0}}>
                     <IconButton onClick={() => {
-                        setCurID({
-                            accessRuleID: row.accessRuleID,
-                            plateNumber: row.plateNumber    
-                        });
+                        setCurID(row.recordID);
                         toggleModal("edit");
                     }}>
                       <PencilSquare
@@ -281,10 +283,7 @@ export function Whitelist (){
                       />
                     </IconButton>
                     <IconButton onClick={() => {
-                        setCurID({
-                            accessRuleID: row.accessRuleID,
-                            plateNumber: row.plateNumber    
-                        });
+                        setCurID(row.recordID);
                         toggleModal("delete");
                     }}>
                       <Trash color="red" size={21} />
@@ -302,7 +301,7 @@ export function Whitelist (){
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
-                colSpan={4}
+                colSpan={7}
                 count={rows.length}
                 rowsPerPage={rowsPerPage}
                 page={page}

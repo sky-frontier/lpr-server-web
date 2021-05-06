@@ -177,7 +177,7 @@ export function Home() {
                 {newDevices.map((row, index) => (
                   <TableRow key={row.deviceID}>
                   <TableCell align="left">{row.deviceID}</TableCell>
-                  <TableCell align="left">{row.deviceIP}</TableCell>
+                  <TableCell align="left">{(row.deviceIP==""||row.deviceIP==null)?"-":row.deviceIP}</TableCell>
                   <TableCell align="right">
                       <IconButton style={{padding:0}}
                       onClick={() => {
@@ -217,7 +217,7 @@ export function Home() {
                   <TableCell align="left">{row.deviceID}</TableCell>
                     <TableCell align="left">{row.deviceName}</TableCell>
                     <TableCell align="left">{row.deviceType===null?null:(deviceTypeNames[row.deviceType]===undefined ? row.deviceType : deviceTypeNames[row.deviceType].name)}</TableCell>
-                  <TableCell align="left">{row.deviceIP}</TableCell>
+                  <TableCell align="left">{(row.deviceIP==""||row.deviceIP==null)?"-":row.deviceIP}</TableCell>
                     <TableCell align="right">
                       <IconButton style={{padding:0}}
                       onClick={() => {

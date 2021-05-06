@@ -182,7 +182,7 @@ export function Devices (){
                   <TableCell align="center">
                   {row.deviceType===null?null: (deviceTypeNames[row.deviceType]===undefined? null: deviceTypeNames[row.deviceType].name)}
                    </TableCell>
-                  <TableCell align="center">{row.deviceIP}</TableCell>
+                  <TableCell align="center">{(row.deviceIP==""||row.deviceIP==null)?"-":row.deviceIP}</TableCell>
                   <TableCell align="center">{row.deviceStatus==='online'?
                   <Tooltip title="Online">
                   <SignalCellularAltIcon style={{ color: "#4caf50" }}/>
