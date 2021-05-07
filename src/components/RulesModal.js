@@ -208,6 +208,7 @@ export function RulesModal(props) {
                     >
                         <CheckPicker
                           sticky
+                          searchable={false}
                           data={gates}
                           defaultValue={[]}
                           style={{ width: "100%" }}
