@@ -44,8 +44,8 @@ export function RulesModal(props) {
     }
   useEffect(() => {
     setValidated(false);
-    setTimeout(()=>setLoading(false), 600);
     if(accessRuleID===null){
+      setLoading(false);
       setState({
         projectID,
         accessRuleName: "",
@@ -54,6 +54,7 @@ export function RulesModal(props) {
       });
       setInitialGates([]);
     }else{
+      setTimeout(()=>setLoading(false), 600);
       getAccessRuleInfo(accessRuleID)
       .then(async (data) => {
         setState(data.message);
@@ -208,6 +209,7 @@ export function RulesModal(props) {
                     >
                         <CheckPicker
                           sticky
+                          searchable={false}
                           data={gates}
                           defaultValue={[]}
                           style={{ width: "100%" }}

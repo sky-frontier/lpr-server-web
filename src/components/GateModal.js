@@ -264,6 +264,7 @@ export function GateModal(props) {
                     >
                         <CheckPicker
                           sticky
+                          searchable={false}
                           data={whiteListTags}
                           defaultValue={[]}
                           style={{ width: "100%" }}
