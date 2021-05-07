@@ -345,5 +345,5 @@ scrollbar-color: #a0bdec #F5F5F5;
   align-items: center;
   z-index: 1200;
   background: black;
-  opacity: 50%;
+  opacity: 0.5;
 }
