@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
+import { Form, Row, Col, Button, Breadcrumb, Spinner } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { ImageModal, TablePaginationActions } from "../components/index.js";
 import {getMovementLogs, getObjectTypes, alertService } from '../services/index.js';
@@ -32,6 +32,7 @@ export function Records({ match }) {
   const [rows, setRows] = useState([]);
   const [gateTypes, setGateTypes] = useState({});
   const [imageSrc, setImageSrc] = useState(null);
+  const [loading, setLoading] = useState(false);
   const  queryFields = [
     "projectName",
     "vehicleType",
@@ -114,10 +115,9 @@ export function Records({ match }) {
     let filters = (timeState.startTime===""&&timeState.endTime==="")?{}:{
       detectionTime : timeState.startTime+'|'+timeState.endTime
     };
-    console.log(filters);
     getMovementLogs(fields.concat("logID"), filters)
       .then(async (data) => {
-        console.log(data.content.slice(0,6));
+      setLoading(false);
         setInitialRows(data.content);
       })
       .catch((error) => {
@@ -127,6 +127,7 @@ export function Records({ match }) {
   }
   useEffect(() => {
     reload();
+    setLoading(true);
     getObjectTypes("gate")
     .then(async (data) => {
       setGateTypes(data.message);
@@ -309,6 +310,18 @@ export function Records({ match }) {
                 ))}
               </TableRow>
             </TableHead>
+            {loading? 
+            <TableBody>
+            <div className = "loadingTable" style={{ height: 53 * rowsPerPage }}>
+              <Spinner animation="border" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+            </div>
+              <TableRow style={{ height: 53 * rowsPerPage }}>
+                  <TableCell colSpan={13} />
+                </TableRow>
+            </TableBody>
+            :
             <TableBody>
               {(rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -384,10 +397,10 @@ export function Records({ match }) {
               ))}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={13} />
                 </TableRow>
               )}
-            </TableBody>
+            </TableBody>}
           </Table>
         </TableContainer>
         <TableRow className="d-flex justify-content-center">

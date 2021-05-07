@@ -128,7 +128,7 @@ export function NavBar() {
             </Nav.Link>
             <Nav.Link>
               <div onClick={()=>direct("/records")}>
-                Log Records
+              Exit/Entry Records
               </div>
             </Nav.Link>
             <Nav.Link>

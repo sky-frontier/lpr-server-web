@@ -338,12 +338,22 @@ scrollbar-color: #a0bdec #F5F5F5;
 }
 .loadingModal{
   position: absolute;
-  width: calc(100% + 1px);
-  height: calc(100% + 1px);
+  width: calc(100% + 0px);
+  height: calc(100% + 0.5px);
   justify-content: center;
   display: flex;
   align-items: center;
   z-index: 1200;
   background: black;
   opacity: 0.5;
+}
+.pro-sidebar:not(.collapsed) .popper-inner {
+  display: none;
+}
+.loadingTable{
+  display: flex;
+align-items: center;
+justify-content: center;
+position: absolute;
+width: 80%;
 }
