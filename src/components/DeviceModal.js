@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { Form, Row, Col, Button, Modal } from "react-bootstrap";
+import { Form, Row, Col, Button, Modal, Spinner } from "react-bootstrap";
 import { alertService, createDevice, getDeviceInfo, updateDeviceInfo, getGate, getProjects } from '../services/index.js';
 
 export function DeviceModal(props) {
@@ -10,6 +10,7 @@ export function DeviceModal(props) {
     const [projects, setProjects] = useState([]);
     const [curProject, setCurProject] = useState("");
     const [gates, setGates] = useState([]);
+    const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setValidated(false);
@@ -27,10 +28,11 @@ export function DeviceModal(props) {
         isGateControl: false
       });
     }else{
+      setLoading(true);
       getDeviceInfo(deviceID)
       .then(async (data) => {
-        console.log(data.message);
         setState(data.message);
+        setLoading(false);
       })
       .catch((error) => {
         alertService.error("There was an error!");
@@ -149,11 +151,16 @@ export function DeviceModal(props) {
              closeButton>
                 <Modal.Title>{deviceID===null?"Add Device":"Edit Device"}</Modal.Title>
             </Modal.Header>
+            <div className={"loadingModal"+(loading?"":" invisible")}>
+            <Spinner animation="border" role="status">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
+          </div>
             <Modal.Body>
             <Form id ="deviceModal" noValidate validated={validated} onSubmit={handleSubmit}>
                 <div>
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Device ID
                     </Form.Label>
                     <Col
@@ -176,7 +183,7 @@ export function DeviceModal(props) {
                     {gateID===null?
                     <div>
                       <Form.Group as={Row}>
-                        <Form.Label column sm={6}>
+                        <Form.Label column sm={4}  align="right">
                             Project
                         </Form.Label>
                         <Col
@@ -204,7 +211,7 @@ export function DeviceModal(props) {
                         </Col>
                       </Form.Group>
                       <Form.Group as={Row}>
-                        <Form.Label column sm={6}>
+                        <Form.Label column sm={4}  align="right">
                             Gate
                         </Form.Label>
                         <Col
@@ -234,7 +241,7 @@ export function DeviceModal(props) {
                       :null
                     }
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Device Name
                     </Form.Label>
                     <Col
@@ -255,7 +262,7 @@ export function DeviceModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Device Type
                     </Form.Label>
                     <Col
@@ -282,7 +289,7 @@ export function DeviceModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Carpark
                     </Form.Label>
                     <Col
@@ -303,7 +310,7 @@ export function DeviceModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                          Manufacturer
                     </Form.Label>
                     <Col
@@ -324,7 +331,7 @@ export function DeviceModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                          Manufacturer Code
                     </Form.Label>
                     <Col
@@ -345,7 +352,7 @@ export function DeviceModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                          Direction
                     </Form.Label>
                     <Col
@@ -366,7 +373,7 @@ export function DeviceModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Primary Device?
                     </Form.Label>
                     <Col
@@ -382,7 +389,7 @@ export function DeviceModal(props) {
                     </Col>
                     </Form.Group>
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Control Gate?
                     </Form.Label>
                     <Col

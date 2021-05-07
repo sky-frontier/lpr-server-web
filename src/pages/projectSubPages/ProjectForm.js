@@ -81,7 +81,7 @@ export function ProjectForm() {
       </Breadcrumb>
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Form.Group as={Row}>
-          <Form.Label column sm={4}>
+          <Form.Label column sm={3} align="right">
             Project ID
           </Form.Label>
           <Col
@@ -92,7 +92,7 @@ export function ProjectForm() {
         </Form.Group>
 
         <Form.Group as={Row}>
-          <Form.Label column sm={4}>
+          <Form.Label column sm={3} align="right">
             Project Name
           </Form.Label>
           <Col
@@ -113,7 +113,7 @@ export function ProjectForm() {
         </Form.Group>
 
         <Form.Group as={Row}>
-          <Form.Label column sm={4}>
+          <Form.Label column sm={3} align="right">
             Project Type
           </Form.Label>
           <Col
@@ -142,7 +142,7 @@ export function ProjectForm() {
         </Form.Group>
 
         <Form.Group as={Row}>
-          <Form.Label column sm={4}>
+          <Form.Label column sm={3} align="right">
             Location
           </Form.Label>
           <Col
@@ -162,7 +162,7 @@ export function ProjectForm() {
         </Form.Group>
 
         <Form.Group as={Row}>
-          <Form.Label column sm={4}>
+          <Form.Label column sm={3} align="right">
             Equipment Manufacturer
           </Form.Label>
           <Col
@@ -182,7 +182,7 @@ export function ProjectForm() {
       </Form.Group>
 
         <Form.Group as={Row}>
-          <Form.Label column sm={4}>
+          <Form.Label column sm={3} align="right">
             MA Company
           </Form.Label>
           <Col
@@ -201,7 +201,7 @@ export function ProjectForm() {
           </Col>
         </Form.Group>
         <Form.Group as={Row}>
-          <Form.Label column sm={4}>
+          <Form.Label column sm={3} align="right">
             Contact No.
           </Form.Label>
           <Form.Label

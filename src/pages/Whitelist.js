@@ -273,7 +273,7 @@ export function Whitelist (){
                   <TableCell align="center">{row.startDateTime}</TableCell>
                   <TableCell align="center">{row.endDateTime}</TableCell>
                   <TableCell align="right" style={{padding:0}}>
-                    <IconButton onClick={() => {
+                  <IconButton onClick={() => {
                         setCurID(row.recordID);
                         toggleModal("edit");
                     }}>

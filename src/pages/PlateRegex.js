@@ -221,7 +221,7 @@ export function PlateRegex({ match }) {
       <Modal.Body>
         <Form noValidate validated={validated} onSubmit={insert}>
         <Form.Group as={Row}>
-          <Form.Label column sm={5}>
+          <Form.Label column sm={4} align="right">
             Project Name
           </Form.Label>
           <Col sm={6}>
@@ -245,7 +245,7 @@ export function PlateRegex({ match }) {
             </Col>
         </Form.Group>
             <Form.Group as={Row}>
-            <Form.Label column sm={5}>
+            <Form.Label column sm={4} align="right">
                 Regex for Plate
             </Form.Label>
             <Col
@@ -265,7 +265,7 @@ export function PlateRegex({ match }) {
             </Col>
             </Form.Group>
             <Form.Group as={Row}>
-            <Form.Label column sm={5}>
+            <Form.Label column sm={4} align="right">
                 Actual Plate
             </Form.Label>
             <Col
@@ -303,7 +303,7 @@ export function PlateRegex({ match }) {
       <Modal.Body>
         <Form noValidate validated={validated} onSubmit={edit}>
             <Form.Group as={Row}>
-            <Form.Label column sm={5}>
+            <Form.Label column sm={4} align="right">
                 Regex for Plate
             </Form.Label>
             <Col
@@ -323,7 +323,7 @@ export function PlateRegex({ match }) {
             </Col>
             </Form.Group>
             <Form.Group as={Row}>
-            <Form.Label column sm={5}>
+            <Form.Label column sm={4} align="right">
                 Actual Plate
             </Form.Label>
             <Col

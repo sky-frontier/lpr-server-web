@@ -3,6 +3,8 @@ import { useState, useEffect, useContext } from "react";
 import { Form, Row, Col, Button, Modal, Spinner } from "react-bootstrap";
 import { alertService, createAccessRule, getAccessRuleInfo, updateAccessRuleInfo, getGate } from '../services/index.js';
 
+import { CheckPicker } from 'rsuite';
+
 export function RulesModal(props) {
     let {hide, accessRuleID, projectID, success, projectName, toggleModal } = props;
     let cnt = 0;
@@ -20,7 +22,6 @@ export function RulesModal(props) {
             temp[element["gateID"]] = false;
         });
         initialGates.forEach(async (element)=>{
-            console.log(element);
             temp[element] = true;
         });
         return await temp;
@@ -28,7 +29,10 @@ export function RulesModal(props) {
     const loadGates = () =>{
         getGate(projectID, ["gateID", "gateName"])
         .then(async (data) => {
-            setGates(data.content);
+            setGates(data.content.map((gate)=>({
+              value: String(gate.gateID),
+              label: gate.gateName
+            })));
             func(data.content).then(async(list)=>{
                 setCurGates(await list);
             });
@@ -163,7 +167,7 @@ export function RulesModal(props) {
             <Form id ="ruleModal" noValidate validated={validated} onSubmit={handleSubmit}>
                 <div>
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Project Name
                     </Form.Label>
                     <Col
@@ -175,7 +179,7 @@ export function RulesModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Access Rule Name
                     </Form.Label>
                     <Col
@@ -196,49 +200,32 @@ export function RulesModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Gates
                     </Form.Label>
-                    </Form.Group>
-                    <Form.Group as={Row}>
                     <Col
                         sm={6}
                     >
-                        {gates.map((gate, index)=>(
-                            <div>{
-                                index%2==0?
-                            <Form.Check 
-                                custom
-                                type={'checkbox'}
-                                id={gate.gateID}
-                                checked={curGates[gate.gateID]}
-                                onChange={handleGateChange}
-                                label={gate.gateName}
-                            />:null
-                            }</div>
-                        ))}
-                    </Col>
-                    <Col
-                        sm={6}
-                    >
-                        {gates.map((gate, index)=>(
-                            <div>{
-                                index%2==1?
-                            <Form.Check 
-                                custom
-                                type={'checkbox'}
-                                id={gate.gateID}
-                                checked={curGates[gate.gateID]}
-                                onChange={handleGateChange}
-                                label={gate.gateName}
-                            />:null
-                            }</div>
-                        ))}
+                        <CheckPicker
+                          sticky
+                          data={gates}
+                          defaultValue={[]}
+                          style={{ width: "100%" }}
+                          value={state.gates}
+                          onChange={(value)=>{
+                            handleChange({
+                              target:{
+                                id: "gates",
+                                value
+                              }
+                            });
+                          }}
+                        />
                     </Col>
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Is Chargeable
                     </Form.Label>
                     <Col

@@ -345,7 +345,7 @@ export function Records({ match }) {
                     </div>
                   </TableCell>
                   <TableCell className="padding-0" align="center">
-                    {row.confirmedPlate===null?null:
+                    {(row.confirmedPlate===null||row.confirmedPlate=="")?null:
                     <div className="outerPlate" >
                       <div className="innerPlate">
                         <u>{row.confirmedPlate}</u>

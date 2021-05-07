@@ -1,7 +1,9 @@
 import { useState, useEffect, useContext } from "react";
-import { Form, Row, Col, Button, Modal } from "react-bootstrap";
+import { Form, Row, Col, Button, Modal, Spinner } from "react-bootstrap";
 import TimeField from 'react-simple-timefield';
 import { alertService, createGate, getGateInfo, updateGateInfo, getWhitelistTags } from '../services/index.js';
+
+import { CheckPicker } from 'rsuite';
 
 export function GateModal(props) {
     let {hide, gateID, toggleModal, success, newState, projectID, gateTypes } = props;
@@ -9,6 +11,7 @@ export function GateModal(props) {
     const [state, setState] = useState({});
     const [dummy, setDummy] = useState(false);
     const [whiteListTags, setWhiteListTags] = useState([]);
+    const [loading, setLoading] = useState(false);
     const newInitialState = {
       gateName: "",
       gateType: "",
@@ -26,6 +29,7 @@ export function GateModal(props) {
     }else if(newState){
       setState(newInitialState);
     }else{
+      setLoading(true);
       getGateInfo(gateID)
       .then(async (data) => {
         if(data.message.allowedTypes!==null){
@@ -36,7 +40,7 @@ export function GateModal(props) {
             allowedTypes: []
           })
         }
-        console.log(data.message);
+        setLoading(false);
       })
       .catch((error) => {
         alertService.error("There was an error!");
@@ -45,31 +49,18 @@ export function GateModal(props) {
     }
     getWhitelistTags()
     .then(async (data) => {
-      setWhiteListTags(data.message.whitelistTags);
+      setWhiteListTags(data.message.whitelistTags.map((tag)=>(
+        {
+          label: tag,
+          value: tag
+        }
+      )));
     })
     .catch((error) => {
       alertService.error("There was an error!");
       console.error("Get WhiteList Tags, There was an error!", error);
     });
   }, [dummy,hide]);
-
-  const handleTagChange = (e) =>{
-    let {id, value} = e.target;
-    let idx = state.allowedTypes.indexOf(id);
-    if(idx==-1){
-      setState((prevState) => ({
-        ...prevState,
-        allowedTypes: prevState.allowedTypes.concat([id])
-      }));
-    }else{
-      let tempList = state.allowedTypes;
-      tempList.splice(idx,1);
-      setState((prevState) => ({
-        ...prevState,
-        allowedTypes: tempList
-      }));
-    }
-  }
 
   const handleChange = (e, filler, e2) => {
     let id, value;
@@ -143,11 +134,16 @@ export function GateModal(props) {
              closeButton>
                 <Modal.Title>{newState?"Add Gate":"Edit Gate"}</Modal.Title>
             </Modal.Header>
+            <div className={"loadingModal"+(loading?"":" invisible")}>
+            <Spinner animation="border" role="status">
+              <span className="sr-only">Loading...</span>
+            </Spinner>
+          </div>
             <Modal.Body>
             <Form id='gateModal' noValidate validated={validated} onSubmit={handleSubmit}>
                 <div>
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Gate Name
                     </Form.Label>
                     <Col
@@ -168,7 +164,7 @@ export function GateModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Gate Type
                     </Form.Label>
                     <Col
@@ -194,7 +190,7 @@ export function GateModal(props) {
                     </Col>
                     </Form.Group>
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Charge fee for entry
                     </Form.Label>
                     <Col
@@ -211,7 +207,7 @@ export function GateModal(props) {
                     </Form.Group>
                     
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                     Time to turn on the LPR camera’s LED
                     </Form.Label>
                     <Form.Label
@@ -236,7 +232,7 @@ export function GateModal(props) {
                     </Form.Group>
 
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Time to turn off the LPR
                     </Form.Label>
                     <Form.Label
@@ -260,45 +256,28 @@ export function GateModal(props) {
                     </Form.Label>
                     </Form.Group>
                     <Form.Group as={Row}>
-                    <Form.Label column sm={6}>
+                    <Form.Label column sm={4}  align="right">
                         Whitelist Tags
                     </Form.Label>
-                    </Form.Group>
-                    <Form.Group as={Row}>
-                      <Col
-                          sm={6}
-                      >
-                        {whiteListTags.map((tag, index)=>(
-                            <div>{
-                                index%2==0?
-                            <Form.Check 
-                                custom
-                                type={'checkbox'}
-                                id={tag}
-                                checked={state.allowedTypes.includes(tag)}
-                                onChange={handleTagChange}
-                                label={tag}
-                            />:null
-                            }</div>
-                        ))}
-                      </Col>
-                      <Col
-                          sm={6}
-                      >
-                        {whiteListTags.map((tag, index)=>(
-                            <div>{
-                                index%2==1?
-                            <Form.Check 
-                                custom
-                                type={'checkbox'}
-                                id={tag}
-                                checked={state.allowedTypes.includes(tag)}
-                                onChange={handleTagChange}
-                                label={tag}
-                            />:null
-                            }</div>
-                        ))}
-                      </Col>
+                    <Col
+                        sm={6}
+                    >
+                        <CheckPicker
+                          sticky
+                          data={whiteListTags}
+                          defaultValue={[]}
+                          style={{ width: "100%" }}
+                          value={state.allowedTypes}
+                          onChange={(value)=>{
+                            handleChange({
+                              target:{
+                                id: "allowedTypes",
+                                value
+                              }
+                            });
+                          }}
+                        />
+                    </Col>
                     </Form.Group>
                 </div>
             </Form>
