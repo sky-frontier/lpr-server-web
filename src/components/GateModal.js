@@ -71,12 +71,11 @@ export function GateModal(props) {
       id = e2.id;
       value = e;
     }
-    console.log(typeof state[id]);
-    if (typeof state[id] === "boolean") {
-        console.log("bool");
+    if (['isChargeable'].includes(id)) {
+      let boolean = e.target.checked;
       setState((prevState) => ({
         ...prevState,
-        [id]: !state[id]
+        [id]: boolean
       }));
     } else {
       setState((prevState) => ({

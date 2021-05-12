@@ -87,11 +87,11 @@ export function DeviceModal(props) {
       id = e2.id;
       value = e;
     }
-    if (typeof state[id] === "boolean") {
-        console.log("bool");
+    if (['isPrimaryDevice','isGateControl'].includes(id)) {
+      let boolean = e.target.checked;
       setState((prevState) => ({
         ...prevState,
-        [id]: !state[id]
+        [id]: boolean
       }));
     } else {
       setState((prevState) => ({
@@ -116,6 +116,7 @@ export function DeviceModal(props) {
   };
 
   const update = () => {
+    console.log(state);
     let tempState = state;
     delete tempState["deviceStatus"];
     updateDeviceInfo(deviceID, tempState)
@@ -381,7 +382,7 @@ export function DeviceModal(props) {
                         className="align-items-center d-flex justify-content-center"
                     >
                         <Form.Check
-                        checked={state.isPrimaryDevice}
+                        checked = {state.isPrimaryDevice}
                         type="switch"
                         id="isPrimaryDevice"
                         onChange={handleChange}

@@ -87,11 +87,11 @@ export function RulesModal(props) {
       id = e2.id;
       value = e;
     }
-    if (typeof state[id] === "boolean") {
-        console.log("bool");
+    if (['isChargeable'].includes(id)) {
+      let boolean = e.target.checked;
       setState((prevState) => ({
         ...prevState,
-        [id]: !state[id]
+        [id]: boolean
       }));
     } else {
       setState((prevState) => ({
