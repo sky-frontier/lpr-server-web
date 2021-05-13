@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom";
 import { ConfirmModal, TablePaginationActions } from "../components/index.js";
 import {getProjects, addProject, delProject, alertService } from '../services/index.js';
 import RefreshIcon from '@material-ui/icons/Refresh';
+import {Helmet} from "react-helmet";
 
 export function Projects({ match }) {
   let history = useHistory();
@@ -147,6 +148,10 @@ export function Projects({ match }) {
 
   return (
     <div>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Projects</title>
+      </Helmet>
       <ConfirmModal
         hide={toggle.delete}
         success={() => {

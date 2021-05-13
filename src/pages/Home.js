@@ -9,6 +9,7 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import BuildIcon from '@material-ui/icons/Build';
 import { Directions } from "@material-ui/icons";
 import { useHistory } from "react-router";
+import {Helmet} from "react-helmet";
 
 
 export function Home() {
@@ -94,6 +95,10 @@ export function Home() {
 
   return (
   <div>
+    <Helmet>
+      <meta charSet="utf-8" />
+      <title>Home</title>
+    </Helmet>
     <ConfirmModal
         hide={toggle.delete}
         success={() => {

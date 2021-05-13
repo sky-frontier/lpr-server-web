@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { store } from "./store.js";
-import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+//import 'bootstrap/dist/css/bootstrap.min.css';
 import 'rsuite/dist/styles/rsuite-default.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import "./styles.css";

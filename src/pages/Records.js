@@ -5,6 +5,7 @@ import { ImageModal, TablePaginationActions } from "../components/index.js";
 import {getMovementLogs, getObjectTypes, alertService } from '../services/index.js';
 import { LockFill, UnlockFill } from "react-bootstrap-icons";
 import RefreshIcon from '@material-ui/icons/Refresh';
+import {Helmet} from "react-helmet";
 
 import { InputGroup, DatePicker } from 'rsuite';
 
@@ -218,6 +219,10 @@ export function Records({ match }) {
 
   return (
     <div>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Records</title>
+      </Helmet>
       <ImageModal
       src = {imageSrc}
       toggleModal={()=>{

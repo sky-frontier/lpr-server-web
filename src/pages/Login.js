@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { store } from "../store.js";
 import { useHistory } from "react-router-dom";
+import {Helmet} from "react-helmet";
 export function Login() {
   const storeContext = useContext(store);
   const globalState = storeContext.state;
@@ -80,6 +81,10 @@ export function Login() {
   };
   return (
     <div className="maincontainer h-100">
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Login</title>
+      </Helmet>
       <div className="container-fluid bg-light h-100">
         <div className="login d-flex align-items-center py-5">
           <div className="container">

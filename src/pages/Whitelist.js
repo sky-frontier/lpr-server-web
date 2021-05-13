@@ -10,6 +10,7 @@ import {alertService, getProjects, getAccessRule,
     delWhitelistEntryInfo} from '../services/index.js';
 import { Directions } from "@material-ui/icons";
 import RefreshIcon from '@material-ui/icons/Refresh';
+import {Helmet} from "react-helmet";
 
 export function Whitelist (){
   const [initialRows, setInitialRows] = useState([]);
@@ -153,6 +154,10 @@ export function Whitelist (){
 
   return (
     <div>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Whitelists</title>
+      </Helmet>
       <ConfirmModal
         hide={toggle.delete}
         success={() => {

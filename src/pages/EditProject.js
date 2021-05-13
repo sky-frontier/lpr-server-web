@@ -17,6 +17,7 @@ import {
   useLocation
 } from "react-router-dom";
 import { useEffect } from "react";
+import {Helmet} from "react-helmet";
 export function EditProject(props) {
   let history = useHistory();
   let { path, url } = useRouteMatch();
@@ -27,6 +28,10 @@ export function EditProject(props) {
   }
   return (
     <div className="tabModal" style={{background:"transparent"}}>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Projects</title>
+      </Helmet>
       <Tab.Container id="left-tabs-example" >
         <Row>
           <Col xs="auto">

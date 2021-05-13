@@ -10,6 +10,7 @@ import { Directions, MonetizationOn } from "@material-ui/icons";
 import MoneyOffIcon from '@material-ui/icons/MoneyOff';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import RefreshIcon from '@material-ui/icons/Refresh';
+import {Helmet} from "react-helmet";
 
 export function ParkingRules (){
   const [rows, setRows] = useState([]);
@@ -120,6 +121,10 @@ export function ParkingRules (){
 
   return (
     <div>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Rules</title>
+      </Helmet>
       <ConfirmModal
         hide={toggle.delete}
         success={() => {

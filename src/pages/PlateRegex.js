@@ -9,6 +9,7 @@ import {getProjects,
   delSpecialPlate,
   updateSpecialPlate,
   addSpecialPlate } from '../services/index.js';
+  import {Helmet} from "react-helmet";
 
 export function PlateRegex({ match }) {
   const [initialRows, setInitialRows] = useState([]);
@@ -208,6 +209,10 @@ export function PlateRegex({ match }) {
 
   return (
     <div>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Regex</title>
+      </Helmet>
       <ConfirmModal
         hide={toggle.delete}
         success={() => {
