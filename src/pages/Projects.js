@@ -1,15 +1,17 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
+import { Form, Row, Col, Button, Breadcrumb, Spinner } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
-import { PencilSquare, Trash } from "react-bootstrap-icons";
+import { PencilSquare, Trash, SignpostSplitFill } from "react-bootstrap-icons";
 import { useHistory } from "react-router-dom";
 import { ConfirmModal, TablePaginationActions } from "../components/index.js";
 import {getProjects, addProject, delProject, alertService } from '../services/index.js';
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 export function Projects({ match }) {
   let history = useHistory();
   const [initialRows, setInitialRows] = useState([]);
   const [rows, setRows] = useState([]);
+  const [loading,setLoading] = useState(false);
   const [toggle, setToggle] = useState({
     delete: false,
     add: false
@@ -39,14 +41,17 @@ export function Projects({ match }) {
   }
   const [dummy, setDummy] = useState(false);
   const reload = () =>{
+    setLoading(true);
     getProjects(["projectID", "projectName", "location", "projectType"])
       .then(async (data) => {
         console.log(data.content);
         setInitialRows(data.content);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("There was an error!", error);
       });
+      setPage(0);
   }
   useEffect(() => {
     reload();
@@ -89,6 +94,7 @@ export function Projects({ match }) {
           row["projectType"].toLowerCase().indexOf(projectType.toLowerCase()) >= 0
       )
     );
+    setPage(0);
   };
 
   const insert = (e) => {
@@ -98,12 +104,17 @@ export function Projects({ match }) {
         history.push("/project/" + ID);
       })
       .catch((error) => {
+        alertService.error("There was an error!");
         console.error("There was an error!", error);
       });
   };
 
   const edit = (projectID) => {
     history.push("/project/" + projectID);
+  };
+
+  const gate = (projectID) =>{
+    history.push("/project/" + projectID + "/gate");
   };
 
   const del = async (projectID) => {
@@ -114,15 +125,16 @@ export function Projects({ match }) {
       alertService.success("Project Deleted");
     })
     .catch((error) => {
+      alertService.error("There was an error!");
       console.error("There was an error!", error);
     });
   };
 
   
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  const emptyRows = (rows.length > 0&& !loading? rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage) : rowsPerPage - 1);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -163,8 +175,32 @@ export function Projects({ match }) {
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item active>Projects</Breadcrumb.Item>
       </Breadcrumb>
-        <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
-          <Row>
+        <Row className="d-flex" style={{padding:"10px 0px"}}>
+          <Col sm="auto">
+              <Button
+                className="btn btn-info align-items-center d-flex"
+                type="button"
+                onClick={reload}
+              >
+              <RefreshIcon/>
+                &nbsp; Refresh 
+              </Button>
+          </Col>
+          <div style={{"flex-grow":"1"}}></div>
+          <Col sm="auto">
+              <Button
+                className="btn btn-success"
+                type="button"
+                onClick={() => {
+                  toggleModal("add");
+                }}
+              >
+                Add +
+              </Button>
+          </Col>
+        </Row>
+        <Form onSubmit={(e)=>{e.preventDefault();}}>
+          <Row className="d-flex">
             <Col sm="auto">
               <Form.Control
                 id="projectName"
@@ -189,6 +225,8 @@ export function Projects({ match }) {
                 value={state.projectType}
               />
             </Col>
+            
+            <div style={{"flex-grow":"1"}}></div>
             <Col sm="auto">
               <Button type="button" onClick={()=>{setCurState(state)}}>
                 Search
@@ -199,17 +237,6 @@ export function Projects({ match }) {
                 Cancel
               </Button>
             </Col>
-            <Col sm="auto">
-              <Button
-                className="btn btn-success"
-                type="button"
-                onClick={() => {
-                  toggleModal("add");
-                }}
-              >
-                Add +
-              </Button>
-            </Col>
           </Row>
         </Form>
       </div>
@@ -218,14 +245,23 @@ export function Projects({ match }) {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Project</TableCell>
-                <TableCell align="left">Location</TableCell>
-                <TableCell align="left">Type</TableCell>
-                <TableCell align="right">Actions</TableCell>
+                <TableCell><b>Project</b></TableCell>
+                <TableCell align="left"><b>Location</b></TableCell>
+                <TableCell align="left"><b>Type</b></TableCell>
+                <TableCell align="right"><b>Actions</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {(rowsPerPage > 0
+              {loading?
+              <TableRow>
+                <TableCell align="center" colSpan={4}>
+                <Spinner animation="border" role="status">
+                  <span className="sr-only">Loading...</span>
+                </Spinner>
+                </TableCell>
+              </TableRow>:
+              rows.length > 0?
+              (rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row) => (
                 <TableRow key={row.projectName}>
@@ -235,6 +271,13 @@ export function Projects({ match }) {
                   <TableCell align="left">{row.location}</TableCell>
                   <TableCell align="left">{row.projectType}</TableCell>
                   <TableCell align="right" style={{padding:0}}>
+                  <IconButton onClick={() => gate(row.projectID)}>
+                      <SignpostSplitFill
+                        data-value={row.projectID}
+                        size={21}
+                        color="royalblue"
+                      />
+                    </IconButton>
                     <IconButton onClick={() => edit(row.projectID)}>
                       <PencilSquare
                         data-value={row.projectID}
@@ -247,7 +290,14 @@ export function Projects({ match }) {
                     </IconButton>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              :
+              <TableRow>
+                <TableCell align="center" colSpan={4}>
+                  No Projects Found
+                </TableCell>
+              </TableRow>
+            }
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
                   <TableCell colSpan={6} />

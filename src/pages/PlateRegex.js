@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Form, Row, Col, Button, Breadcrumb, Modal } from "react-bootstrap";
+import { Form, Row, Col, Button, Breadcrumb, Modal,Spinner } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 import { ConfirmModal, TablePaginationActions } from "../components/index.js";
+import RefreshIcon from '@material-ui/icons/Refresh';
 import {getProjects, 
   getSpecialPlate,
   delSpecialPlate,
@@ -45,15 +46,19 @@ export function PlateRegex({ match }) {
   const [dummy, setDummy] = useState(false);
   const [projects, setProjects] = useState([]);
   const [projectNames, setProjectNames] = useState({});
+  const [loading,setLoading] = useState(false);
   const reload = () =>{
+    setLoading(true);
     getSpecialPlate(["projectID", "matchPlate", "actualPlate"])
       .then(async (data) => {
+        setLoading(false);
         console.log(data.content);
         setInitialRows(data.content);
       })
       .catch((error) => {
         console.error("There was an error!", error);
       });
+      setPage(0);
   }
   const func = async (val) =>{
     let temp = {};
@@ -130,6 +135,7 @@ export function PlateRegex({ match }) {
           String(row["actualPlate"]).toLowerCase().indexOf(actualPlate.toLowerCase()) >= 0
       )
     );
+    setPage(0);
   };
 
   const insert = (e) => {
@@ -187,7 +193,7 @@ export function PlateRegex({ match }) {
 
   
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
@@ -358,8 +364,36 @@ export function PlateRegex({ match }) {
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item active>Plate Regex</Breadcrumb.Item>
       </Breadcrumb>
-        <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
-          <Row>
+        <Form onSubmit={(e)=>{e.preventDefault();}}>
+          <Row className = "d-flex">
+            <Col sm="auto">
+              <Button
+                className="btn btn-info align-items-center d-flex"
+                type="button"
+                onClick={reload}
+              >
+              <RefreshIcon/>
+                &nbsp; Refresh 
+              </Button>
+            </Col>
+            <Col sm="auto">
+              <Button
+                className="btn btn-success"
+                type="button"
+                onClick={() => {
+                setVal({
+                    projectID: "",
+                    matchPlate: "",
+                    actualPlate: ""
+                    });
+                  setValidated(false);
+                  toggleModal("add");
+                }}
+              >
+                Add +
+              </Button>
+            </Col>
+            <div style={{"flex-grow":"1"}}></div>
             <Col sm="auto">
               <Form.Control
                 custom
@@ -393,23 +427,6 @@ export function PlateRegex({ match }) {
                 Cancel
               </Button>
             </Col>
-            <Col sm="auto">
-              <Button
-                className="btn btn-success"
-                type="button"
-                onClick={() => {
-                setVal({
-                    projectID: "",
-                    matchPlate: "",
-                    actualPlate: ""
-                    });
-                  setValidated(false);
-                  toggleModal("add");
-                }}
-              >
-                Add +
-              </Button>
-            </Col>
           </Row>
         </Form>
       </div>
@@ -418,14 +435,23 @@ export function PlateRegex({ match }) {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell align="center">Project</TableCell>
-                <TableCell align="center">Regex of Plate</TableCell>
-                <TableCell align="center">Actual Plate</TableCell>
-                <TableCell align="right">Actions</TableCell>
+                <TableCell align="center"><b>Project</b></TableCell>
+                <TableCell align="center"><b>Regex of Plate</b></TableCell>
+                <TableCell align="center"><b>Actual Plate</b></TableCell>
+                <TableCell align="right"><b>Actions</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {(rowsPerPage > 0
+              {loading?
+              <TableRow>
+              <TableCell align="center" colSpan={6}>
+              <Spinner animation="border" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+              </TableCell>
+            </TableRow>:
+            rows.length > 0?
+            (rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row) => (
                 <TableRow key={row.matchPlate}>
@@ -461,7 +487,13 @@ export function PlateRegex({ match }) {
                     </IconButton>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              :
+              <TableRow>
+                <TableCell align="center" colSpan={4}>
+                  No Plate Regex Found
+                </TableCell>
+              </TableRow>}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
                   <TableCell colSpan={6} />

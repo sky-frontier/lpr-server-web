@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
+import { Form, Row, Col, Button, Breadcrumb, Spinner } from "react-bootstrap";
 import {Tooltip, TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { PencilSquare, Trash, Cpu } from "react-bootstrap-icons";
 
@@ -9,12 +9,14 @@ import {getDevice, alertService, delDevice, getObjectTypes, getProjectInfo, getG
 import { Directions } from "@material-ui/icons";
 import SignalCellularAltIcon from '@material-ui/icons/SignalCellularAlt';
 import SignalCellularConnectedNoInternet0BarIcon from '@material-ui/icons/SignalCellularConnectedNoInternet0Bar';
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 export function Devices (){
     let { projectID, gateID }= useParams();
     let history = useHistory();
     let {pathname} = useLocation();
   const [rows, setRows] = useState([]);
+  const [loading,setLoading] = useState(false);
   const [toggle, setToggle] = useState({
     delete: false,
     edit: false
@@ -27,6 +29,7 @@ export function Devices (){
   const [deviceTypes, setDeviceTypes] = useState([]);
   const [deviceTypeNames, setDeviceTypeNames] = useState([]);
   const reload = () =>{
+    setLoading(true);
     getProjectInfo(projectID)
     .then(async (data) => {
       setProjectName(data.message.projectName);
@@ -45,6 +48,7 @@ export function Devices (){
     });
     getDevice(gateID, ["deviceID", "deviceName", "deviceType", "deviceStatus","deviceIP"])
       .then(async (data) => {
+        setLoading(false);
         console.log(data.content);
         setRows(data.content);
       })
@@ -64,6 +68,7 @@ export function Devices (){
       alertService.error("There was an error!");
       console.error("There was an error Get Device Types!", error);
     });
+    setPage(0);
   }
   useEffect(() => {
     reload();
@@ -85,15 +90,16 @@ export function Devices (){
       alertService.success("Device Deleted");
     })
     .catch((error) => {
+      alertService.error("There was an error!");
       console.error("Delete Device, There was an error!", error);
     });
   };
 
   
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  const emptyRows = (rows.length > 0 && !loading? rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage) : rowsPerPage - 1);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -143,6 +149,16 @@ export function Devices (){
       <div style={{"flex-grow":"1"}}></div>
         <Form inline className="rightFlex" onSubmit={(e)=>{e.preventDefault();}}>
           <Row>
+          <Col sm="auto">
+              <Button
+                className="btn btn-info align-items-center d-flex"
+                type="button"
+                onClick={reload}
+              >
+              <RefreshIcon/>
+                &nbsp; Refresh 
+              </Button>
+          </Col>
             <Col sm="auto">
               <Button
                 className="btn btn-success"
@@ -173,7 +189,16 @@ export function Devices (){
               </TableRow>
             </TableHead>
             <TableBody>
-              {(rowsPerPage > 0
+              {loading?
+              <TableRow>
+              <TableCell align="center" colSpan={6}>
+              <Spinner animation="border" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+              </TableCell>
+            </TableRow>:
+            rows.length > 0?
+              (rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row, index) => (
                 <TableRow key={row.gateName}>
@@ -214,7 +239,13 @@ export function Devices (){
                     </Tooltip>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              :
+              <TableRow>
+                <TableCell align="center" colSpan={6}>
+                  No Devices Found
+                </TableCell>
+              </TableRow>}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
                   <TableCell colSpan={6} />

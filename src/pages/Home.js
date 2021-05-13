@@ -1,10 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
 import {Jumbotron, Row, Col, Card } from 'react-bootstrap';
-import {getAllDevice, getObjectTypes, alertService, getGateInfo, getNewDevices} from '../services/index.js';
+import {delDevice, getAllDevice, getObjectTypes, alertService, getGateInfo, getNewDevices} from '../services/index.js';
 import {IconButton, Typography  , TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, TableHead, TableRow, Paper, CardActions } from '@material-ui/core';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
-import { TablePaginationActions , DeviceModal} from "../components/index.js";
+import { TablePaginationActions , DeviceModal, ConfirmModal} from "../components/index.js";
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import BuildIcon from '@material-ui/icons/Build';
 import { Directions } from "@material-ui/icons";
 import { useHistory } from "react-router";
@@ -19,7 +20,8 @@ export function Home() {
   const [deviceTypeNames, setDeviceTypeNames] = useState({});
   const [curID, setCurID] = useState(null);
   const [toggle, setToggle] = useState({
-    edit: false
+    edit: false,
+    delete: false
   });
   let history = useHistory();
 
@@ -78,8 +80,31 @@ export function Home() {
     }));
   };
 
+  const del = async (deviceID) => {
+    delDevice(deviceID)
+    .then(async (data) => {
+      reload();
+      toggleModal("delete");
+      alertService.success("Device Deleted");
+    })
+    .catch((error) => {
+      console.error("Delete Device, There was an error!", error);
+    });
+  };
+
   return (
   <div>
+    <ConfirmModal
+        hide={toggle.delete}
+        success={() => {
+          del(curID);
+        }}
+        toggleModal={() => {
+          toggleModal("delete");
+        }}
+        title="Confirm Deletion"
+        body="Delete this device?"
+      />
     <DeviceModal
       deviceTypes = {deviceTypes}
       hide={toggle.edit}
@@ -174,7 +199,8 @@ export function Home() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {newDevices.map((row, index) => (
+                {newDevices.length > 0?
+                newDevices.map((row, index) => (
                   <TableRow key={row.deviceID}>
                   <TableCell align="left">{row.deviceID}</TableCell>
                   <TableCell align="left">{(row.deviceIP==""||row.deviceIP==null)?"-":row.deviceIP}</TableCell>
@@ -189,7 +215,14 @@ export function Home() {
                       </IconButton>
                     </TableCell>
                   </TableRow>
-                ))}
+                ))
+                :
+                <TableRow>
+                  <TableCell align="center" colSpan={3}>
+                    No New Devices
+                  </TableCell>
+                </TableRow>
+                }
               </TableBody>
             </Table>
           </TableContainer>
@@ -212,23 +245,38 @@ export function Home() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {devices.map((row, index) => (
+                {devices.length > 0?
+                devices.map((row, index) => (
                   <TableRow key={row.deviceID}>
                   <TableCell align="left">{row.deviceID}</TableCell>
                     <TableCell align="left">{row.deviceName}</TableCell>
                     <TableCell align="left">{row.deviceType===null?null:(deviceTypeNames[row.deviceType]===undefined ? row.deviceType : deviceTypeNames[row.deviceType].name)}</TableCell>
                   <TableCell align="left">{(row.deviceIP==""||row.deviceIP==null)?"-":row.deviceIP}</TableCell>
                     <TableCell align="right">
-                      <IconButton style={{padding:0}}
+                      <IconButton style={{padding:"0px 5px"}}
                       onClick={() => {
                           direct(row.gateID);
                       }}>
                         <OpenInNewIcon
                         />
                       </IconButton>
+                      <IconButton style={{padding:0}}
+                      onClick={() => {
+                          setCurID(row.deviceID);
+                          toggleModal("delete");
+                      }}>
+                        <DeleteOutlineIcon
+                        />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
-                ))}
+                ))
+                :
+                <TableRow>
+                  <TableCell align="center" colSpan={5}>
+                    No Disconnected Devices
+                  </TableCell>
+                </TableRow>}
               </TableBody>
             </Table>
           </TableContainer>

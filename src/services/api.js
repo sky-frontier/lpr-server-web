@@ -631,6 +631,19 @@ const getPlates = (columns) =>{
     .then(returnFunc)
 }
 
+const restartServer = () =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "restartServer"
+        })
+      };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 export {
     getGate,
     getDevice,
@@ -669,5 +682,6 @@ export {
     updateWhitelistEntryInfo,
     delWhitelistEntryInfo,
     createWhitelistEntry,
-    getPlates
+    getPlates,
+    restartServer
 };

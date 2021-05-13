@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
+import { Form, Row, Col, Button, Breadcrumb, Spinner } from "react-bootstrap";
 import {Tooltip, TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { PencilSquare, Trash, Cpu } from "react-bootstrap-icons";
 
@@ -9,6 +9,7 @@ import {getGate, alertService, delGate, getProjects, getAccessRule, delAccessRul
 import { Directions, MonetizationOn } from "@material-ui/icons";
 import MoneyOffIcon from '@material-ui/icons/MoneyOff';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 export function ParkingRules (){
   const [rows, setRows] = useState([]);
@@ -21,6 +22,7 @@ export function ParkingRules (){
   const [dummy, setDummy] = useState(false);
   const [projectNames, setProjectNames] = useState({});
   const [gateNames, setGateNames] = useState({});
+  const [loading,setLoading] = useState(false);
   const [projects,setProjects] = useState([]);
   const func = async (val, inputField, outputField) =>{
     let temp = {};
@@ -47,14 +49,21 @@ export function ParkingRules (){
   }, [dummy]);
 
   const reload = () =>{
-    getAccessRule(project, ["accessRuleID", "accessRuleName", "isChargeable", "gates"])
-    .then(async (data) => {
-      console.log(data.content);
-      setRows(data.content);
-    })
-    .catch((error) => {
-      console.error("Get Gate, there was an error!", error);
-    });
+    if(project===""){
+      setRows([]);
+    }else{
+      setLoading(true);
+      getAccessRule(project, ["accessRuleID", "accessRuleName", "isChargeable", "gates"])
+      .then(async (data) => {
+        setLoading(false);
+        console.log(data.content);
+        setRows(data.content);
+      })
+      .catch((error) => {
+        console.error("Get Gate, there was an error!", error);
+      });
+    }
+    setPage(0);
   }
 
   const reloadGates = () =>{
@@ -90,14 +99,15 @@ export function ParkingRules (){
       alertService.success("Rule Deleted");
     })
     .catch((error) => {
+      alertService.error("There was an error!");
       console.error("Delete Rule, There was an error!", error);
     });
   };
   
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  const emptyRows = (rows.length > 0? rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage) : rowsPerPage - 1);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -141,8 +151,8 @@ export function ParkingRules (){
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item active>Access Rules</Breadcrumb.Item>
       </Breadcrumb>
-        <Form inline onSubmit={(e)=>{e.preventDefault();}}>
-          <Row>
+        <Form onSubmit={(e)=>{e.preventDefault();}}>
+          <Row className = "d-flex">
             <Col sm="auto">
               <Form.Control
                 custom
@@ -172,6 +182,17 @@ export function ParkingRules (){
                 + Add
               </Button>
             </Col>
+            <div style={{"flex-grow":"1"}}></div>
+            <Col sm="auto">
+              <Button
+                className="btn btn-info align-items-center d-flex"
+                type="button"
+                onClick={reload}
+              >
+              <RefreshIcon/>
+                &nbsp; Refresh 
+              </Button>
+            </Col>
           </Row>
         </Form>
       </div>
@@ -188,7 +209,16 @@ export function ParkingRules (){
               </TableRow>
             </TableHead>
             <TableBody>
-              {(rowsPerPage > 0
+              {loading?
+              <TableRow>
+              <TableCell align="center" colSpan={5}>
+              <Spinner animation="border" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+              </TableCell>
+            </TableRow>:
+            rows.length > 0 ?
+            (rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row, index) => (
                 <TableRow key={row.gateName}>
@@ -219,7 +249,13 @@ export function ParkingRules (){
                     </IconButton>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              :
+              <TableRow>
+                <TableCell align="center" colSpan={5}>
+                  No Rules Found
+                </TableCell>
+              </TableRow>}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
                   <TableCell colSpan={6} />

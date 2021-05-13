@@ -4,6 +4,7 @@ import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Tabl
 import { ImageModal, TablePaginationActions } from "../components/index.js";
 import {getMovementLogs, getObjectTypes, alertService } from '../services/index.js';
 import { LockFill, UnlockFill } from "react-bootstrap-icons";
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 import { InputGroup, DatePicker } from 'rsuite';
 
@@ -42,18 +43,16 @@ export function Records({ match }) {
     "confirmedPlate"
   ];
   const fieldPlaceholder = {
-    projectName: "Project Name",
+    projectName: "Project",
     vehicleType: "Vehicle Type",
-    isOpened: "Is Opened",
+    isOpened: "Open?",
     gateName: "Gate Name",
     gateType: "Gate Type",
     originalPlate: "Original Plate",
     confirmedPlate: "Actual Plate",
     detectionTime: "Detection Time",
     confirmedTime: "Confirmed Time",
-    image1: "Image 1",
-    image2: "Image 2",
-    image3: "Image 3",
+    image1: "Image",
     plateImage: "Plate Image"
   };
   const fields = [
@@ -67,35 +66,31 @@ export function Records({ match }) {
     "originalPlate",
     "confirmedPlate",
     "image1",
-    "image2",
-    "image3",
     "plateImage"
   ];
   const fieldLength = {
     projectName: "120px",
     vehicleType: "120px",
-    isOpened: "120px",
+    isOpened: "0px",
     gateName: "120px",
-    gateType: "120px",
-    originalPlate: "120px",
-    confirmedPlate: "120px",
-    detectionTime: "230px",
-    confirmedTime: "230px",
+    gateType: "100px",
+    originalPlate: "140px",
+    confirmedPlate: "140px",
+    detectionTime: "160px",
+    confirmedTime: "160px",
     image1: "90px",
-    image2: "90px",
-    image3: "90px",
     plateImage: "90px"
   };
   const fieldHeight = {
     image1: "50px",
-    image2: "50px",
-    image3: "50px",
     plateImage: "50px",
     isOpened: "30px"
   }
   const [state, setState] = useState({
     curField: "projectName",
-    val: ""
+    val: "",
+    curField2: "gateName",
+    val2: ""
   });
   const [timeState, setTimeState] = useState({
     startTime: "",
@@ -107,7 +102,9 @@ export function Records({ match }) {
   })
   const [curState, setCurState] = useState({
     curField: "projectName",
-    val: ""
+    val: "",
+    curField2: "gateName",
+    val2: ""
   });
   const [dummy, setDummy] = useState(false);
   const [projects, setProjects] = useState([]);
@@ -124,6 +121,7 @@ export function Records({ match }) {
         alertService.error("There was an error!");
         console.error("There was an error!", error);
       });
+      setPage(0);
   }
   useEffect(() => {
     reload();
@@ -169,27 +167,31 @@ export function Records({ match }) {
   };
 
   const filter = (e) => {
-    let { curField, val } = curState;
+    let { curField, val,curField2, val2  } = curState;
     let curRows = initialRows;
     setRows(
       curRows.filter(
         (row) =>
-          row[curField].toLowerCase().indexOf(val.toLowerCase()) >= 0 
+          row[curField].toLowerCase().indexOf(val.toLowerCase()) >= 0 &&
+          row[curField2].toLowerCase().indexOf(val2.toLowerCase()) >= 0 
       ).sort(
         (a,b)=> (a.detectionTime < b.detectionTime) ? 1 : -1
       )
     );
+    setPage(0);
   };
   
   const reset = async (e) =>{
-    setState({
-      curField: "projectName",
-      val: ""
-    });
-    setCurState({
-      curField: "projectName",
-      val: ""
-    });
+    setState((prevState)=>({
+      ...prevState,
+      val: "",
+      val2:""
+    }));
+    setCurState((prevState)=>({
+      ...prevState,
+      val: "",
+      val2:""
+    }));
     setCurTimeState({
       startTime: "",
       endTime: ""
@@ -201,9 +203,9 @@ export function Records({ match }) {
   }
   
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  const emptyRows = (rows.length > 0 && !loading? rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage) : rowsPerPage - 1);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -227,30 +229,8 @@ export function Records({ match }) {
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item active>Entry Exit Records</Breadcrumb.Item>
       </Breadcrumb>
-        <Form onSubmit={(e)=>{e.preventDefault();}}>
-          <Row className="d-flex">
-            <Col sm="auto">
-              <Form.Control
-                custom
-                as = "select"
-                id="curField"
-                onChange={handleChange}
-                value={state.curField}
-              >
-                  {queryFields.map((queryField)=>(
-                      <option value={queryField}>{fieldPlaceholder[queryField]}</option>
-                  ))}
-              </Form.Control>
-            </Col>
-            <Col sm="auto">
-              <Form.Control
-                id="val"
-                placeholder={fieldPlaceholder[state.curField]}
-                onChange={handleChange}
-                value={state.val}
-              />  
-            </Col>
-            <Col sm="auto">
+        <Row className="d-flex" style={{padding:"10px 0px"}}>
+          <Col sm="auto">
             <InputGroup style={{"background-color":"white"}}>
               <InputGroup.Addon>From</InputGroup.Addon>
               <DatePicker 
@@ -285,6 +265,65 @@ export function Records({ match }) {
               ]}
               placeholder="YYYY-MM-DD HH:MM:SS"/>
             </InputGroup>
+          </Col>
+          <div style={{"flex-grow":"1"}}></div>
+          <Col sm="auto">
+              <Button
+                className="btn btn-info align-items-center d-flex"
+                type="button"
+                onClick={()=>{
+                  setLoading(true);
+                  reload();
+                }}
+              >
+              <RefreshIcon/>
+                &nbsp; Refresh 
+              </Button>
+          </Col>
+        </Row>
+        <Form onSubmit={(e)=>{e.preventDefault();}}>
+          <Row className="d-flex">
+            <Col sm="auto">
+              <Form.Control
+                custom
+                as = "select"
+                id="curField"
+                onChange={handleChange}
+                value={state.curField}
+              >
+                  {queryFields.map((queryField)=>(
+                      <option value={queryField}>{fieldPlaceholder[queryField]}</option>
+                  ))}
+              </Form.Control>
+            </Col>
+            <Col sm="auto">
+              <Form.Control
+                id="val"
+                placeholder={fieldPlaceholder[state.curField]}
+                onChange={handleChange}
+                value={state.val}
+              />  
+            </Col>
+            <Col sm="auto">
+              <Form.Control
+                custom
+                as = "select"
+                id="curField2"
+                onChange={handleChange}
+                value={state.curField2}
+              >
+                  {queryFields.map((queryField)=>(
+                      <option value={queryField}>{fieldPlaceholder[queryField]}</option>
+                  ))}
+              </Form.Control>
+            </Col>
+            <Col sm="auto">
+              <Form.Control
+                id="val2"
+                placeholder={fieldPlaceholder[state.curField2]}
+                onChange={handleChange}
+                value={state.val2}
+              />  
             </Col>
             <div style={{"flex-grow":"1"}}></div>
             <Col sm="auto">
@@ -306,7 +345,7 @@ export function Records({ match }) {
             <TableHead>
               <TableRow>
                 {fields.map((field) =>(
-                  <TableCell align="center" style={{"min-width":fieldLength[field]}}>{fieldPlaceholder[field]}</TableCell>
+                  <TableCell align="center" style={{"min-width":fieldLength[field]}}><b>{fieldPlaceholder[field]}</b></TableCell>
                 ))}
               </TableRow>
             </TableHead>
@@ -323,31 +362,32 @@ export function Records({ match }) {
             </TableBody>
             :
             <TableBody>
-              {(rowsPerPage > 0
+              {rows.length>0?
+              (rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row) => (
                 <TableRow key={row.logID}>
-                  <TableCell className="padding-0" component="th" scope="row" align="center">
+                  <TableCell className="padding-0" align="center">
                     {row.projectName}
                   </TableCell>
-                  <TableCell className="padding-0" component="th" scope="row" align="center">
+                  <TableCell className="padding-0" align="center">
                     {row.vehicleType}
                   </TableCell>
-                  <TableCell className="padding-0" component="th" scope="row" align="center">
+                  <TableCell className="padding-0" align="center">
                     {row.isOpened === true?
                     <UnlockFill color="#64D381" size={25} />:
                     <LockFill color="red" size={25} />}
             </TableCell>
-                  <TableCell className="padding-0" component="th" scope="row" align="center">
+                  <TableCell className="padding-0" align="center">
                     {row.gateName}
                   </TableCell>
-                  <TableCell className="padding-0" component="th" scope="row" align="center">
+                  <TableCell className="padding-0" align="center">
                     {row.gateType===null?null: (gateTypes[row.gateType]===undefined? null: gateTypes[row.gateType].name)}
                   </TableCell>
-                  <TableCell className="padding-0" component="th" scope="row" align="center">
+                  <TableCell className="padding-0" align="center">
                     {row.detectionTime}
                   </TableCell>
-                  <TableCell className="padding-0" component="th" scope="row" align="center">
+                  <TableCell className="padding-0" align="center">
                     {row.confirmedTime}
                   </TableCell>
                   <TableCell className="padding-0" align="center">
@@ -365,28 +405,14 @@ export function Records({ match }) {
                       </div>
                     </div>}
                   </TableCell>
-                  <TableCell className="padding-0" align="center">
+                  <TableCell style={{padding:"0 10px"}} align="center">
                     <img 
                     className="imageClick"
                     onClick = {()=>setImageSrc(row.image1)} 
                     style={{"height":fieldHeight.image1}} 
                     src={row.image1}/>
                   </TableCell>
-                  <TableCell className="padding-0" align="center">
-                    <img 
-                    className="imageClick"
-                    onClick = {()=>setImageSrc(row.image2)} 
-                    style={{"height":fieldHeight.image2}} 
-                    src={row.image2} />
-                  </TableCell>
-                  <TableCell className="padding-0" align="center">
-                    <img 
-                    className="imageClick"
-                    onClick = {()=>setImageSrc(row.image3)} 
-                    style={{"height":fieldHeight.image3}} 
-                    src={row.image3} />
-                  </TableCell>
-                  <TableCell className="padding-0" align="center">
+                  <TableCell style={{padding:"0 10px"}} align="center">
                     <img 
                     className="imageClick"
                     onClick = {()=>setImageSrc(row.plateImage)} 
@@ -394,19 +420,27 @@ export function Records({ match }) {
                     src={row.plateImage} />
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              :
+              <TableRow>
+                <TableCell align="center" colSpan={11}>
+                  No Records Found
+                </TableCell>
+              </TableRow>
+            }
               {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={13} />
+                <TableRow style={{ height: 50 * emptyRows }}>
+                  <TableCell colSpan={11} />
                 </TableRow>
               )}
-            </TableBody>}
+            </TableBody>
+          }
           </Table>
         </TableContainer>
         <TableRow className="d-flex justify-content-center">
             <TablePagination
               rowsPerPageOptions={[5, 10, 50]}
-              colSpan={13}
+              colSpan={11}
               count={rows.length}
               rowsPerPage={rowsPerPage}
               page={page}

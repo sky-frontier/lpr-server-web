@@ -37,7 +37,8 @@ import {
     updateWhitelistEntryInfo,
     delWhitelistEntryInfo,
     createWhitelistEntry,
-    getPlates} from "./api";
+    getPlates,
+    restartServer} from "./api";
 export {
     alertService,
     alertType,
@@ -78,5 +79,6 @@ export {
     updateWhitelistEntryInfo,
     delWhitelistEntryInfo,
     createWhitelistEntry,
-    getPlates
+    getPlates,
+    restartServer
 };

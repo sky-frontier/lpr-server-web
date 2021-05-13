@@ -19,6 +19,9 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LocalParkingIcon from '@material-ui/icons/LocalParking';
 import PaymentIcon from '@material-ui/icons/Payment';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import CachedSharpIcon from '@material-ui/icons/CachedSharp';
+import {IconButton} from '@material-ui/core';
+import {restartServer, alertService} from '../services/index.js';
 
 export function NavBar() {
   const storeContext = useContext(store);
@@ -46,6 +49,16 @@ export function NavBar() {
       type: "setToggled"
     });
   };
+  const restart = () =>{
+    restartServer()
+    .then(async (data) => {
+      alertService.success("Server Restarted");
+    })
+    .catch((error) => {
+      alertService.error("There was an error!");
+      console.error("Get Project, there was an error!", error);
+    });
+  }
   return (
     <div className="h-100 fixed-top clickThrough">
       <ProSidebar
@@ -152,6 +165,11 @@ export function NavBar() {
           </Nav>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
+        <IconButton onClick={() => {
+          
+        }}>
+          <CachedSharpIcon/>
+        </IconButton>
           <Navbar.Text>
             <Nav.Link onClick={logout}>Signout</Nav.Link>
           </Navbar.Text>

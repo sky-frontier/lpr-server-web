@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
+import { Form, Row, Col, Button, Breadcrumb, Spinner } from "react-bootstrap";
 import {Tooltip, TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 
@@ -9,10 +9,12 @@ import {alertService, getProjects, getAccessRule,
     getWhitelistEntry,
     delWhitelistEntryInfo} from '../services/index.js';
 import { Directions } from "@material-ui/icons";
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 export function Whitelist (){
   const [initialRows, setInitialRows] = useState([]);
   const [pNumber, setPNumber] = useState("");
+  const [loading,setLoading] = useState(false);
   const [curPNo, setCurPNo] = useState("");
   const [rows, setRows] = useState([]);
   const [toggle, setToggle] = useState({
@@ -78,6 +80,7 @@ export function Whitelist (){
 
 
   const reload = () =>{
+    setLoading(true);
     getWhitelistEntry(["recordID","plateNumber", "accessRuleID", "tag", "startDateTime","endDateTime"])
     .then(async (data) => {
         setInitialRows(
@@ -86,10 +89,12 @@ export function Whitelist (){
                 accessRuleVals[entry.accessRuleID] !== undefined
             )
         );
+        setLoading(false);
     })
     .catch((error) => {
       console.error("Get entry, there was an error!", error);
     });
+    setPage(0);
   }
 
   useEffect(()=>{
@@ -105,6 +110,7 @@ export function Whitelist (){
           row["plateNumber"].toLowerCase().indexOf(pNumber.toLowerCase()) >= 0
       )
     );
+    setPage(0);
   };
 
   useEffect(()=>{
@@ -132,7 +138,7 @@ export function Whitelist (){
   };
   
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
@@ -209,6 +215,16 @@ export function Whitelist (){
                 + Add
               </Button>
             </Col>
+            <Col sm="auto">
+            <Button
+              className="btn btn-info align-items-center d-flex"
+              type="button"
+              onClick={reload}
+            >
+            <RefreshIcon/>
+              &nbsp; Refresh 
+            </Button>
+          </Col>
             <div style={{"flex-grow":"1"}}></div>
             <Col sm="auto">
               <Form.Control
@@ -256,7 +272,15 @@ export function Whitelist (){
               </TableRow>
             </TableHead>
             <TableBody>
-              {(rowsPerPage > 0
+              {loading?
+              <TableRow>
+              <TableCell align="center" colSpan={7}>
+              <Spinner animation="border" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+              </TableCell>
+            </TableRow>:
+            rows.length > 0 ?(rowsPerPage > 0
             ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : rows).map((row, index) => (
                 <TableRow key={row.gateName}>
@@ -290,7 +314,13 @@ export function Whitelist (){
                     </IconButton>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              :
+              <TableRow>
+                <TableCell align="center" colSpan={7}>
+                  No Entries Found
+                </TableCell>
+              </TableRow>}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
                   <TableCell colSpan={6} />
