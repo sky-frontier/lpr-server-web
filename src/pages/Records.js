@@ -149,8 +149,15 @@ export function Records({ match }) {
     const { id, value } = e.target;
     if(id==="curField"){
       setState((prevState) => ({
+        ...prevState,
         curField: value,
         val: ""
+      }));
+    }else if(id==="curField2"){
+      setState((prevState) => ({
+        ...prevState,
+        curField2: value,
+        val2: ""
       }));
     }else{
       setState((prevState) => ({

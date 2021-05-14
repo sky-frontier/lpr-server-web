@@ -444,6 +444,7 @@ const getAccessRuleInfo = (ID) =>{
 }
 
 const updateAccessRuleInfo = (ID, state) =>{
+    console.log(state);
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

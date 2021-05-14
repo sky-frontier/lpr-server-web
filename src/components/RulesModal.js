@@ -124,7 +124,10 @@ export function RulesModal(props) {
   };
 
   const update = () => {
-    updateAccessRuleInfo(accessRuleID, state)
+    updateAccessRuleInfo(accessRuleID, {
+      ...state,
+      gates: state.gates.map((gate)=>(parseInt(gate)))
+    })
     .then(async (data) => {
         setValidated(false);
         alertService.success("Update Successful!");
@@ -137,7 +140,10 @@ export function RulesModal(props) {
   };
 
   const create = () =>{
-    createAccessRule(state)
+    createAccessRule({
+      ...state,
+      gates: state.gates.map((gate)=>(parseInt(gate)))
+    })
     .then(async (data) => {
         setValidated(false);
       alertService.success("Addition Successful!");
