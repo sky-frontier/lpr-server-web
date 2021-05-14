@@ -20,7 +20,7 @@ export class AlertGroup extends React.Component {
                 this.setState({ alerts: [...this.state.alerts, alert] });
 
                 // auto close alert if required
-                setTimeout(() => this.removeAlert(alert), 3000);
+                setTimeout(() => this.removeAlert(alert), alert.time===undefined ? 3000: alert.time);
             });
 
         // clear alerts on location change
@@ -40,7 +40,7 @@ export class AlertGroup extends React.Component {
         if (!alerts.length) return null;
         return (
             <div className="alertGrp">
-                {console.log(alerts),
+                {console.log(alerts), 
                 alerts.map((alert,idx) =>
                     <Alert 
                     key = {idx} 

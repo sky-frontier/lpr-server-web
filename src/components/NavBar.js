@@ -52,13 +52,21 @@ export function NavBar() {
   const restart = () =>{
     restartServer()
     .then(async (data) => {
-      alertService.success("Server Restarted");
+      alertService.success("Restarting Server...",{time:5000});
+      setTimeout(()=>{
+        refreshPage();
+      }, 5000);
     })
     .catch((error) => {
       alertService.error("There was an error!");
       console.error("Get Project, there was an error!", error);
     });
   }
+
+  function refreshPage() {
+    window.location.reload(false);
+  }
+
   return (
     <div className="h-100 fixed-top clickThrough">
       <ProSidebar
@@ -165,9 +173,7 @@ export function NavBar() {
           </Nav>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
-        <IconButton onClick={() => {
-          
-        }}>
+        <IconButton onClick={restart}>
           <CachedSharpIcon/>
         </IconButton>
           <Navbar.Text>
