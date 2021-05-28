@@ -57,6 +57,7 @@ export function Whitelist (){
   const [accessRules, setAccessRules] = useState([]);
   const [accessRuleVals, setAccessRuleVals] = useState({});
   const [timeVar, setTimeVar] = useState("startDateTime");
+  const [curTimeVar, setCurTimeVar] = useState("startDateTime");
   const [projectNames, setProjectNames] = useState({});
   const [projects,setProjects] = useState([]);
   const func = async (val, inputField, outputField) =>{
@@ -76,6 +77,7 @@ export function Whitelist (){
   });
 
   const reset = () =>{
+    console.log("reseting");
     setTimeState({
       startTime: "",
       endTime: ""
@@ -142,7 +144,7 @@ export function Whitelist (){
     }else{
       setLoading(true);
       let filters = (timeState.startTime===""&&timeState.endTime==="")?{}:{
-        [timeVar] : timeState.startTime+'|'+timeState.endTime
+        [curTimeVar] : timeState.startTime+'|'+timeState.endTime
       };
       getWhitelistEntry(["recordID","plateNumber", "accessRuleID", "tag", "startDateTime","endDateTime"],filters)
       .then(async (data) => {
@@ -163,7 +165,7 @@ export function Whitelist (){
 
   useEffect(()=>{
     reload();
-  },[accessRuleVals, curTimeState]);
+  },[accessRuleVals, curTimeState, curTimeVar]);
 
   const filter = () => {
     let curRows = initialRows;
@@ -408,13 +410,14 @@ export function Whitelist (){
                 onClick={() => {
                   setCurTimeState(timeState);
                   setCurState(state);
+                  setCurTimeVar(timeVar);
                 }}
               >
                 Search
               </Button>
             </Col>
             <Col sm="auto">
-            <Button type="button" variant="secondary" onClick={()=>reset}>
+            <Button type="button" variant="secondary" onClick={()=>reset()}>
                 Cancel
               </Button>
             </Col>
