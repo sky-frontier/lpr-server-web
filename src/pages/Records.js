@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Breadcrumb, Spinner } from "react-bootstrap";
 import {TableFooter, TablePagination, TableContainer, TableCell, TableBody, Table, IconButton, TableHead, TableRow, Paper } from '@material-ui/core';
-import { ImageModal, TablePaginationActions } from "../components/index.js";
+import { ImageModal, TablePaginationActions, ExportRecordModal } from "../components/index.js";
 import {getMovementLogs, getObjectTypes, alertService } from '../services/index.js';
 import { LockFill, UnlockFill } from "react-bootstrap-icons";
 import RefreshIcon from '@material-ui/icons/Refresh';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import {Helmet} from "react-helmet";
 
 import { InputGroup, DatePicker } from 'rsuite';
@@ -33,8 +34,10 @@ export function Records({ match }) {
   const [validated, setValidated] = useState(false);
   const [rows, setRows] = useState([]);
   const [gateTypes, setGateTypes] = useState({});
+  const [toggle, setToggle] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadImage, setLoadImage] = useState({});
   const  queryFields = [
     "projectName",
     "vehicleType",
@@ -65,9 +68,7 @@ export function Records({ match }) {
     "detectionTime",
     "confirmedTime",
     "originalPlate",
-    "confirmedPlate",
-    "image1",
-    "plateImage"
+    "confirmedPlate"
   ];
   const fieldLength = {
     projectName: "120px",
@@ -210,6 +211,21 @@ export function Records({ match }) {
     });
   }
   
+  const addImages = (logID) =>{
+    getMovementLogs(["image1","plateImage"], {logID})
+      .then(async (data) => {
+        setLoadImage((prevState)=>({
+          ...prevState,
+          [logID]: data.content[0]
+        }));
+      })
+      .catch((error) => {
+        alertService.error("There was an error!");
+        console.error("There was an error!", error);
+      });
+      console.log(loadImage);
+  }
+
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -236,6 +252,13 @@ export function Records({ match }) {
         setImageSrc(null);
       }}
       />
+      {toggle?
+      <ExportRecordModal
+        hide={toggle}
+        toggleModal={() => {
+          setToggle(false);
+        }}
+      />:null}
       <div className="content">
       <Breadcrumb>
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
@@ -291,6 +314,16 @@ export function Records({ match }) {
               <RefreshIcon/>
                 &nbsp; Refresh 
               </Button>
+          </Col>
+          <Col sm="auto">
+            <Button
+              className="btn btn-success align-items-center d-flex"
+              type="button"
+              onClick={()=>setToggle(true)}
+            >
+            <GetAppIcon/>
+              &nbsp; Export 
+            </Button>
           </Col>
         </Row>
         <Form onSubmit={(e)=>{e.preventDefault();}}>
@@ -359,6 +392,8 @@ export function Records({ match }) {
                 {fields.map((field) =>(
                   <TableCell align="center" style={{"min-width":fieldLength[field]}}><b>{fieldPlaceholder[field]}</b></TableCell>
                 ))}
+                <TableCell align="center" style={{"min-width":fieldLength["image1"]}}><b>{fieldPlaceholder["image1"]}</b></TableCell>
+                <TableCell align="center" style={{"min-width":fieldLength["plateImage"]}}><b>{fieldPlaceholder["plateImage"]}</b></TableCell>
               </TableRow>
             </TableHead>
             {loading? 
@@ -418,18 +453,30 @@ export function Records({ match }) {
                     </div>}
                   </TableCell>
                   <TableCell style={{padding:"0 10px"}} align="center">
-                    <img 
-                    className="imageClick"
-                    onClick = {()=>setImageSrc(row.image1)} 
-                    style={{"height":fieldHeight.image1}} 
-                    src={row.image1}/>
+                    {
+                      loadImage[row.logID] === undefined?
+                      <IconButton onClick={() => addImages(row.logID)}>
+                        <GetAppIcon/>
+                      </IconButton>:
+                      <img 
+                      className="imageClick"
+                      onClick = {()=>setImageSrc(loadImage[row.logID].image1)} 
+                      style={{"height":fieldHeight.image1}} 
+                      src={loadImage[row.logID].image1}/>
+                    }
                   </TableCell>
                   <TableCell style={{padding:"0 10px"}} align="center">
+                  {
+                      loadImage[row.logID] === undefined?
+                      <IconButton onClick={() => addImages(row.logID)}>
+                        <GetAppIcon/>
+                      </IconButton>:
                     <img 
                     className="imageClick"
-                    onClick = {()=>setImageSrc(row.plateImage)} 
+                    onClick = {()=>setImageSrc(loadImage[row.logID].plateImage)} 
                     style={{"height":fieldHeight.plateImage}} 
-                    src={row.plateImage} />
+                    src={loadImage[row.logID].plateImage} />
+                  }
                   </TableCell>
                 </TableRow>
               ))

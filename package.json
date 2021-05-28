@@ -18,6 +18,7 @@
     "react-bootstrap-icons": "^1.4.1",
     "react-datepicker": "^3.8.0",
     "react-dom": "^17.0.2",
+    "react-export-excel": "^0.5.3",
     "react-helmet": "^6.1.0",
     "react-numeric-input": "^2.2.3",
     "react-phone-input-2": "^2.14.0",
@@ -29,6 +30,7 @@
     "rsuite": "^4.10.1",
     "rxjs": "^7.0.1",
     "web-vitals": "^1.1.2",
+    "xlsx-style": "^0.8.13",
     "yarn": "^1.22.10"
   },
   "scripts": {
@@ -54,5 +56,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "file-saver": "^2.0.5",
+    "xlsx": "^0.17.0"
   }
 }

@@ -4,29 +4,59 @@ import {Tooltip, TableFooter, TablePagination, TableContainer, TableCell, TableB
 import { PencilSquare, Trash } from "react-bootstrap-icons";
 
 import { useHistory, useParams, useLocation } from "react-router-dom";
-import { ConfirmModal, WhitelistModal, TablePaginationActions } from "../components/index.js";
+import { ConfirmModal, WhitelistModal, TablePaginationActions, ExportWhitelistModal } from "../components/index.js";
 import {alertService, getProjects, getAccessRule, 
     getWhitelistEntry,
     delWhitelistEntryInfo} from '../services/index.js';
 import { Directions } from "@material-ui/icons";
 import RefreshIcon from '@material-ui/icons/Refresh';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import {Helmet} from "react-helmet";
+
+import { InputGroup, DatePicker } from 'rsuite';
+
+function pad2(n) { return n < 10 ? '0' + n : n }
+function dateToString(date){
+  if(date===null)return "";
+  else return date.getFullYear().toString() +'-'+ pad2(date.getMonth() + 1) +'-'+ pad2( date.getDate()) +' '+ pad2( date.getHours() ) +':'+ pad2( date.getMinutes() ) +':'+ pad2( date.getSeconds() );
+}
+
+function minStr(str1, str2){
+  if(str1==="")return str2;
+  if(str2==="")return "";
+  if(str1 > str2)return str2;
+  else return str1;
+}
+function maxStr(str1, str2){
+  if(str1==="")return str2;
+  if(str2==="")return "";
+  if(str1 < str2)return str2;
+  else return str1;
+}
 
 export function Whitelist (){
   const [initialRows, setInitialRows] = useState([]);
-  const [pNumber, setPNumber] = useState("");
   const [loading,setLoading] = useState(false);
-  const [curPNo, setCurPNo] = useState("");
+  const [state, setState] = useState({
+    plateNumber: "",
+    tag: ""
+  });
+  const [curState, setCurState] = useState({
+    plateNumber: "",
+    tag: ""
+  });
   const [rows, setRows] = useState([]);
   const [toggle, setToggle] = useState({
     delete: false,
-    edit: false
+    edit: false,
+    export: false
   });
   const [project,setProject] = useState("");
   const [curID, setCurID] = useState(null);
   const [dummy, setDummy] = useState(false);
   const [accessRules, setAccessRules] = useState([]);
   const [accessRuleVals, setAccessRuleVals] = useState({});
+  const [timeVar, setTimeVar] = useState("startDateTime");
   const [projectNames, setProjectNames] = useState({});
   const [projects,setProjects] = useState([]);
   const func = async (val, inputField, outputField) =>{
@@ -36,6 +66,33 @@ export function Whitelist (){
     });
     return await temp;
   };
+  const [timeState, setTimeState] = useState({
+    startTime: "",
+    endTime: ""
+  });
+  const [curTimeState, setCurTimeState] = useState({
+    startTime: "",
+    endTime: ""
+  });
+
+  const reset = () =>{
+    setTimeState({
+      startTime: "",
+      endTime: ""
+    });
+    setCurTimeState({
+      startTime: "",
+      endTime: ""
+    });
+    setState({
+      plateNumber: "",
+      tag: ""
+    });
+    setCurState({
+      plateNumber: "",
+      tag: ""
+    });
+  }
 
   const reloadProjects = () =>{
     getProjects(["projectID", "projectName"])
@@ -75,40 +132,49 @@ export function Whitelist (){
 
   useEffect(()=>{
     reloadAccessRules();
-    setPNumber("");
-    setCurPNo("");
+    reset();
   },[project]);
 
 
   const reload = () =>{
-    setLoading(true);
-    getWhitelistEntry(["recordID","plateNumber", "accessRuleID", "tag", "startDateTime","endDateTime"])
-    .then(async (data) => {
-        setInitialRows(
-            data.content.filter((entry)=>
-                entry.accessRuleID !== null &&
-                accessRuleVals[entry.accessRuleID] !== undefined
-            )
-        );
-        setLoading(false);
-    })
-    .catch((error) => {
-      console.error("Get entry, there was an error!", error);
-    });
+    if(project===""){
+      setInitialRows([]);
+    }else{
+      setLoading(true);
+      let filters = (timeState.startTime===""&&timeState.endTime==="")?{}:{
+        [timeVar] : timeState.startTime+'|'+timeState.endTime
+      };
+      getWhitelistEntry(["recordID","plateNumber", "accessRuleID", "tag", "startDateTime","endDateTime"],filters)
+      .then(async (data) => {
+          setInitialRows(
+              data.content.filter((entry)=>
+                  entry.accessRuleID !== null &&
+                  accessRuleVals[entry.accessRuleID] !== undefined
+              )
+          );
+          setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Get entry, there was an error!", error);
+      });
+    }
     setPage(0);
   }
 
   useEffect(()=>{
     reload();
-  },[accessRuleVals]);
+  },[accessRuleVals, curTimeState]);
 
   const filter = () => {
     let curRows = initialRows;
+    let {plateNumber, tag} = curState;
     console.log(curRows);
+    console.log(plateNumber,tag);
     setRows(
       curRows.filter(
         (row) =>
-          row["plateNumber"].toLowerCase().indexOf(pNumber.toLowerCase()) >= 0
+          row["plateNumber"].toLowerCase().indexOf(plateNumber.toLowerCase()) >= 0 &&
+          row["tag"].toLowerCase().indexOf(tag.toLowerCase()) >=0
       )
     );
     setPage(0);
@@ -116,13 +182,27 @@ export function Whitelist (){
 
   useEffect(()=>{
     filter();
-  },[initialRows, pNumber]);
+  },[initialRows, curState]);
 
   const toggleModal = (modal) => {
     let prevVal = toggle[modal];
     setToggle((prevState) => ({
       ...prevState,
       [modal]: !prevVal
+    }));
+  };
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+      setState((prevState) => ({
+        ...prevState,
+        [id]: value
+      }));
+  };
+  const handleTimeChange = (value, id) => {
+    setTimeState((prevState)=>({
+      ...prevState,
+      [id]:value
     }));
   };
 
@@ -184,13 +264,23 @@ export function Whitelist (){
         }}
       />:null}
 
+      {toggle.export?
+      <ExportWhitelistModal
+        hide={toggle.export}
+        projects={projects}
+        projectNames = {projectNames}
+        toggleModal={() => {
+          toggleModal("export");
+        }}
+      />:null}
+
       <div className="content">
       <Breadcrumb>
         <Breadcrumb.Item href="/home">Home</Breadcrumb.Item>
         <Breadcrumb.Item active>Whitelist Entries</Breadcrumb.Item>
       </Breadcrumb>
         <Form onSubmit={(e)=>{e.preventDefault();}}>
-          <Row className="d-flex">
+          <Row className="d-flex" style={{padding:"10px 0px"}}>
             <Col sm="auto">
               <Form.Control
                 custom
@@ -220,6 +310,25 @@ export function Whitelist (){
                 + Add
               </Button>
             </Col>
+          </Row>
+          <Row className="d-flex" style={{padding:"10px 0px"}}>
+            <Col sm="auto">
+              <Form.Control
+                placeholder="Plate No."
+                id="plateNumber"
+                onChange={handleChange}
+                value={state.plateNumber}
+              />
+            </Col>
+            <Col sm="auto">
+              <Form.Control
+                placeholder="Tag"
+                id="tag"
+                onChange={handleChange}
+                value={state.tag}
+              />
+            </Col>
+          <div style={{"flex-grow":"1"}}></div>
             <Col sm="auto">
             <Button
               className="btn btn-info align-items-center d-flex"
@@ -230,32 +339,82 @@ export function Whitelist (){
               &nbsp; Refresh 
             </Button>
           </Col>
-            <div style={{"flex-grow":"1"}}></div>
-            <Col sm="auto">
+          <Col sm="auto">
+            <Button
+              className="btn btn-success align-items-center d-flex"
+              type="button"
+              onClick={()=>toggleModal("export")}
+            >
+            <GetAppIcon/>
+              &nbsp; Export 
+            </Button>
+          </Col>
+          </Row>
+          <Row className="d-flex" style={{padding:"10px 0px"}}>
+          <Col sm="auto">
               <Form.Control
-                placeholder="Plate No."
+                custom
+                as = "select"
                 onChange={(e)=>{
-                    setCurPNo(e.target.value);
+                  setTimeVar(e.target.value);
                 }}
-                value={curPNo}
-              />
+                value={timeVar}
+              >
+                <option value="startDateTime">Start Date</option>
+                <option value="endDateTime">End Date</option>
+              </Form.Control>
             </Col>
+          <Col sm="auto">
+            <InputGroup style={{"background-color":"white"}}>
+              <InputGroup.Addon>From</InputGroup.Addon>
+              <DatePicker 
+              format="YYYY-MM-DD HH:mm:ss" 
+              block appearance="subtle"
+              value={timeState.startTime}
+              onChange={(val)=>{
+                handleTimeChange(dateToString(val), "startTime");
+                handleTimeChange(maxStr(dateToString(val),timeState.endTime), "endTime");
+              }}
+              ranges={[
+                {
+                  label: 'Now',
+                  value: new Date()
+                }
+              ]}
+              placeholder="YYYY-MM-DD HH:MM:SS"/>
+              <InputGroup.Addon>To</InputGroup.Addon>
+              <DatePicker 
+              format="YYYY-MM-DD HH:mm:ss" 
+              block appearance="subtle"
+              value={timeState.endTime}
+              onChange={(val)=>{
+                handleTimeChange(dateToString(val), "endTime");
+                handleTimeChange(minStr(dateToString(val),timeState.startTime), "startTime");
+              }} 
+              ranges={[
+                {
+                  label: 'Now',
+                  value: new Date()
+                }
+              ]}
+              placeholder="YYYY-MM-DD HH:MM:SS"/>
+            </InputGroup>
+          </Col>
+          <div style={{"flex-grow":"1"}}></div>
             <Col sm="auto">
               <Button
                 className="btn btn-primary"
                 type="button"
                 onClick={() => {
-                    setPNumber(curPNo);
+                  setCurTimeState(timeState);
+                  setCurState(state);
                 }}
               >
                 Search
               </Button>
             </Col>
             <Col sm="auto">
-            <Button type="button" variant="secondary" onClick={()=>{
-                setCurPNo("");
-                setPNumber("");
-            }}>
+            <Button type="button" variant="secondary" onClick={()=>reset}>
                 Cancel
               </Button>
             </Col>
