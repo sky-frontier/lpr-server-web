@@ -546,9 +546,9 @@ const getWhitelistEntry = (columns,filters) =>{
           serviceName: "getTable",
           content: {
             objName: "dbWhitelist",
-            columns
-          },
-          filters
+            columns,
+            filters
+          }
         })
       };
     return fetch(server_URL, requestOptions)
