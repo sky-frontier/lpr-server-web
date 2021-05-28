@@ -66,6 +66,10 @@ const getSpecialPlate = (columns, filters) =>{
 }
 
 const getAccessRule = (projectID, columns) =>{
+    let filters = {};
+    if(projectID!==null)filters = {
+        projectID
+    };
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -75,9 +79,7 @@ const getAccessRule = (projectID, columns) =>{
           content: {
             objName: "accessRule",
             columns,
-            filters:{
-                projectID
-            }
+            filters
           }
         })
     };
@@ -535,7 +537,7 @@ const delAccessRule = (ID) =>{
     .then(returnFunc)
 }
 
-const getWhitelistEntry = (columns) =>{
+const getWhitelistEntry = (columns,filters) =>{
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -545,7 +547,8 @@ const getWhitelistEntry = (columns) =>{
           content: {
             objName: "dbWhitelist",
             columns
-          }
+          },
+          filters
         })
       };
     return fetch(server_URL, requestOptions)

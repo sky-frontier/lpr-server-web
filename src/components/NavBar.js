@@ -157,17 +157,12 @@ export function NavBar() {
                 Parking Records
               </div>
             </Nav.Link>
-            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item data-value="/home" onClick={direct}>
-                Action
+            <NavDropdown title="Access" id="basic-nav-dropdown">
+              <NavDropdown.Item onClick={()=>direct("/accessRules")}>
+                Access Rules
               </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                Separated link
+              <NavDropdown.Item onClick={()=>direct("/whitelist")}>
+                Whitelist Entries
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
