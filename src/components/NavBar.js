@@ -19,8 +19,12 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LocalParkingIcon from '@material-ui/icons/LocalParking';
 import PaymentIcon from '@material-ui/icons/Payment';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import CachedSharpIcon from '@material-ui/icons/CachedSharp';
-import {IconButton} from '@material-ui/core';
+import CachedIcon from '@material-ui/icons/Cached';
+import ApartmentIcon from '@material-ui/icons/Apartment';
+import FlipIcon from '@material-ui/icons/Flip';
+import HistoryIcon from '@material-ui/icons/History';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import {IconButton, Button} from '@material-ui/core';
 import {restartServer, alertService} from '../services/index.js';
 
 export function NavBar() {
@@ -101,11 +105,10 @@ export function NavBar() {
                 Project
               </div>
             </MenuItem>
-            <MenuItem icon={<CodeIcon onClick={()=>direct("/regex")} />}>
-              <div onClick={()=>direct("/regex")}>
-                Plate Regex
-              </div>
-            </MenuItem>
+            <SubMenu title="Plate Correction" icon={<FlipIcon/>}>
+              <MenuItem onClick={()=>direct("/specialPlates")}>Special Plate Correction</MenuItem>
+              <MenuItem onClick={()=>direct("/regexPlates")}>Standard Plate Matching</MenuItem>
+            </SubMenu>
             <MenuItem icon={<StorageIcon onClick={()=>direct("/records")} />}>
               <div onClick={()=>direct("/records")}>
                 Exit/Entry Records
@@ -117,9 +120,19 @@ export function NavBar() {
               </div>
             </MenuItem>
             <SubMenu title="Access" icon={<PaymentIcon/>}>
-              <MenuItem  onClick={()=>direct("/accessRules")} >Access Rules</MenuItem>
+              <MenuItem  onClick={()=>direct("/accessRules")}>Access Rules</MenuItem>
               <MenuItem onClick={()=>direct("/whitelist")}>Whitelist Entries</MenuItem>
             </SubMenu>
+            <MenuItem icon={<ApartmentIcon onClick={()=>direct("/units")} />}>
+              <div onClick={()=>direct("/units")}>
+                Units
+              </div>
+            </MenuItem>
+            <MenuItem icon={<HistoryIcon onClick={()=>direct("/DeviceHistory")} />}>
+              <div onClick={()=>direct("/DeviceHistory")}>
+                Device History
+              </div>
+            </MenuItem>
           </Menu>
         </SidebarContent>
       </ProSidebar>
@@ -165,15 +178,24 @@ export function NavBar() {
                 Whitelist Entries
               </NavDropdown.Item>
             </NavDropdown>
+            <Nav.Link>
+              <div onClick={()=>direct("/units")}>
+                Units
+              </div>
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
-        <IconButton onClick={restart}>
-          <CachedSharpIcon/>
-        </IconButton>
-          <Navbar.Text>
-            <Nav.Link onClick={logout}>Signout</Nav.Link>
-          </Navbar.Text>
+          <Button onClick={restart}
+          style={{marginRight: "10px"}}
+          endIcon={<CachedIcon/>} >
+            Restart Server
+          </Button>
+          <Button onClick={logout}
+          variant='outlined'
+          endIcon={<ExitToAppIcon/>} >
+            Logout
+          </Button>
         </Navbar.Collapse>
       </Navbar>
     </div>

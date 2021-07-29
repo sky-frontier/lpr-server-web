@@ -49,7 +49,7 @@ export function Records({ match }) {
   const fieldPlaceholder = {
     projectName: "Project",
     vehicleType: "Vehicle Type",
-    isOpened: "Open?",
+    isOpened: "Opened?",
     gateName: "Gate Name",
     gateType: "Gate Type",
     originalPlate: "Original Plate",
@@ -112,11 +112,14 @@ export function Records({ match }) {
   const [projects, setProjects] = useState([]);
   const reload = () =>{
     let filters = (timeState.startTime===""&&timeState.endTime==="")?{}:{
-      detectionTime : timeState.startTime+'|'+timeState.endTime
+      detectionTime : timeState.startTime+'|'+timeState.endTime,
     };
-    getMovementLogs(fields.concat("logID"), filters)
+    if (state.val.length) filters[state.curField] = state.val;
+    if (state.val2.length) filters[state.curField2] = state.val2;
+    setLoading(true);
+    getMovementLogs(fields.concat("logID"), filters, 0, true)
       .then(async (data) => {
-      setLoading(false);
+        setLoading(false);
         setInitialRows(data.content);
       })
       .catch((error) => {
@@ -124,10 +127,9 @@ export function Records({ match }) {
         console.error("There was an error!", error);
       });
       setPage(0);
-  }
+  };
   useEffect(() => {
     reload();
-    setLoading(true);
     getObjectTypes("gate")
     .then(async (data) => {
       setGateTypes(data.message);
@@ -140,11 +142,15 @@ export function Records({ match }) {
 
   useEffect(() => {
     filter();
-  }, [initialRows, curState]);
+  }, [initialRows]);
 
   useEffect(()=>{
     reload();
-  },[curTimeState]);
+  },[curTimeState, curState]);
+
+  useEffect(() => {
+    !loading && rows?.length && alertService.info(`${rows.length} entries loaded`);
+  }, [rows]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -176,17 +182,19 @@ export function Records({ match }) {
   };
 
   const filter = (e) => {
-    let { curField, val,curField2, val2  } = curState;
+    // let { curField, val,curField2, val2  } = curState;
+    // let curRows = initialRows;
+    // setRows(
+    //   curRows.filter(
+    //     (row) =>
+    //       row[curField].toLowerCase().indexOf(val.toLowerCase()) >= 0 &&
+    //       row[curField2].toLowerCase().indexOf(val2.toLowerCase()) >= 0 
+    //   ).sort(
+    //     (a,b)=> (a.detectionTime < b.detectionTime) ? 1 : -1
+    //   )
+    // );
     let curRows = initialRows;
-    setRows(
-      curRows.filter(
-        (row) =>
-          row[curField].toLowerCase().indexOf(val.toLowerCase()) >= 0 &&
-          row[curField2].toLowerCase().indexOf(val2.toLowerCase()) >= 0 
-      ).sort(
-        (a,b)=> (a.detectionTime < b.detectionTime) ? 1 : -1
-      )
-    );
+    setRows(curRows.sort((a, b) => (a.detectionTime < b.detectionTime) ? 1 : -1));
     setPage(0);
   };
   
@@ -226,8 +234,8 @@ export function Records({ match }) {
       console.log(loadImage);
   }
 
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const emptyRows = (rows.length > 0 && !loading? rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage) : rowsPerPage - 1);
 
@@ -239,6 +247,26 @@ export function Records({ match }) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  useEffect(() => {
+    if (rows.length / rowsPerPage - 1 == page) {
+      let filters = (timeState.startTime===""&&timeState.endTime==="")?{}:{
+        detectionTime : timeState.startTime+'|'+timeState.endTime,
+      };
+      if (state.val.length) filters[state.curField] = state.val;
+      if (state.val2.length) filters[state.curField2] = state.val2;
+      setLoading(true);
+      getMovementLogs(fields.concat("logID"), filters, rows.length, true)
+      .then(async (data) => {
+        setLoading(false);
+        setRows(rows.concat(data.content.sort((a, b) => (a.detectionTime < b.detectionTime) ? 1 : -1)));
+      })
+      .catch((error) => {
+        alertService.error("There was an error!");
+        console.error("There was an error!", error);
+      });  
+    }
+  }, [page]);
 
   return (
     <div>
@@ -372,7 +400,10 @@ export function Records({ match }) {
             </Col>
             <div style={{"flex-grow":"1"}}></div>
             <Col sm="auto">
-              <Button type="button" onClick={()=>{setCurState(state);setCurTimeState(timeState)}}>
+              <Button type="button" onClick={()=>{
+                setCurState(state);
+                setCurTimeState(timeState);
+              }}>
                 Search
               </Button>
             </Col>

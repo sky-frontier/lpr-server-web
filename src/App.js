@@ -13,7 +13,7 @@ import {
   Redirect
 } from "react-router-dom";
 
-import { Home, Login, Projects, EditProject, PlateRegex, Records, ParkRecords, ParkingRules, Whitelist } from "./pages/index.js";
+import { Home, Login, Projects, EditProject, SpecialPlates, RegexPlates, Records, ParkRecords, ParkingRules, Whitelist, Units, DeviceHistory } from "./pages/index.js";
 
 class DebugRouter extends Router {
   constructor(props) {
@@ -45,8 +45,11 @@ export function App() {
         <PrivateRoute path="/project">
           <Projects />
         </PrivateRoute>
-        <PrivateRoute path="/regex">
-          <PlateRegex />
+        <PrivateRoute path="/specialPlates">
+          <SpecialPlates />
+        </PrivateRoute>
+        <PrivateRoute path="/regexPlates">
+          <RegexPlates />
         </PrivateRoute>
         <PrivateRoute path="/records">
           <Records />
@@ -59,6 +62,12 @@ export function App() {
         </PrivateRoute>
         <PrivateRoute path="/whitelist">
           <Whitelist />
+        </PrivateRoute>
+        <PrivateRoute path="/units">
+          <Units />
+        </PrivateRoute>
+        <PrivateRoute path="/deviceHistory">
+          <DeviceHistory />
         </PrivateRoute>
         <PublicRoute path="/">
           <Login />

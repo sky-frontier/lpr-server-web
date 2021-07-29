@@ -29,7 +29,7 @@ const getProjects = (columns) =>{
     .then(returnFunc)
 }
 
-const getMovementLogs = (columns, filters) =>{
+const getMovementLogs = (columns, filters, startIndex = 0, looseMatch = false) =>{
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,7 +39,9 @@ const getMovementLogs = (columns, filters) =>{
           content: {
             objName: "movementLog",
             columns,
-            filters
+            filters,
+            startIndex,
+            looseMatch
           }
         })
     };
@@ -47,7 +49,7 @@ const getMovementLogs = (columns, filters) =>{
     .then(returnFunc)
 }
 
-const getSpecialPlate = (columns, filters) =>{
+const getDeviceHistory = (columns, filters, startIndex = 0, looseMatch = false) =>{
     const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,9 +57,11 @@ const getSpecialPlate = (columns, filters) =>{
           authID: "",
           serviceName: "getTable",
           content: {
-            objName: "specialPlate",
+            objName: "deviceStatusLog",
             columns,
-            filters
+            filters,
+            startIndex,
+            looseMatch
           }
         })
     };
@@ -101,6 +105,24 @@ const addSpecialPlate = (state) =>{
     .then(returnFunc)
 }
 
+const getSpecialPlate = (columns, filters) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "getTable",
+          content: {
+            objName: "specialPlate",
+            columns,
+            filters
+          }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 const delSpecialPlate = (matchPlate) =>{
     const requestOptions = {
         method: "POST",
@@ -124,6 +146,71 @@ const updateSpecialPlate = (state) =>{
         body: JSON.stringify({
             authID: "",
             serviceName: "modifySpecialPlate",
+            content: {
+            matchPlate: state.matchPlate,
+            modifyParams: state
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const addRegexPlate = (state) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "createRegexPlate",
+          content: state
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const getRegexPlate = (columns, filters) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          authID: "",
+          serviceName: "getTable",
+          content: {
+            objName: "regexPlate",
+            columns,
+            filters
+          }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const delRegexPlate = (matchPlate) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "deleteRegexPlate",
+            content: {
+                matchPlate
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const updateRegexPlate = (state) =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "modifyRegexPlate",
             content: {
             matchPlate: state.matchPlate,
             modifyParams: state
@@ -479,6 +566,19 @@ const getObjectTypes = (obj) =>{
     .then(returnFunc)
 }
 
+const getCheckConditions = () =>{
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "getCheckConditions"
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 const getWhitelistTags = () =>{
     const requestOptions = {
         method: "POST",
@@ -618,6 +718,92 @@ const createWhitelistEntry = (values) =>{
     .then(returnFunc)
 }
 
+const createUnit = (values) => {
+    const newDeviceReq = {
+        ...values
+    }
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "createUnit",
+            content: newDeviceReq
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const getUnitInfo = (ID) => {
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "getUnit",
+            content: {
+                unitID: ID
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const updateUnitInfo = (ID, state) => {
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "modifyUnit",
+            content: {
+                unitID: ID,
+                modifyParams: state
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const delUnit = (ID) => {
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "deleteUnit",
+            content: {
+                unitID: ID
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
+const getUnit = (projectID, columns) => {
+    let filters = {};
+    if (projectID !== null) filters = { projectID };
+    const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            authID: "",
+            serviceName: "getTable",
+            content: {
+                objName: "unit",
+                columns,
+                filters
+            }
+        })
+    };
+    return fetch(server_URL, requestOptions)
+    .then(returnFunc)
+}
+
 const getPlates = (columns) =>{
     const requestOptions = {
         method: "POST",
@@ -667,15 +853,21 @@ export {
     delGate,
     delDevice,
     getMovementLogs,
+    getDeviceHistory,
     getSpecialPlate,
     delSpecialPlate,
     updateSpecialPlate,
     addSpecialPlate,
+    getRegexPlate,
+    delRegexPlate,
+    updateRegexPlate,
+    addRegexPlate,
     getAccessRule,
     createAccessRule,
     getAccessRuleInfo,
     updateAccessRuleInfo,
     getObjectTypes,
+    getCheckConditions,
     getWhitelistTags,
     openGate,
     getAllDevice,
@@ -686,6 +878,11 @@ export {
     updateWhitelistEntryInfo,
     delWhitelistEntryInfo,
     createWhitelistEntry,
+    createUnit,
+    getUnitInfo,
+    updateUnitInfo,
+    delUnit,
+    getUnit,
     getPlates,
     restartServer
 };

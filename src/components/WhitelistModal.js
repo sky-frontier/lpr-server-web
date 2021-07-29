@@ -24,7 +24,7 @@ function maxStr(str1, str2){
 }
 
 export function WhitelistModal(props) {
-    let {hide, ID, success, projectName, accessRules, toggleModal } = props;
+    let {hide, ID, success, projectName, accessRules, units, toggleModal } = props;
     let cnt = 0;
     const [validated, setValidated] = useState(false);
     const [state, setState] = useState({});
@@ -63,6 +63,7 @@ export function WhitelistModal(props) {
     if(ID===null){
       setState({
         plateNumber: "",
+        unitID: "",
         accessRuleID: "",
         tag: "",
         startDateTime: "",
@@ -192,7 +193,7 @@ export function WhitelistModal(props) {
                     <div>
                         <Form.Control
                         required
-                        placeholder="Name"
+                        placeholder="Plate Number"
                         id="plateNumber"
                         name="plateNumber"
                         value={state.plateNumber}
@@ -206,6 +207,29 @@ export function WhitelistModal(props) {
                     </div>
                     :<Form.Control type="text" placeholder={state.plateNumber} readOnly />
                 }
+                </Col>
+                </Form.Group>
+
+                <Form.Group as={Row}>
+                <Form.Label column sm={4}  align="right">
+                    Unit
+                </Form.Label>
+                <Col
+                    sm={6}
+                >
+                    <Form.Control
+                        custom
+                        as="select"
+                        id="unitID"
+                        name="unitID"
+                        value={state.unitID===null?"":state.unitID}
+                        onChange={handleChange}
+                        >
+                        <option value={""}>None</option>
+                        {units.map((unit)=>(
+                            <option value={unit.unitID}>{unit.unitName}</option>
+                        ))}
+                    </Form.Control>
                 </Col>
                 </Form.Group>
 

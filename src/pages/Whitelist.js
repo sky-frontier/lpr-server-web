@@ -7,7 +7,8 @@ import { useHistory, useParams, useLocation } from "react-router-dom";
 import { ConfirmModal, WhitelistModal, TablePaginationActions, ExportWhitelistModal } from "../components/index.js";
 import {alertService, getProjects, getAccessRule, 
     getWhitelistEntry,
-    delWhitelistEntryInfo} from '../services/index.js';
+    delWhitelistEntryInfo,
+    getUnit} from '../services/index.js';
 import { Directions } from "@material-ui/icons";
 import RefreshIcon from '@material-ui/icons/Refresh';
 import GetAppIcon from '@material-ui/icons/GetApp';
@@ -56,6 +57,8 @@ export function Whitelist (){
   const [dummy, setDummy] = useState(false);
   const [accessRules, setAccessRules] = useState([]);
   const [accessRuleVals, setAccessRuleVals] = useState({});
+  const [units, setUnits] = useState([]);
+  const [unitNames, setUnitNames] = useState({});
   const [timeVar, setTimeVar] = useState("startDateTime");
   const [curTimeVar, setCurTimeVar] = useState("startDateTime");
   const [projectNames, setProjectNames] = useState({});
@@ -131,9 +134,23 @@ export function Whitelist (){
         console.error("Get Access Rule, there was an error!", error);
       });
   }
+ 
+  const reloadUnits = () =>{
+    getUnit(project, ["unitID", "unitName"])
+      .then(async (data) => {
+        setUnits(data.content);
+        func(data.content,"unitID", "unitName").then(async(list)=>{
+          setUnitNames(await list);
+        });
+      })
+      .catch((error) => {
+        console.error("Get Unit, there was an error!", error);
+      });
+  }
 
   useEffect(()=>{
     reloadAccessRules();
+    reloadUnits();
     reset();
   },[project]);
 
@@ -146,7 +163,7 @@ export function Whitelist (){
       let filters = (timeState.startTime===""&&timeState.endTime==="")?{}:{
         [curTimeVar] : timeState.startTime+'|'+timeState.endTime
       };
-      getWhitelistEntry(["recordID","plateNumber", "accessRuleID", "tag", "startDateTime","endDateTime"],filters)
+      getWhitelistEntry(["recordID","plateNumber","accessRuleID","tag","startDateTime","endDateTime","unitID"],filters)
       .then(async (data) => {
           setInitialRows(
               data.content.filter((entry)=>
@@ -165,7 +182,7 @@ export function Whitelist (){
 
   useEffect(()=>{
     reload();
-  },[accessRuleVals, curTimeState, curTimeVar]);
+  },[accessRuleVals, unitNames, curTimeState, curTimeVar]);
 
   const filter = () => {
     let curRows = initialRows;
@@ -257,6 +274,7 @@ export function Whitelist (){
         projectName = {projectNames[project]}
         ID = {curID}
         accessRules = {accessRules}
+        units = {units}
         success={() => {
             reload();
             toggleModal("edit");
@@ -431,6 +449,7 @@ export function Whitelist (){
               <TableRow>
                 <TableCell align="center"><b>Plate Number</b></TableCell>
                 <TableCell align="center"><b>Project</b></TableCell>
+                <TableCell align="center"><b>Unit Name</b></TableCell>
                 <TableCell align="center"><b>Access Rule</b></TableCell>
                 <TableCell align="center"><b>Tag</b></TableCell>
                 <TableCell align="center"><b>Start Date</b></TableCell>
@@ -441,7 +460,7 @@ export function Whitelist (){
             <TableBody>
               {loading?
               <TableRow>
-              <TableCell align="center" colSpan={7}>
+              <TableCell align="center" colSpan={8}>
               <Spinner animation="border" role="status">
                 <span className="sr-only">Loading...</span>
               </Spinner>
@@ -459,6 +478,7 @@ export function Whitelist (){
                     </div>
                 </TableCell>
                   <TableCell align="center">{projectNames[project]}</TableCell>
+                  <TableCell align="center">{Number.isInteger(row.unitID)? unitNames[String(row.unitID)] : '-'}</TableCell>
                   <TableCell align="center">{row.accessRuleID === null? null: accessRuleVals[row.accessRuleID]}</TableCell>
                   <TableCell align="center">{row.tag}</TableCell>
                   <TableCell align="center">{row.startDateTime}</TableCell>
@@ -484,13 +504,13 @@ export function Whitelist (){
               ))
               :
               <TableRow>
-                <TableCell align="center" colSpan={7}>
+                <TableCell align="center" colSpan={8}>
                   No Entries Found
                 </TableCell>
               </TableRow>}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={8} />
                 </TableRow>
               )}
             </TableBody>
@@ -498,7 +518,7 @@ export function Whitelist (){
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
-                colSpan={7}
+                colSpan={8}
                 count={rows.length}
                 rowsPerPage={rowsPerPage}
                 page={page}

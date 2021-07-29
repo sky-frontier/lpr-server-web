@@ -263,7 +263,7 @@ export function ParkingRules (){
               </TableRow>}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={5} />
                 </TableRow>
               )}
             </TableBody>
@@ -271,7 +271,7 @@ export function ParkingRules (){
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
-                colSpan={4}
+                colSpan={5}
                 count={rows.length}
                 rowsPerPage={rowsPerPage}
                 page={page}

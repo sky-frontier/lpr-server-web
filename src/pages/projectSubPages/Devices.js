@@ -256,7 +256,7 @@ export function Devices (){
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, { label: 'All', value: -1 }]}
-                colSpan={4}
+                colSpan={6}
                 count={rows.length}
                 rowsPerPage={rowsPerPage}
                 page={page}

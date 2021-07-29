@@ -195,7 +195,7 @@ export function Home() {
             New Devices
           </Typography>
           <TableContainer component={Paper} className="scrollbar-grey" style={{"box-shadow":"none"}}>
-            <Table aria-label="simple table">
+            <Table stickyHeader aria-label="simple table">
               <TableHead >
                 <TableRow>
                   <TableCell align="left"><b>ID</b></TableCell>
@@ -258,14 +258,14 @@ export function Home() {
                     <TableCell align="left">{row.deviceType===null?null:(deviceTypeNames[row.deviceType]===undefined ? row.deviceType : deviceTypeNames[row.deviceType].name)}</TableCell>
                   <TableCell align="left">{(row.deviceIP==""||row.deviceIP==null)?"-":row.deviceIP}</TableCell>
                     <TableCell align="right">
-                      <IconButton style={{padding:"0px 5px"}}
+                      <IconButton style={{padding:5}}
                       onClick={() => {
                           direct(row.gateID);
                       }}>
                         <OpenInNewIcon
                         />
                       </IconButton>
-                      <IconButton style={{padding:0}}
+                      <IconButton style={{padding:5}}
                       onClick={() => {
                           setCurID(row.deviceID);
                           toggleModal("delete");

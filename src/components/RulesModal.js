@@ -254,8 +254,8 @@ export function RulesModal(props) {
           </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={()=>{
-    setValidated(false);
-    toggleModal();}}>
+          setValidated(false);
+          toggleModal();}}>
             Cancel
           </Button>
           <Button form ="ruleModal" variant="primary" type="submit">
