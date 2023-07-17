@@ -78,7 +78,6 @@ export function Whitelist (){
     startTime: "",
     endTime: ""
   });
-  const [lastReload, setLastReload] = useState(0);
 
   const reset = () =>{
     console.log("reseting");
@@ -164,6 +163,8 @@ export function Whitelist (){
       let filters = (timeState.startTime===""&&timeState.endTime==="")?{}:{
         [curTimeVar] : timeState.startTime+'|'+timeState.endTime
       };
+      filters["accessRuleID"] = Object.keys(accessRuleVals || {}).map(x => +x);
+
       getWhitelistEntry(["recordID","plateNumber","accessRuleID","tag","startDateTime","endDateTime","unitID"],filters)
       .then(async (data) => {
           setInitialRows(
@@ -182,10 +183,9 @@ export function Whitelist (){
   }
 
   useEffect(()=>{
-    if (Date.now() - lastReload < 10000) return;
-    setLastReload(Date.now());
+    if (Object.keys(accessRuleVals || {}).length === 0) return;
     reload();
-  },[lastReload, accessRuleVals, unitNames, curTimeState, curTimeVar]);
+  },[accessRuleVals, unitNames, curTimeState, curTimeVar]);
 
   const filter = () => {
     let curRows = initialRows;
