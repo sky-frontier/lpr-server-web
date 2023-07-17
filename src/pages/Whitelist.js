@@ -78,6 +78,7 @@ export function Whitelist (){
     startTime: "",
     endTime: ""
   });
+  const [lastReload, setLastReload] = useState(0);
 
   const reset = () =>{
     console.log("reseting");
@@ -181,8 +182,10 @@ export function Whitelist (){
   }
 
   useEffect(()=>{
+    if (Date.now() - lastReload < 10000) return;
+    setLastReload(Date.now());
     reload();
-  },[accessRuleVals, unitNames, curTimeState, curTimeVar]);
+  },[lastReload, accessRuleVals, unitNames, curTimeState, curTimeVar]);
 
   const filter = () => {
     let curRows = initialRows;
