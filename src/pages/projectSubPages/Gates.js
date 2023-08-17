@@ -360,8 +360,8 @@ export function Gates() {
                     inputProps: { "aria-label": "rows per page" },
                     native: true,
                   }}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  onChangePage={handleChangePage}
+                  onChangeRowsPerPage={handleChangeRowsPerPage}
                   ActionsComponent={TablePaginationActions}
                 />
               </TableRow>
