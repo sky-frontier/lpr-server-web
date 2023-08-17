@@ -1,13 +1,19 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Breadcrumb } from "react-bootstrap";
-import { CheckPicker } from 'rsuite';
+import { CheckPicker } from "rsuite";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { alertService, getProjectInfo, updateProjectInfo , getObjectTypes, getCheckConditions} from '../../services/index.js';
-import {useParams} from "react-router-dom";
+import {
+  alertService,
+  getProjectInfo,
+  updateProjectInfo,
+  getObjectTypes,
+  getCheckConditions,
+} from "../../services/index.js";
+import { useParams } from "react-router-dom";
 
-export function ProjectForm() {
-  let { projectID }= useParams();
+export const ProjectForm = () => {
+  let { projectID } = useParams();
   const [validated, setValidated] = useState(false);
   const [state, setState] = useState({
     projectName: "",
@@ -19,7 +25,6 @@ export function ProjectForm() {
     checkConditions: [],
     levDistance: "",
   });
-  const [dummy, setDummy] = useState(false);
   const [projectTypes, setProjectTypes] = useState([]);
   const [checkConditions, setCheckConditions] = useState([]);
 
@@ -35,10 +40,12 @@ export function ProjectForm() {
       });
     getObjectTypes("project")
       .then(async (data) => {
-        setProjectTypes(Object.entries(data.message).map((type)=>({
-          id: type[0],
-          name: type[1].name
-        })));
+        setProjectTypes(
+          Object.entries(data.message).map((type) => ({
+            id: type[0],
+            name: type[1].name,
+          }))
+        );
       })
       .catch((error) => {
         alertService.error("There was an error!");
@@ -46,22 +53,24 @@ export function ProjectForm() {
       });
     getCheckConditions()
       .then(async (data) => {
-        setCheckConditions(Object.entries(data.message).map((cond)=>({
-          value: cond[0],
-          label: cond[1].desc
-        })));
+        setCheckConditions(
+          Object.entries(data.message).map((cond) => ({
+            value: cond[0],
+            label: cond[1].desc,
+          }))
+        );
       })
       .catch((error) => {
         alertService.error("There was an error!");
         console.error("There was an error Get Check Conditions!", error);
       });
-  }, [dummy]);
+  }, [projectID]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setState((prevState) => ({
       ...prevState,
-      [id]: value
+      [id]: value,
     }));
   };
 
@@ -80,7 +89,7 @@ export function ProjectForm() {
   const update = () => {
     updateProjectInfo(projectID, state)
       .then(async (data) => {
-        alertService.success('Update Successful!');
+        alertService.success("Update Successful!");
       })
       .catch((error) => {
         alertService.error("There was an error!");
@@ -100,9 +109,7 @@ export function ProjectForm() {
           <Form.Label column sm={3} align="right">
             Project ID
           </Form.Label>
-          <Col
-            sm={4}
-          >
+          <Col sm={4}>
             <Form.Control type="text" placeholder={projectID} readOnly />
           </Col>
         </Form.Group>
@@ -111,9 +118,7 @@ export function ProjectForm() {
           <Form.Label column sm={3} align="right">
             Project Name
           </Form.Label>
-          <Col
-            sm={4}
-          >
+          <Col sm={4}>
             <Form.Control
               required
               placeholder="Name"
@@ -132,24 +137,20 @@ export function ProjectForm() {
           <Form.Label column sm={3} align="right">
             Project Type
           </Form.Label>
-          <Col
-            sm={4}
-          >
+          <Col sm={4}>
             <Form.Control
               custom
               required
               as="select"
               id="projectType"
               name="projectType"
-              value={state.projectType===null? '':state.projectType}
+              value={state.projectType === null ? "" : state.projectType}
               onChange={handleChange}
             >
-              <option value={''}>--Select Type--</option>
-              {
-                projectTypes.map((type)=>(
-                  <option value={type.id}>{type.name}</option>
-                ))
-              }
+              <option value={""}>--Select Type--</option>
+              {projectTypes.map((type) => (
+                <option value={type.id}>{type.name}</option>
+              ))}
             </Form.Control>
             <Form.Control.Feedback type="invalid">
               Project Type is a required field.
@@ -161,9 +162,7 @@ export function ProjectForm() {
           <Form.Label column sm={3} align="right">
             Location
           </Form.Label>
-          <Col
-            sm={4}
-          >
+          <Col sm={4}>
             <Form.Control
               required
               id="location"
@@ -181,9 +180,7 @@ export function ProjectForm() {
           <Form.Label column sm={3} align="right">
             Equipment Manufacturer
           </Form.Label>
-          <Col
-            sm={4}
-          >
+          <Col sm={4}>
             <Form.Control
               required
               id="equipManu"
@@ -201,9 +198,7 @@ export function ProjectForm() {
           <Form.Label column sm={3} align="right">
             MA Company
           </Form.Label>
-          <Col
-            sm={4}
-          >
+          <Col sm={4}>
             <Form.Control
               required
               id="maCompany"
@@ -220,23 +215,20 @@ export function ProjectForm() {
           <Form.Label column sm={3} align="right">
             Contact No.
           </Form.Label>
-          <Form.Label
-            column
-            sm={4}
-          >
+          <Form.Label column sm={4}>
             <PhoneInput
               inputProps={{
-                required: true
+                required: true,
               }}
               placeholder="+XX-XXXX-XXXX"
               id="contactNumber"
               name="contactNumber"
               country={"sg"}
               value={String(state.contactNumber)}
-              onChange={(e)=>{
+              onChange={(e) => {
                 setState((prevState) => ({
                   ...prevState,
-                  ["contactNumber"]: parseInt(e)
+                  contactNumber: parseInt(e),
                 }));
               }}
               isValid={(value, country) => {
@@ -251,12 +243,10 @@ export function ProjectForm() {
         </Form.Group>
 
         <Form.Group as={Row}>
-          <Form.Label column sm={3}  align="right">
-              Plate Check Conditions
+          <Form.Label column sm={3} align="right">
+            Plate Check Conditions
           </Form.Label>
-          <Col
-              sm={4}
-          >
+          <Col sm={4}>
             <CheckPicker
               sticky
               searchable={false}
@@ -264,12 +254,12 @@ export function ProjectForm() {
               defaultValue={[]}
               style={{ width: "100%" }}
               value={state.checkConditions}
-              onChange={(value)=>{
+              onChange={(value) => {
                 handleChange({
-                  target:{
+                  target: {
                     id: "checkConditions",
-                    value
-                  }
+                    value,
+                  },
                 });
               }}
             />
@@ -277,36 +267,32 @@ export function ProjectForm() {
         </Form.Group>
 
         <Form.Group as={Row}>
-        <Form.Label column sm={3}  align="right">
+          <Form.Label column sm={3} align="right">
             Maximum Levenshtein Distance
-        </Form.Label>
-        <Col
-            sm={4}
-        >
+          </Form.Label>
+          <Col sm={4}>
             <Form.Control
-            required
-            id="levDistance"
-            name="levDistance"
-            type="number"
-            value={state.levDistance}
-            onChange={handleChange}
+              required
+              id="levDistance"
+              name="levDistance"
+              type="number"
+              value={state.levDistance}
+              onChange={handleChange}
             />
             <Form.Control.Feedback type="invalid">
-            Maximum Levenshtein Distance is a required field.
+              Maximum Levenshtein Distance is a required field.
             </Form.Control.Feedback>
-        </Col>
+          </Col>
         </Form.Group>
 
-        
         <Form.Group as={Row}>
-          <Col sm={8}
-           className="d-flex justify-content-end">
+          <Col sm={8} className="d-flex justify-content-end">
             <Button type="submit">Update</Button>
           </Col>
         </Form.Group>
       </Form>
     </div>
   );
-}
+};
 
 export default { ProjectForm };

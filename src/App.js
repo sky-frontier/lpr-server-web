@@ -1,39 +1,79 @@
-import React, { useContext } from "react";
-import { store } from "./store.js";
+import React, { useEffect } from "react";
 //import 'bootstrap/dist/css/bootstrap.min.css';
-import 'rsuite/dist/styles/rsuite-default.css';
-import 'react-datepicker/dist/react-datepicker.css';
+import "rsuite/dist/styles/rsuite-default.css";
+import "react-datepicker/dist/react-datepicker.css";
 import "./styles.css";
 import "./assets/scrollbar.css";
 import { NavBar, AlertGroup } from "./components/index.js";
 import {
   BrowserRouter as Router,
-  Switch,
   Route,
-  Redirect
+  Redirect,
+  Switch,
 } from "react-router-dom";
+import { useSelector } from "react-redux";
+import {
+  Home,
+  Login,
+  Projects,
+  EditProject,
+  SpecialPlates,
+  RegexPlates,
+  Records,
+  ParkRecords,
+  ParkingRules,
+  Whitelist,
+  Units,
+  DeviceHistory,
+} from "./pages/index.js";
+import { useDispatch } from "react-redux/es";
+import { authActions } from "./store";
+import { getUniversalCookies } from "./services/cookies";
 
-import { Home, Login, Projects, EditProject, SpecialPlates, RegexPlates, Records, ParkRecords, ParkingRules, Whitelist, Units, DeviceHistory } from "./pages/index.js";
-
-class DebugRouter extends Router {
-  constructor(props) {
-    super(props);
-    console.log("initial history is: ", JSON.stringify(this.history, null, 2));
-    this.history.listen((location, action) => {
-      console.log(
-        `The current URL is ${location.pathname}${location.search}${location.hash}`
-      );
-      console.log(
-        `The last navigation action was ${action}`,
-        JSON.stringify(this.history, null, 2)
-      );
-    });
-  }
-}
+// class DebugRouter extends Router {
+//   constructor(props) {
+//     super(props);
+//     console.log("initial history is: ", JSON.stringify(this.history, null, 2));
+//     this.history.listen((location, action) => {
+//       console.log(
+//         `The current URL is ${location.pathname}${location.search}${location.hash}`
+//       );
+//       console.log(
+//         `The last navigation action was ${action}`,
+//         JSON.stringify(this.history, null, 2)
+//       );
+//     });
+//   }
+// }
 
 export function App() {
+  const dispatch = useDispatch();
+
+  const resetUser = () => {
+    // const expiryDate = getUniversalCookies.get("user").expiryDate;
+    getUniversalCookies().set(
+      "user",
+      { id: null, username: null, token: null, expiryDate: null },
+      { path: "/", sameSite: "strict" }
+    );
+    dispatch(authActions.notAuthed());
+    return;
+  };
+
+  useEffect(() => {
+    const loggedInUser = getUniversalCookies().get("user");
+    if (loggedInUser) {
+      if (new Date() > new Date(loggedInUser.expiryDate)) {
+        resetUser();
+      } else {
+        dispatch(authActions.authed());
+      }
+    }
+  }, []);
+
   return (
     // <DebugRouter>
+
     <Router>
       <Switch>
         <PrivateRoute path="/home">
@@ -79,19 +119,22 @@ export function App() {
 }
 
 function PrivateRoute({ children, ...rest }) {
-  const storeContext = useContext(store);
-  const globalState = storeContext.state;
-  let auth = globalState.auth;
-  let toggled = globalState.toggled;
+  const auth = !!getUniversalCookies().get("user").token;
+  const toggled = useSelector((state) => state.auth.toggled);
   return (
     <Route
       {...rest}
       render={(props) =>
         auth ? (
           <div className="h-100">
-              <AlertGroup />
+            <AlertGroup />
             <NavBar />
-            <div id="content-body" className={toggled?"content-body-collapsed":"content-body-expand"}>
+            <div
+              id="content-body"
+              className={
+                toggled ? "content-body-collapsed" : "content-body-expand"
+              }
+            >
               {React.cloneElement(children, { params: props.match.params })}
             </div>
           </div>
@@ -99,7 +142,7 @@ function PrivateRoute({ children, ...rest }) {
           <Redirect
             to={{
               pathname: "/",
-              state: { from: props.location }
+              state: { from: props.location },
             }}
           />
         )
@@ -109,9 +152,7 @@ function PrivateRoute({ children, ...rest }) {
 }
 
 function PublicRoute({ children, ...rest }) {
-  const storeContext = useContext(store);
-  const globalState = storeContext.state;
-  let auth = globalState.auth;
+  const auth = !!getUniversalCookies().get("user").token;
   return (
     <Route
       {...rest}
@@ -120,14 +161,15 @@ function PublicRoute({ children, ...rest }) {
           <Redirect
             to={{
               pathname: "/home",
-              state: { from: location }
+              state: { from: location },
             }}
           />
-        ) : 
-        <div className="h-100">
-        <AlertGroup />
-          {children}
-        </div>
+        ) : (
+          <div className="h-100">
+            <AlertGroup />
+            {children}
+          </div>
+        )
       }
     />
   );

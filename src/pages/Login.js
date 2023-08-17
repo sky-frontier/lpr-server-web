@@ -1,83 +1,91 @@
-import React, { useState, useContext } from "react";
-import { store } from "../store.js";
-import { useHistory } from "react-router-dom";
-import {Helmet} from "react-helmet";
+import React, { useState } from "react";
+import { authActions } from "../store.js";
+import { Helmet } from "react-helmet";
+import { useDispatch } from "react-redux/es/exports.js";
+import { getUniversalCookies } from "../services/cookies.js";
+import { useHistory } from "react-router";
+
 export function Login() {
-  const storeContext = useContext(store);
-  const globalState = storeContext.state;
-  const { dispatch } = storeContext;
+  //   const storeContext = useContext(store);
+  //   const globalState = storeContext.state;
+  //   const { dispatch } = storeContext;
   let history = useHistory();
   const [state, setState] = useState({
     username: "",
-    password: ""
+    password: "",
   });
+
+  const dispatch = useDispatch();
+
+  const [errorText, setErrorText] = useState("");
+
+  const loginServerUrl = process.env.REACT_APP_SERVER_LOGIN_URL;
   const handleChange = (e) => {
     const { id, value } = e.target;
     setState((prevState) => ({
       ...prevState,
-      [id]: value
+      [id]: value,
     }));
   };
+
   const reqLogin = (e) => {
     e.preventDefault();
-    let { username, password } = state;
-    /*
+    const { username, password } = state;
+
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username,
-        password
-      })
+        password,
+      }),
     };
-    
-    fetch(server_URL + "/login", requestOptions)
-    .then(async (response) => {
-      const data = await response.json();
-  
-      // check for error response
-      if (!response.ok) {
-        // get error message from body or default to response status
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
-  
-      dispatch({
-        type: "setAuth",
-        value: true
-      });
-      return(
-        <Redirect
-          to={{
-            pathname: "/home"
-          }}
-        />
-      );
-    })
-    .catch((error) => {
-      this.setState({ errorMessage: error.toString() });
-      console.error("There was an error!", error);
-    });*/
-    if (username === "huajun" && password === "huajun") {
-      dispatch({
-        type: "setAuth",
-        value: true
-      });
-      dispatch({
-        type: "setUser",
-        value: username
-      });
-      history.push("/home");
-    } else if (username.length === 0) {
+
+    if (username.length === 0) {
       document.getElementById("login-error").innerText =
         "Username cannot be blank";
+      return;
     } else if (password.length === 0) {
       document.getElementById("login-error").innerText =
         "Password cannot be blank";
-    } else {
-      document.getElementById("login-error").innerText =
-        "Invalid Username or Password";
+      return;
     }
+    // document.getElementById("login-error").innerText =
+    //   "Invalid Username or Password";
+    fetch(loginServerUrl, requestOptions)
+      .then(async (response) => {
+        const data = await response.json();
+        console.log(`Data: ${JSON.stringify(data)}`);
+
+        // check for error response
+        if (!response.ok) {
+          // get error message from body or default to response status
+          const error = (data && data.message) || response.status;
+          if (response.status === 401) {
+            document.getElementById("login-error").innerText =
+              "Invalid username or password.";
+          }
+          return Promise.reject(error);
+        }
+        const expiryDate = new Date();
+        expiryDate.setMonth(expiryDate.getMonth() + 1);
+        getUniversalCookies().set(
+          "user",
+          { ...data, expiryDate },
+          {
+            path: "/",
+            sameSite: "strict",
+          }
+        );
+
+        dispatch(authActions.authed());
+        history.push("/home");
+        return;
+      })
+      .catch((error) => {
+        setErrorText(error.toString());
+        console.error("There was an error!", error);
+      });
   };
   return (
     <div className="maincontainer h-100">
@@ -117,7 +125,9 @@ export function Login() {
                       value={state.password}
                     />
                   </div>
-                  <p id="login-error" className="text-danger"></p>
+                  <p id="login-error" className="text-danger">
+                    {errorText}
+                  </p>
                   <button
                     type="submit"
                     className="btn btn-primary btn-block text-uppercase mb-2 rounded-pill shadow-sm"
