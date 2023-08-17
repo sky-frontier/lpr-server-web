@@ -235,7 +235,7 @@ export function Whitelist() {
   useEffect(() => {
     if (Object.keys(accessRuleVals || {}).length === 0) return;
     reload();
-  }, [accessRuleVals, unitNames, curTimeState, curTimeVar]);
+  }, [accessRuleVals, unitNames, curTimeState, curTimeVar, curState]);
 
   const filter = () => {
     let curRows = initialRows;
