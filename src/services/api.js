@@ -751,6 +751,7 @@ const getWhitelistEntry = (columns, filters) => {
         objName: "dbWhitelist",
         columns,
         filters,
+        looseMatch: true,
       },
     }),
   };
