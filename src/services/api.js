@@ -737,7 +737,7 @@ const delAccessRule = (ID) => {
   return fetch(server_URL, requestOptions).then(returnFunc);
 };
 
-const getWhitelistEntry = (columns, filters) => {
+const getWhitelistEntry = (columns, filters, startIndex) => {
   const requestOptions = {
     method: "POST",
     headers: {
@@ -752,6 +752,7 @@ const getWhitelistEntry = (columns, filters) => {
         columns,
         filters,
         looseMatch: true,
+        startIndex,
       },
     }),
   };

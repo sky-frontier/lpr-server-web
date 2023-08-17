@@ -306,7 +306,7 @@ export function Records({ match }) {
       getMovementLogs(fields.concat("logID"), filters, rows.length, true)
         .then(async (data) => {
           setLoading(false);
-          setRows(
+          setRows((rows) =>
             rows.concat(
               data.content.sort((a, b) =>
                 a.detectionTime < b.detectionTime ? 1 : -1

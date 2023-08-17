@@ -185,7 +185,7 @@ export function Whitelist() {
     reset();
   }, [project]);
 
-  const reload = () => {
+  const reload = (startIndex = 0) => {
     if (project === "") {
       setInitialRows([]);
     } else {
@@ -212,7 +212,8 @@ export function Whitelist() {
           "endDateTime",
           "unitID",
         ],
-        filters
+        filters,
+        startIndex
       )
         .then(async (data) => {
           setInitialRows(
@@ -291,6 +292,45 @@ export function Whitelist() {
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  useEffect(() => {
+    if (rows.length / rowsPerPage - 1 == page) {
+      setLoading(true);
+      let filters =
+        timeState.startTime === "" && timeState.endTime === ""
+          ? {}
+          : {
+              [curTimeVar]: timeState.startTime + "|" + timeState.endTime,
+            };
+      filters["accessRuleID"] = Object.keys(accessRuleVals || {}).map(
+        (x) => +x
+      );
+      filters["plateNumber"] =
+        state.plateNumber === "" ? undefined : state.plateNumber;
+
+      getWhitelistEntry(
+        [
+          "recordID",
+          "plateNumber",
+          "accessRuleID",
+          "tag",
+          "startDateTime",
+          "endDateTime",
+          "unitID",
+        ],
+        filters,
+        rows.length
+      )
+        .then(async (data) => {
+          console.log(data);
+          setRows((rows) => rows.concat(data.content));
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Get entry, there was an error!", error);
+        });
+    }
+  }, [page]);
 
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
