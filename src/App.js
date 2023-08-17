@@ -119,7 +119,7 @@ export function App() {
 }
 
 function PrivateRoute({ children, ...rest }) {
-  const auth = !!getUniversalCookies().get("user").token;
+  const auth = !!getUniversalCookies().get("user")?.token;
   const toggled = useSelector((state) => state.auth.toggled);
   return (
     <Route
@@ -152,7 +152,7 @@ function PrivateRoute({ children, ...rest }) {
 }
 
 function PublicRoute({ children, ...rest }) {
-  const auth = !!getUniversalCookies().get("user").token;
+  const auth = !!getUniversalCookies().get("user")?.token;
   return (
     <Route
       {...rest}
