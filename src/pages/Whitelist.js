@@ -201,6 +201,7 @@ export function Whitelist() {
       );
       filters["plateNumber"] =
         state.plateNumber === "" ? undefined : state.plateNumber;
+      filters["tag"] = state.tag === "" ? undefined : state.tag;
 
       getWhitelistEntry(
         [
