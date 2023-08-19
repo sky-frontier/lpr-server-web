@@ -38,7 +38,7 @@ export function EditProject(props) {
               <Nav.Item>
                 <Nav.Link
                   onClick={() => {
-                    direct("info");
+                    direct("/info");
                   }}
                   active={page === "info"}
                 >
@@ -48,7 +48,7 @@ export function EditProject(props) {
               <Nav.Item>
                 <Nav.Link
                   onClick={() => {
-                    direct("business");
+                    direct("/business");
                   }}
                   active={page === "business"}
                 >
@@ -58,7 +58,7 @@ export function EditProject(props) {
               <Nav.Item>
                 <Nav.Link
                   onClick={() => {
-                    direct("gate");
+                    direct("/gate");
                   }}
                   active={page === "gate"}
                 >
@@ -68,7 +68,7 @@ export function EditProject(props) {
               <Nav.Item>
                 <Nav.Link
                   onClick={() => {
-                    direct("ledconfig");
+                    direct("/ledconfig");
                   }}
                   active={page === "ledconfig"}
                 >
@@ -95,7 +95,7 @@ export function EditProject(props) {
                 <LedConfig />
               </Route>
               <Route path={path}>
-                <Redirect to={`${path}/info`} />
+                <Redirect to={`${url}/info`} />
               </Route>
             </Switch>
           </Col>

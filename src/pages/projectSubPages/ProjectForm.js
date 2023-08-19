@@ -149,7 +149,9 @@ export const ProjectForm = () => {
             >
               <option value={""}>--Select Type--</option>
               {projectTypes.map((type) => (
-                <option value={type.id}>{type.name}</option>
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
               ))}
             </Form.Control>
             <Form.Control.Feedback type="invalid">
