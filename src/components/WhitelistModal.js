@@ -136,6 +136,10 @@ export function WhitelistModal(props) {
       e.preventDefault();
       e.stopPropagation();
     }
+    setState((prevState) => ({
+      ...prevState,
+      unitID: prevState.unitId,
+    }));
     setValidated(true);
     if (form.checkValidity()) {
       if (ID === null) create();
@@ -253,8 +257,8 @@ export function WhitelistModal(props) {
                 <Form.Control
                   custom
                   as="select"
-                  id="unitID"
-                  name="unitID"
+                  id="unitId"
+                  name="unitId"
                   value={state.unitId ?? ""}
                   onChange={handleChange}
                 >
