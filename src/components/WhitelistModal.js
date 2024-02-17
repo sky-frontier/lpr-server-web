@@ -253,8 +253,8 @@ export function WhitelistModal(props) {
                 <Form.Control
                   custom
                   as="select"
-                  id="unitId"
-                  name="unitId"
+                  id="unitID"
+                  name="unitID"
                   value={state.unitId ?? ""}
                   onChange={handleChange}
                 >
