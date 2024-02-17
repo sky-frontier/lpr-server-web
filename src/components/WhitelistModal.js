@@ -85,7 +85,7 @@ export function WhitelistModal(props) {
     if (ID === null) {
       setState({
         plateNumber: "",
-        unitID: "",
+        unitId: "",
         accessRuleID: "",
         tag: "",
         startDateTime: "",
@@ -96,7 +96,7 @@ export function WhitelistModal(props) {
       getWhitelistEntryInfo(ID)
         .then(async (data) => {
           console.log(data.message);
-          setState({ ...data.message, unitID: data.unitId });
+          setState({ ...data.message, unitId: data.unitId });
           setLoading(false);
         })
         .catch((error) => {
@@ -260,7 +260,7 @@ export function WhitelistModal(props) {
                 >
                   <option value={""}>None</option>
                   {units.map((unit) => (
-                    <option value={unit.unitID}>{unit.unitName}</option>
+                    <option value={unit.unitId}>{unit.unitName}</option>
                   ))}
                 </Form.Control>
               </Col>
