@@ -96,7 +96,7 @@ export function WhitelistModal(props) {
       getWhitelistEntryInfo(ID)
         .then(async (data) => {
           console.log(data.message);
-          setState({ ...data.message, unitID: data.unitId });
+          setState({ ...data.message, unitID: data.message.unitId ?? "" });
           setLoading(false);
         })
         .catch((error) => {
@@ -115,6 +115,8 @@ export function WhitelistModal(props) {
       id = e2.id;
       value = e;
     }
+    console.log("id: ", id);
+    console.log("value: ", value);
     if (typeof state[id] === "boolean") {
       console.log("bool");
       setState((prevState) => ({
@@ -127,6 +129,7 @@ export function WhitelistModal(props) {
         [id]: value,
       }));
     }
+    console.log(state);
   };
 
   const handleSubmit = (e) => {
@@ -136,10 +139,7 @@ export function WhitelistModal(props) {
       e.preventDefault();
       e.stopPropagation();
     }
-    setState((prevState) => ({
-      ...prevState,
-      unitID: prevState.unitId,
-    }));
+
     setValidated(true);
     if (form.checkValidity()) {
       if (ID === null) create();
@@ -149,6 +149,10 @@ export function WhitelistModal(props) {
 
   const update = () => {
     setLoading(true);
+    setState((prevState) => ({
+      ...prevState,
+      // unitID: prevState.unitID == "" ? 0 : prevState.unitID,
+    }));
     console.log(state);
     updateWhitelistEntryInfo(state)
       .then(async (data) => {
@@ -257,12 +261,12 @@ export function WhitelistModal(props) {
                 <Form.Control
                   custom
                   as="select"
-                  id="unitId"
-                  name="unitId"
-                  value={state.unitId ?? ""}
+                  id="unitID"
+                  name="unitID"
+                  value={state.unitID ?? ""}
                   onChange={handleChange}
                 >
-                  <option value={""}>None</option>
+                  <option value={0}>None</option>
                   {units.map((unit) => (
                     <option value={unit.unitID}>{unit.unitName}</option>
                   ))}
