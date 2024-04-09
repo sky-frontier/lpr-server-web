@@ -24,6 +24,7 @@ export const ProjectForm = () => {
     equipManu: "",
     checkConditions: [],
     levDistance: "",
+    targetService: "",
   });
   const [projectTypes, setProjectTypes] = useState([]);
   const [checkConditions, setCheckConditions] = useState([]);
@@ -283,6 +284,29 @@ export const ProjectForm = () => {
             />
             <Form.Control.Feedback type="invalid">
               Maximum Levenshtein Distance is a required field.
+            </Form.Control.Feedback>
+          </Col>
+        </Form.Group>
+
+        <Form.Group as={Row}>
+          <Form.Label column sm={3} align="right">
+            Target service
+          </Form.Label>
+          <Col sm={4}>
+            <Form.Control
+              custom
+              as="select"
+              id="targetService"
+              name="targetService"
+              value={state.targetService === null ? "" : state.targetService}
+              onChange={handleChange}
+            >
+              <option value={""}>--Select service--</option>
+              <option value="dooremi">DooReMi</option>
+              <option value="lifeup">LifeUp</option>
+            </Form.Control>
+            <Form.Control.Feedback type="invalid">
+              Project Type is a required field.
             </Form.Control.Feedback>
           </Col>
         </Form.Group>
